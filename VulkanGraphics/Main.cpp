@@ -1257,17 +1257,17 @@ private:
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
         camera->Update();
-        animation.UpdateBones(BoneList, ModelInfo.GlobalInverseTransform);
+       // animation.UpdateBones(BoneList, ModelInfo.GlobalInverseTransform);
 
         UniformBufferObject ubo{};
-        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.model = glm::mat4(1.0f);
         ubo.view = camera->GetViewMatrix();
         ubo.proj = camera->GetProjectionMatrix();
         ubo.proj[1][1] *= -1;
 
         for (auto bone : BoneList)
         {
-            ubo.BoneTransform[bone->GetBoneID()] = bone->GetBoneTransformMatrix();
+            ubo.BoneTransform[bone->GetBoneID()] = bone->GetFinalBoneTransformMatrix();
 
             std::cout << bone->GetBoneName() << std::endl;
             std::cout << bone->GetBoneTransformMatrix()[0].x << "  " << bone->GetBoneTransformMatrix()[0].y << "  " << bone->GetBoneTransformMatrix()[0].z << "  " << bone->GetBoneTransformMatrix()[0].w << std::endl;

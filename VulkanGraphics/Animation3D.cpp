@@ -23,6 +23,6 @@ void Animation3D::UpdateBones(std::vector<std::shared_ptr<Bone>> Skeleton, glm::
 
 	for (auto bone : Skeleton)
 	{
-		bone->InvertBoneMatrix(GlobalInverseTransform);
+	//	bone->InvertBoneMatrix(GlobalInverseTransform);
 	}
 }
