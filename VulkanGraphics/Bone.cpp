@@ -42,3 +42,7 @@ void Bone::InvertBoneMatrix(const glm::mat4& GlobalInverseTransformMatrix)
 	glm::mat4 GlobalTransform = ParentMatrix * glm::mat4(1.0f);
 	BoneTransformMatrix = GlobalInverseTransformMatrix * GlobalTransform * OffsetMatrix;
 }
+
+void Bone::UpdateBoneMatrix(const glm::mat4& GlobalInverseTransformMatrix)
+{
+}

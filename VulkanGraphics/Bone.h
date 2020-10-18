@@ -22,6 +22,7 @@ public:
 	void SetParentBone(const glm::mat4& GlobalInverseTransformMatrix, std::shared_ptr<Bone> parentBone);
 	void AddChildBone(std::shared_ptr<Bone> bone);
 	void InvertBoneMatrix(const glm::mat4& GlobalInverseTransformMatrix);
+	void UpdateBoneMatrix(const glm::mat4& GlobalInverseTransformMatrix);
 
 	int GetBoneID() { return BoneID; }
 	const std::string& GetBoneName() { return BoneName; }

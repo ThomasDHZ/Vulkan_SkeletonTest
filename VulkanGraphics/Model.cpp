@@ -39,7 +39,7 @@ void Model::ProcessNode(const std::string& FilePath, aiNode* node, const aiScene
 		VertexList = LoadVertices(mesh);
 		IndexList = LoadIndices(mesh);
 		BoneList = LoadBones(scene->mRootNode, mesh, VertexList);
-		//LoadAnimations(scene);
+		LoadAnimations(scene);
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -184,62 +184,62 @@ std::vector<std::shared_ptr<Bone>> Model::LoadBones(const aiNode* RootNode, cons
 	return BoneList;
 }
 
-//std::vector<Animation3D> Model::LoadAnimations(const aiScene* scene)
-//{
-//	for (int x = 0; x < scene->mNumAnimations; x++)
-//	{
-//		aiAnimation* assImpAnimation = scene->mAnimations[x];
-//
-//		Animation3D animation = Animation3D();
-//		animation.TicksPerSec = assImpAnimation->mTicksPerSecond;
-//		animation.AnimationTime = assImpAnimation->mDuration * animation.TicksPerSec;
-//
-//		for (int y = 0; y < assImpAnimation->mNumChannels; y++)
-//		{
-//			KeyFrame keyframe;
-//			aiNodeAnim* channel = assImpAnimation->mChannels[y];
-//
-//			for (auto bone : BoneList)
-//			{
-//				if (channel->mNodeName.C_Str() == bone.GetBoneName())
-//				{
-//					keyframe.BoneName = channel->mNodeName.C_Str();
-//					keyframe.BoneId = bone.GetBoneID();
-//					break;
-//				}
-//			}
-//
-//			for (int z = 0; z < channel->mNumPositionKeys; z++)
-//			{
-//				KeyFrameInfo PosKeyFrame;
-//				PosKeyFrame.Time = channel->mPositionKeys[z].mTime;
-//				PosKeyFrame.AnimationInfo = glm::vec3(channel->mPositionKeys[z].mValue.x, channel->mPositionKeys[z].mValue.y, channel->mPositionKeys[z].mValue.z);
-//				keyframe.BonePosition.emplace_back(PosKeyFrame);
-//			}
-//
-//			for (int z = 0; z < channel->mNumRotationKeys; z++)
-//			{
-//				KeyFrameInfo RotKeyFrame;
-//				RotKeyFrame.Time = channel->mRotationKeys[z].mTime;
-//				RotKeyFrame.AnimationInfo = glm::vec3(channel->mRotationKeys[z].mValue.x, channel->mRotationKeys[z].mValue.y, channel->mRotationKeys[z].mValue.z);
-//				keyframe.BoneRotation.emplace_back(RotKeyFrame);
-//			}
-//
-//			for (int z = 0; z < channel->mNumScalingKeys; z++)
-//			{
-//				KeyFrameInfo ScaleKeyFrame;
-//				ScaleKeyFrame.Time = channel->mScalingKeys[z].mTime;
-//				ScaleKeyFrame.AnimationInfo = glm::vec3(channel->mScalingKeys[z].mValue.x, channel->mScalingKeys[z].mValue.y, channel->mScalingKeys[z].mValue.z);
-//				keyframe.BoneScale.emplace_back(ScaleKeyFrame);
-//			}
-//
-//			animation.AddBoneKeyFrame(keyframe);
-//		}
-//
-//		AnimationList.emplace_back(animation);
-//	}
-//	return AnimationList;
-//}
+std::vector<Animation3D> Model::LoadAnimations(const aiScene* scene)
+{
+	for (int x = 0; x < scene->mNumAnimations; x++)
+	{
+		aiAnimation* assImpAnimation = scene->mAnimations[x];
+
+		Animation3D animation = Animation3D();
+		animation.TicksPerSec = assImpAnimation->mTicksPerSecond;
+		animation.AnimationTime = assImpAnimation->mDuration * animation.TicksPerSec;
+
+		for (int y = 0; y < assImpAnimation->mNumChannels; y++)
+		{
+			KeyFrame keyframe;
+			aiNodeAnim* channel = assImpAnimation->mChannels[y];
+
+			for (auto bone : BoneList)
+			{
+				if (channel->mNodeName.C_Str() == bone->GetBoneName())
+				{
+					keyframe.BoneName = channel->mNodeName.C_Str();
+					keyframe.BoneId = bone->GetBoneID();
+					break;
+				}
+			}
+
+			for (int z = 0; z < channel->mNumPositionKeys; z++)
+			{
+				KeyFrameInfo PosKeyFrame;
+				PosKeyFrame.Time = channel->mPositionKeys[z].mTime;
+				PosKeyFrame.AnimationInfo = glm::vec3(channel->mPositionKeys[z].mValue.x, channel->mPositionKeys[z].mValue.y, channel->mPositionKeys[z].mValue.z);
+				keyframe.BonePosition.emplace_back(PosKeyFrame);
+			}
+
+			for (int z = 0; z < channel->mNumRotationKeys; z++)
+			{
+				KeyFrameInfo RotKeyFrame;
+				RotKeyFrame.Time = channel->mRotationKeys[z].mTime;
+				RotKeyFrame.AnimationInfo = glm::vec3(channel->mRotationKeys[z].mValue.x, channel->mRotationKeys[z].mValue.y, channel->mRotationKeys[z].mValue.z);
+				keyframe.BoneRotation.emplace_back(RotKeyFrame);
+			}
+
+			for (int z = 0; z < channel->mNumScalingKeys; z++)
+			{
+				KeyFrameInfo ScaleKeyFrame;
+				ScaleKeyFrame.Time = channel->mScalingKeys[z].mTime;
+				ScaleKeyFrame.AnimationInfo = glm::vec3(channel->mScalingKeys[z].mValue.x, channel->mScalingKeys[z].mValue.y, channel->mScalingKeys[z].mValue.z);
+				keyframe.BoneScale.emplace_back(ScaleKeyFrame);
+			}
+
+			animation.AddBoneKeyFrame(keyframe);
+		}
+
+		AnimationList.emplace_back(animation);
+	}
+	return AnimationList;
+}
 
 glm::mat4 Model::AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix)
 {

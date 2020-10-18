@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation3D.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="Keyboard.cpp" />
@@ -159,6 +160,7 @@
     <None Include="Shaders\Shader.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation3D.h" />
     <ClInclude Include="Bone.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Keyboard.h" />
