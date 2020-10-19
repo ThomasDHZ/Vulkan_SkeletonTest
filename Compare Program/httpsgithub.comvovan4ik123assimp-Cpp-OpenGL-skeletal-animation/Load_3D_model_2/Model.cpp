@@ -56,7 +56,7 @@ void Model::update()
 
 void Model::draw(GLuint shaders_program)
 {
-	vector<aiMatrix4x4> transforms;
+	vector<glm::mat4> transforms;
 	boneTransform((double) SDL_GetTicks() / 1000.0f, transforms);
 
 	for (uint i = 0; i < transforms.size(); i++) // move all matrices for actual model position to shader
@@ -97,15 +97,13 @@ void Model::loadModel(const string& path)
 		cout << "error assimp : " << import.GetErrorString() << endl;
 		return;
 	}
-	m_global_inverse_transform = scene->mRootNode->mTransformation;
-	m_global_inverse_transform.Inverse();
-	glm_m_global_inverse_transform = aiToGlm(m_global_inverse_transform);
+	m_global_inverse_transform = aiToGlm(scene->mRootNode->mTransformation.Inverse());
 
 	std::cout << "GlobalInverseTransform" << std::endl;
-	std::cout << glm_m_global_inverse_transform[0].x << "  " << glm_m_global_inverse_transform[0].y << "  " << glm_m_global_inverse_transform[0].z << "  " << glm_m_global_inverse_transform[0].w << std::endl;
-	std::cout << glm_m_global_inverse_transform[1].x << "  " << glm_m_global_inverse_transform[1].y << "  " << glm_m_global_inverse_transform[1].z << "  " << glm_m_global_inverse_transform[1].w << std::endl;
-	std::cout << glm_m_global_inverse_transform[2].x << "  " << glm_m_global_inverse_transform[2].y << "  " << glm_m_global_inverse_transform[2].z << "  " << glm_m_global_inverse_transform[2].w << std::endl;
-	std::cout << glm_m_global_inverse_transform[3].x << "  " << glm_m_global_inverse_transform[3].y << "  " << glm_m_global_inverse_transform[3].z << "  " << glm_m_global_inverse_transform[3].w << std::endl;
+	std::cout << m_global_inverse_transform[0].x << "  " << m_global_inverse_transform[0].y << "  " << m_global_inverse_transform[0].z << "  " << m_global_inverse_transform[0].w << std::endl;
+	std::cout << m_global_inverse_transform[1].x << "  " << m_global_inverse_transform[1].y << "  " << m_global_inverse_transform[1].z << "  " << m_global_inverse_transform[1].w << std::endl;
+	std::cout << m_global_inverse_transform[2].x << "  " << m_global_inverse_transform[2].y << "  " << m_global_inverse_transform[2].z << "  " << m_global_inverse_transform[2].w << std::endl;
+	std::cout << m_global_inverse_transform[3].x << "  " << m_global_inverse_transform[3].y << "  " << m_global_inverse_transform[3].z << "  " << m_global_inverse_transform[3].w << std::endl;
 
 	if (scene->mAnimations[0]->mTicksPerSecond != 0.0)
 	{
@@ -279,19 +277,9 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 			m_num_bones++;
 			BoneMatrix bi;
 			m_bone_matrices.push_back(bi);
-			m_bone_matrices[bone_index].offset_matrix = mesh->mBones[i]->mOffsetMatrix;
+			m_bone_matrices[bone_index].offset_matrix = aiToGlm(mesh->mBones[i]->mOffsetMatrix);
 			m_bone_mapping[bone_name] = bone_index;
 			
-			glm_m_bone_matrices.push_back(bi);
-			glm_m_bone_matrices[bone_index].glm_offset_matrix = aiToGlm(mesh->mBones[i]->mOffsetMatrix);
-			glm_m_bone_mapping[bone_name] = bone_index;
-
-			std::cout << mesh->mBones[i]->mName.C_Str() << std::endl;
-			std::cout << glm_m_bone_matrices[bone_index].glm_offset_matrix[0].x << "  " << glm_m_bone_matrices[bone_index].glm_offset_matrix[0].y << "  " << glm_m_bone_matrices[bone_index].glm_offset_matrix[0].z << "  " << glm_m_bone_matrices[bone_index].glm_offset_matrix[0].w << std::endl;
-			std::cout << glm_m_bone_matrices[bone_index].glm_offset_matrix[1].x << "  " << glm_m_bone_matrices[bone_index].glm_offset_matrix[1].y << "  " << glm_m_bone_matrices[bone_index].glm_offset_matrix[1].z << "  " << glm_m_bone_matrices[bone_index].glm_offset_matrix[1].w << std::endl;
-			std::cout << glm_m_bone_matrices[bone_index].glm_offset_matrix[2].x << "  " << glm_m_bone_matrices[bone_index].glm_offset_matrix[2].y << "  " << glm_m_bone_matrices[bone_index].glm_offset_matrix[2].z << "  " << glm_m_bone_matrices[bone_index].glm_offset_matrix[2].w << std::endl;
-			std::cout << glm_m_bone_matrices[bone_index].glm_offset_matrix[3].x << "  " << glm_m_bone_matrices[bone_index].glm_offset_matrix[3].y << "  " << glm_m_bone_matrices[bone_index].glm_offset_matrix[3].z << "  " << glm_m_bone_matrices[bone_index].glm_offset_matrix[3].w << std::endl;
-
 			int a = 0;
 			//cout << "bone_name: " << bone_name << "			 bone_index: " << bone_index << endl;
 		}
@@ -470,15 +458,14 @@ const aiNodeAnim * Model::findNodeAnim(const aiAnimation * p_animation, const st
 	return nullptr;
 }
 								// start from RootNode
-void Model::readNodeHierarchy(float p_animation_time, const aiNode* p_node, const aiMatrix4x4 parent_transform)
+void Model::readNodeHierarchy(float p_animation_time, const aiNode* p_node, const glm::mat4 parent_transform)
 {
 
 	string node_name(p_node->mName.data);
 
 	//������� node, �� ������� ������������ �������, ������������� �������� ���� ������(aiNodeAnim).
 	const aiAnimation* animation = scene->mAnimations[0];
-	aiMatrix4x4 node_transform = p_node->mTransformation;
-	auto node = aiToGlm(node_transform);
+	glm::mat4 node_transform = aiToGlm(p_node->mTransformation);
 
 	//std::cout << "Transform" << std::endl;
 	//std::cout << node[0].x << "  " << node[0].y << "  " << node[0].z << "  " << node[0].w << std::endl;
@@ -525,55 +512,49 @@ void Model::readNodeHierarchy(float p_animation_time, const aiNode* p_node, cons
 
 
 	aiMatrix4x4 identity_matrix;
-	aiMatrix4x4 global_transform = parent_transform * node_transform;
-	auto parent = aiToGlm(parent_transform);
+	glm::mat4 global_transform = parent_transform * node_transform;
 
 	std::cout << "Transform" << std::endl;
-	std::cout << node[0].x << "  " << node[0].y << "  " << node[0].z << "  " << node[0].w << std::endl;
-	std::cout << node[1].x << "  " << node[1].y << "  " << node[1].z << "  " << node[1].w << std::endl;
-	std::cout << node[2].x << "  " << node[2].y << "  " << node[2].z << "  " << node[2].w << std::endl;
-	std::cout << node[3].x << "  " << node[3].y << "  " << node[3].z << "  " << node[3].w << std::endl;
+	std::cout << node_transform[0].x << "  " << node_transform[0].y << "  " << node_transform[0].z << "  " << node_transform[0].w << std::endl;
+	std::cout << node_transform[1].x << "  " << node_transform[1].y << "  " << node_transform[1].z << "  " << node_transform[1].w << std::endl;
+	std::cout << node_transform[2].x << "  " << node_transform[2].y << "  " << node_transform[2].z << "  " << node_transform[2].w << std::endl;
+	std::cout << node_transform[3].x << "  " << node_transform[3].y << "  " << node_transform[3].z << "  " << node_transform[3].w << std::endl;
 
 	std::cout << "Parent" << std::endl;
-	std::cout << parent[0].x << "  " << parent[0].y << "  " << parent[0].z << "  " << parent[0].w << std::endl;
-	std::cout << parent[1].x << "  " << parent[1].y << "  " << parent[1].z << "  " << parent[1].w << std::endl;
-	std::cout << parent[2].x << "  " << parent[2].y << "  " << parent[2].z << "  " << parent[2].w << std::endl;
-	std::cout << parent[3].x << "  " << parent[3].y << "  " << parent[3].z << "  " << parent[3].w << std::endl;
+	std::cout << node_transform[0].x << "  " << node_transform[0].y << "  " << node_transform[0].z << "  " << node_transform[0].w << std::endl;
+	std::cout << node_transform[1].x << "  " << node_transform[1].y << "  " << node_transform[1].z << "  " << node_transform[1].w << std::endl;
+	std::cout << node_transform[2].x << "  " << node_transform[2].y << "  " << node_transform[2].z << "  " << node_transform[2].w << std::endl;
+	std::cout << node_transform[3].x << "  " << node_transform[3].y << "  " << node_transform[3].z << "  " << node_transform[3].w << std::endl;
 
 	// ���� � node �� �������� ����������� bone, �� �� node ������ ��������� � ������ bone !!!
 	if (m_bone_mapping.find(node_name) != m_bone_mapping.end()) // true if node_name exist in bone_mapping
 	{
 		uint bone_index = m_bone_mapping[node_name];
 		m_bone_matrices[bone_index].final_world_transform = m_global_inverse_transform * global_transform * m_bone_matrices[bone_index].offset_matrix;
-		
-		auto glm_global_transform = aiToGlm(global_transform);
-		auto glm_Offset_transform = aiToGlm(m_bone_matrices[bone_index].offset_matrix);
-		auto a = glm_m_global_inverse_transform * glm_global_transform * glm_Offset_transform;
-
 
 		std::cout << "Offset" << std::endl;
-		std::cout << glm_Offset_transform[0].x << "  " << glm_Offset_transform[0].y << "  " << glm_Offset_transform[0].z << "  " << glm_Offset_transform[0].w << std::endl;
-		std::cout << glm_Offset_transform[1].x << "  " << glm_Offset_transform[1].y << "  " << glm_Offset_transform[1].z << "  " << glm_Offset_transform[1].w << std::endl;
-		std::cout << glm_Offset_transform[2].x << "  " << glm_Offset_transform[2].y << "  " << glm_Offset_transform[2].z << "  " << glm_Offset_transform[2].w << std::endl;
-		std::cout << glm_Offset_transform[3].x << "  " << glm_Offset_transform[3].y << "  " << glm_Offset_transform[3].z << "  " << glm_Offset_transform[3].w << std::endl;
+		std::cout << m_bone_matrices[bone_index].offset_matrix[0].x << "  " << m_bone_matrices[bone_index].offset_matrix[0].y << "  " << m_bone_matrices[bone_index].offset_matrix[0].z << "  " << m_bone_matrices[bone_index].offset_matrix[0].w << std::endl;
+		std::cout << m_bone_matrices[bone_index].offset_matrix[1].x << "  " << m_bone_matrices[bone_index].offset_matrix[1].y << "  " << m_bone_matrices[bone_index].offset_matrix[1].z << "  " << m_bone_matrices[bone_index].offset_matrix[1].w << std::endl;
+		std::cout << m_bone_matrices[bone_index].offset_matrix[2].x << "  " << m_bone_matrices[bone_index].offset_matrix[2].y << "  " << m_bone_matrices[bone_index].offset_matrix[2].z << "  " << m_bone_matrices[bone_index].offset_matrix[2].w << std::endl;
+		std::cout << m_bone_matrices[bone_index].offset_matrix[3].x << "  " << m_bone_matrices[bone_index].offset_matrix[3].y << "  " << m_bone_matrices[bone_index].offset_matrix[3].z << "  " << m_bone_matrices[bone_index].offset_matrix[3].w << std::endl;
 
 		std::cout << "global" << std::endl;
-		std::cout << glm_global_transform[0].x << "  " << glm_global_transform[0].y << "  " << glm_global_transform[0].z << "  " << glm_global_transform[0].w << std::endl;
-		std::cout << glm_global_transform[1].x << "  " << glm_global_transform[1].y << "  " << glm_global_transform[1].z << "  " << glm_global_transform[1].w << std::endl;
-		std::cout << glm_global_transform[2].x << "  " << glm_global_transform[2].y << "  " << glm_global_transform[2].z << "  " << glm_global_transform[2].w << std::endl;
-		std::cout << glm_global_transform[3].x << "  " << glm_global_transform[3].y << "  " << glm_global_transform[3].z << "  " << glm_global_transform[3].w << std::endl;
+		std::cout << global_transform[0].x << "  " << global_transform[0].y << "  " << global_transform[0].z << "  " << global_transform[0].w << std::endl;
+		std::cout << global_transform[1].x << "  " << global_transform[1].y << "  " << global_transform[1].z << "  " << global_transform[1].w << std::endl;
+		std::cout << global_transform[2].x << "  " << global_transform[2].y << "  " << global_transform[2].z << "  " << global_transform[2].w << std::endl;
+		std::cout << global_transform[3].x << "  " << global_transform[3].y << "  " << global_transform[3].z << "  " << global_transform[3].w << std::endl;
 
 		std::cout << "GlobalInverseTransform" << std::endl;
-		std::cout << glm_m_global_inverse_transform[0].x << "  " << glm_m_global_inverse_transform[0].y << "  " << glm_m_global_inverse_transform[0].z << "  " << glm_m_global_inverse_transform[0].w << std::endl;
-		std::cout << glm_m_global_inverse_transform[1].x << "  " << glm_m_global_inverse_transform[1].y << "  " << glm_m_global_inverse_transform[1].z << "  " << glm_m_global_inverse_transform[1].w << std::endl;
-		std::cout << glm_m_global_inverse_transform[2].x << "  " << glm_m_global_inverse_transform[2].y << "  " << glm_m_global_inverse_transform[2].z << "  " << glm_m_global_inverse_transform[2].w << std::endl;
-		std::cout << glm_m_global_inverse_transform[3].x << "  " << glm_m_global_inverse_transform[3].y << "  " << glm_m_global_inverse_transform[3].z << "  " << glm_m_global_inverse_transform[3].w << std::endl;
+		std::cout << m_global_inverse_transform[0].x << "  " << m_global_inverse_transform[0].y << "  " << m_global_inverse_transform[0].z << "  " << m_global_inverse_transform[0].w << std::endl;
+		std::cout << m_global_inverse_transform[1].x << "  " << m_global_inverse_transform[1].y << "  " << m_global_inverse_transform[1].z << "  " << m_global_inverse_transform[1].w << std::endl;
+		std::cout << m_global_inverse_transform[2].x << "  " << m_global_inverse_transform[2].y << "  " << m_global_inverse_transform[2].z << "  " << m_global_inverse_transform[2].w << std::endl;
+		std::cout << m_global_inverse_transform[3].x << "  " << m_global_inverse_transform[3].y << "  " << m_global_inverse_transform[3].z << "  " << m_global_inverse_transform[3].w << std::endl;
 
 		std::cout << node_name << std::endl;
-		std::cout << a[0].x << "  " << a[0].y << "  " << a[0].z << "  " << a[0].w << std::endl;
-		std::cout << a[1].x << "  " << a[1].y << "  " << a[1].z << "  " << a[1].w << std::endl;
-		std::cout << a[2].x << "  " << a[2].y << "  " << a[2].z << "  " << a[2].w << std::endl;
-		std::cout << a[3].x << "  " << a[3].y << "  " << a[3].z << "  " << a[3].w << std::endl;
+		std::cout << m_bone_matrices[bone_index].final_world_transform[0].x << "  " << m_bone_matrices[bone_index].final_world_transform[0].y << "  " << m_bone_matrices[bone_index].final_world_transform[0].z << "  " << m_bone_matrices[bone_index].final_world_transform[0].w << std::endl;
+		std::cout << m_bone_matrices[bone_index].final_world_transform[1].x << "  " << m_bone_matrices[bone_index].final_world_transform[1].y << "  " << m_bone_matrices[bone_index].final_world_transform[1].z << "  " << m_bone_matrices[bone_index].final_world_transform[1].w << std::endl;
+		std::cout << m_bone_matrices[bone_index].final_world_transform[2].x << "  " << m_bone_matrices[bone_index].final_world_transform[2].y << "  " << m_bone_matrices[bone_index].final_world_transform[2].z << "  " << m_bone_matrices[bone_index].final_world_transform[2].w << std::endl;
+		std::cout << m_bone_matrices[bone_index].final_world_transform[3].x << "  " << m_bone_matrices[bone_index].final_world_transform[3].y << "  " << m_bone_matrices[bone_index].final_world_transform[3].z << "  " << m_bone_matrices[bone_index].final_world_transform[3].w << std::endl;
 
 		int b = 34;
 	}
@@ -585,9 +566,9 @@ void Model::readNodeHierarchy(float p_animation_time, const aiNode* p_node, cons
 
 }
 
-void Model::boneTransform(double time_in_sec, vector<aiMatrix4x4>& transforms)
+void Model::boneTransform(double time_in_sec, vector<glm::mat4>& transforms)
 {
-	aiMatrix4x4 identity_matrix; // = mat4(1.0f);
+	glm::mat4 identity_matrix = glm::mat4(1.0f);
 
 	double time_in_ticks = time_in_sec * ticks_per_second;
 	float animation_time = fmod(time_in_ticks, scene->mAnimations[0]->mDuration); //������� �� ����� (������� �� ������)

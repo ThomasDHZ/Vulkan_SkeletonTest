@@ -45,8 +45,7 @@ private:
 	uint m_num_bones = 0;
 	vector<BoneMatrix> m_bone_matrices;
 	vector<BoneMatrix> glm_m_bone_matrices;
-	aiMatrix4x4 m_global_inverse_transform;
-	glm::mat4 glm_m_global_inverse_transform;
+	glm::mat4 m_global_inverse_transform;
 
 	GLuint m_bone_location[MAX_BONES];
 	float ticks_per_second = 0.0f;
@@ -65,8 +64,8 @@ private:
 	aiQuaternion calcInterpolatedRotation(float p_animation_time, const aiNodeAnim* p_node_anim);
 	aiVector3D calcInterpolatedScaling(float p_animation_time, const aiNodeAnim* p_node_anim);
 
-	void readNodeHierarchy(float p_animation_time, const aiNode* p_node, const aiMatrix4x4 parent_transform);
-	void boneTransform(double time_in_sec, vector<aiMatrix4x4>& transforms);
+	void readNodeHierarchy(float p_animation_time, const aiNode* p_node, const glm::mat4 parent_transform);
+	void boneTransform(double time_in_sec, vector<glm::mat4>& transforms);
 
 	// rotate Head
 	glm::quat rotate_head_xz = glm::quat(cos(glm::radians(0.0f)), sin(glm::radians(0.0f)) * glm::vec3(1.0f, 0.0f, 0.0f)); // this quad do nothingggggg!!!!!

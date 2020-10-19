@@ -30,10 +30,8 @@ struct Texture
 
 struct BoneMatrix
 {
-	aiMatrix4x4 offset_matrix;
-	aiMatrix4x4 final_world_transform;
-	glm::mat4 glm_offset_matrix;
-	glm::mat4 glm_final_world_transform;
+	glm::mat4 offset_matrix;
+	glm::mat4 final_world_transform;
 };
 
 struct VertexBoneData
