@@ -77,4 +77,6 @@ struct Vertex
 
 		return AttributeDescriptions;
 	}
+
+	void addBoneData(unsigned int bone_id, float weight);
 };
