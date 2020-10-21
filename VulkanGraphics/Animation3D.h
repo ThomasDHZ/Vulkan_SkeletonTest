@@ -5,23 +5,29 @@
 struct KeyFrameInfo
 {
 	float Time;
-	glm::vec3 AnimationInfo;
+	aiVector3D AnimationInfo;
+};
+struct KeyFrameRotationInfo
+{
+	float Time;
+	aiQuaternion AnimationInfo;
 };
 struct KeyFrame
 {
 	int BoneId;
 	std::string BoneName;
 	std::vector<KeyFrameInfo> BonePosition;
-	std::vector<KeyFrameInfo> BoneRotation;
+	std::vector<KeyFrameRotationInfo> BoneRotation;
 	std::vector<KeyFrameInfo> BoneScale;
 };
 
 class Animation3D
 {
 private:
-	std::vector<KeyFrame> BoneKeyFrameList;
+	
 
 public:
+	std::vector<KeyFrame> BoneKeyFrameList;
 	float AnimationTime;
 	float TicksPerSec;
 

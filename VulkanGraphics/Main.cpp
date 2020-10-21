@@ -1257,6 +1257,7 @@ private:
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
         camera->Update();
+        ModelInfo.Update("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/TestAnimModel/model.dae");
        // animation.UpdateBones(BoneList, ModelInfo.GlobalInverseTransform);
 
         UniformBufferObject ubo{};

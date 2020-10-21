@@ -1,6 +1,12 @@
 #include "Model.h"
 #include <iostream>
-
+#include <glm\ext\matrix_transform.hpp>
+#include "assimp\Importer.hpp"
+#include "assimp\scene.h"
+#include "assimp\postprocess.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 Model::Model()
 {
 }
@@ -26,25 +32,25 @@ void Model::LoadModel(const std::string& FilePath)
 		return;
 	}
 
-	GlobalInverseTransform = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
+	GlobalInverseTransformMatrix = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 
-	ProcessNode(FilePath, Scene->mRootNode, Scene);
+	ProcessNode(Scene->mRootNode, Scene);
 }
 
-void Model::ProcessNode(const std::string& FilePath, aiNode* node, const aiScene* scene)
+void Model::ProcessNode(aiNode* node, const aiScene* scene)
 {
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		LoadVertices(mesh);
 		LoadIndices(mesh);
-		LoadBones(scene->mRootNode, mesh, VertexList);
+		LoadBones(scene->mRootNode, mesh, VertexList, scene);
 		LoadAnimations(scene);
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		ProcessNode(FilePath, node->mChildren[i], scene);
+		ProcessNode(node->mChildren[i], scene);
 	}
 }
 
@@ -95,20 +101,7 @@ void Model::LoadIndices(aiMesh* mesh)
 	}
 }
 
-void Vertex::addBoneData(unsigned int bone_id, float weight)
-{
-	for (unsigned int i = 0; i < 4; i++)
-	{
-		if (BoneWeights[i] == 0.0)
-		{
-			BoneID[i] = bone_id;
-			BoneWeights[i] = weight;
-			return;
-		}
-	}
-}
-
-void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList)
+void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList, const aiScene* scene)
 {
 	for (int x = 0; x < mesh->mNumBones; x++)
 	{
@@ -117,24 +110,6 @@ void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Ve
 		BoneList.emplace_back(std::make_shared<Bone>(mesh->mBones[x]->mName.data, x, nodeTransform, AssimpToGLMMatrixConverter(mesh->mBones[x]->mOffsetMatrix)));
 	}
 
-	/*for (auto bone : BoneList)
-	{
-		auto BoneAsNode = RootNode->FindNode(bone->GetBoneName().c_str());
-		for (int x = 0; x < BoneAsNode->mNumChildren; x++)
-		{
-			for (auto bone2 : BoneList)
-			{
-				if (bone2->GetBoneName() == BoneAsNode->mChildren[x]->mName.C_Str())
-				{
-					bone2->SetParentBone(GlobalInverseTransform, bone);
-					bone->AddChildBone(bone2);
-				}
-			}
-		}
-	}
-
-
-	*/
 	for (int x = 0; x < mesh->mNumBones; x++)
 	{
 		std::vector<unsigned int> AffectedVertices;
@@ -165,17 +140,11 @@ void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Ve
 				VertexList[vertexID].BoneWeights.w = weight;
 				break;
 			}
-		}
-	}
 
-
-	for (int x = 0; x < mesh->mNumBones; x++)
-	{
-		for (unsigned int j = 0; j < mesh->mBones[x]->mNumWeights; j++)
-		{
-			unsigned int vertex_id = mesh->mBones[x]->mWeights[j].mVertexId;
-			float weight = mesh->mBones[x]->mWeights[j].mWeight;
-			VertexList[vertex_id].addBoneData(x, weight);
+			std::cout << "VertexID: " << vertexID << std::endl;
+			std::cout << "BoneID: " << x << std::endl;
+			std::cout << "BoneWeight " << weight << std::endl;
+			int a = 34;
 		}
 	}
 
@@ -195,7 +164,7 @@ void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Ve
 		}
 	}
 
-	InvertBoneMatrix(GlobalInverseTransform, RootNode, glm::mat4(1.0f));
+	UpdateSkeleton(RootNode, glm::mat4(1.0f), scene);
 }
 
 void Model::LoadAnimations(const aiScene* scene)
@@ -227,15 +196,15 @@ void Model::LoadAnimations(const aiScene* scene)
 			{
 				KeyFrameInfo PosKeyFrame;
 				PosKeyFrame.Time = channel->mPositionKeys[z].mTime;
-				PosKeyFrame.AnimationInfo = glm::vec3(channel->mPositionKeys[z].mValue.x, channel->mPositionKeys[z].mValue.y, channel->mPositionKeys[z].mValue.z);
+				PosKeyFrame.AnimationInfo = aiVector3D(channel->mPositionKeys[z].mValue.x, channel->mPositionKeys[z].mValue.y, channel->mPositionKeys[z].mValue.z);
 				keyframe.BonePosition.emplace_back(PosKeyFrame);
 			}
 
 			for (int z = 0; z < channel->mNumRotationKeys; z++)
 			{
-				KeyFrameInfo RotKeyFrame;
+				KeyFrameRotationInfo RotKeyFrame;
 				RotKeyFrame.Time = channel->mRotationKeys[z].mTime;
-				RotKeyFrame.AnimationInfo = glm::vec3(channel->mRotationKeys[z].mValue.x, channel->mRotationKeys[z].mValue.y, channel->mRotationKeys[z].mValue.z);
+				RotKeyFrame.AnimationInfo = aiQuaternion(channel->mRotationKeys[z].mValue.x, channel->mRotationKeys[z].mValue.y, channel->mRotationKeys[z].mValue.z);
 				keyframe.BoneRotation.emplace_back(RotKeyFrame);
 			}
 
@@ -243,7 +212,7 @@ void Model::LoadAnimations(const aiScene* scene)
 			{
 				KeyFrameInfo ScaleKeyFrame;
 				ScaleKeyFrame.Time = channel->mScalingKeys[z].mTime;
-				ScaleKeyFrame.AnimationInfo = glm::vec3(channel->mScalingKeys[z].mValue.x, channel->mScalingKeys[z].mValue.y, channel->mScalingKeys[z].mValue.z);
+				ScaleKeyFrame.AnimationInfo = aiVector3D(channel->mScalingKeys[z].mValue.x, channel->mScalingKeys[z].mValue.y, channel->mScalingKeys[z].mValue.z);
 				keyframe.BoneScale.emplace_back(ScaleKeyFrame);
 			}
 
@@ -254,9 +223,93 @@ void Model::LoadAnimations(const aiScene* scene)
 	}
 }
 
-void Model::InvertBoneMatrix(const glm::mat4& GlobalInverseTransformMatrix, const aiNode* p_node, const glm::mat4 ParentMatrix)
+aiVector3D Model::calcInterpolatedPosition(float p_animation_time, const aiNodeAnim* p_node_anim)
 {
+	return p_node_anim->mPositionKeys[frame].mValue;
+}
+
+aiQuaternion Model::calcInterpolatedRotation(float p_animation_time, const aiNodeAnim* p_node_anim)
+{
+	return p_node_anim->mRotationKeys[frame].mValue;
+}
+
+aiVector3D Model::calcInterpolatedScaling(float p_animation_time, const aiNodeAnim* p_node_anim)
+{
+	return p_node_anim->mScalingKeys[frame].mValue;
+}
+const aiNodeAnim* Model::FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)
+{
+	for (unsigned int i = 0; i < pAnimation->mNumChannels; i++) {
+		const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
+
+		if (std::string(pNodeAnim->mNodeName.data) == NodeName) {
+			return pNodeAnim;
+		}
+	}
+
+	return NULL;
+}
+void Model::UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix, const aiScene* Scene)
+{
+	const aiAnimation* animation = Scene->mAnimations[0];
+	aiMatrix4x4 node_transform = p_node->mTransformation;
+
 	auto glmTransform = AssimpToGLMMatrixConverter(p_node->mTransformation);
+	if (AnimationList.size() != 0)
+	{
+		for (auto bone : BoneList)
+		{
+			if (p_node->mName.C_Str() == bone->GetBoneName())
+			{
+				const aiNodeAnim* node_anim = FindNodeAnim(animation, bone->GetBoneName());
+				//scaling
+				//aiVector3D scaling_vector = node_anim->mScalingKeys[2].mValue;
+				aiVector3D scaling_vector = node_anim->mScalingKeys[frame].mValue;
+				aiMatrix4x4 scaling_matr;
+				aiMatrix4x4::Scaling(scaling_vector, scaling_matr);
+
+				std::cout << "Scale: Bone Name: " << bone->BoneName << " Frame: " << frame << std::endl;
+				std::cout << scaling_matr.a1 << "  " << scaling_matr.a2 << "  " << scaling_matr.a3 << "  " << scaling_matr.a4 << std::endl;
+				std::cout << scaling_matr.b1 << "  " << scaling_matr.b2 << "  " << scaling_matr.b3 << "  " << scaling_matr.b4 << std::endl;
+				std::cout << scaling_matr.c1 << "  " << scaling_matr.c2 << "  " << scaling_matr.c3 << "  " << scaling_matr.c4 << std::endl;
+				std::cout << scaling_matr.d1 << "  " << scaling_matr.c1 << "  " << scaling_matr.d3 << "  " << scaling_matr.d4 << std::endl;
+
+				//rotation
+				//aiQuaternion rotate_quat = node_anim->mRotationKeys[2].mValue;
+				aiQuaternion rotate_quat = node_anim->mRotationKeys[frame].mValue;
+				aiMatrix4x4 rotate_matr = aiMatrix4x4(rotate_quat.GetMatrix());
+
+				std::cout << "Rotate: Bone Name: " << bone->BoneName << " Frame: " << frame << std::endl;
+				std::cout << rotate_matr.a1 << "  " << rotate_matr.a2 << "  " << rotate_matr.a3 << "  " << rotate_matr.a4 << std::endl;
+				std::cout << rotate_matr.b1 << "  " << rotate_matr.b2 << "  " << rotate_matr.b3 << "  " << rotate_matr.b4 << std::endl;
+				std::cout << rotate_matr.c1 << "  " << rotate_matr.c2 << "  " << rotate_matr.c3 << "  " << rotate_matr.c4 << std::endl;
+				std::cout << rotate_matr.d1 << "  " << rotate_matr.c1 << "  " << rotate_matr.d3 << "  " << rotate_matr.d4 << std::endl;
+
+				//translation
+				//aiVector3D translate_vector = node_anim->mPositionKeys[2].mValue;
+				aiVector3D translate_vector = node_anim->mPositionKeys[frame].mValue;
+				aiMatrix4x4 translate_matr;
+				aiMatrix4x4::Translation(translate_vector, translate_matr);
+
+				std::cout << "Translate: Bone Name: " << bone->BoneName << " Frame: " << frame << std::endl;
+				std::cout << translate_matr.a1 << "  " << translate_matr.a2 << "  " << translate_matr.a3 << "  " << translate_matr.a4 << std::endl;
+				std::cout << translate_matr.b1 << "  " << translate_matr.b2 << "  " << translate_matr.b3 << "  " << translate_matr.b4 << std::endl;
+				std::cout << translate_matr.c1 << "  " << translate_matr.c2 << "  " << translate_matr.c3 << "  " << translate_matr.c4 << std::endl;
+				std::cout << translate_matr.d1 << "  " << translate_matr.c1 << "  " << translate_matr.d3 << "  " << translate_matr.d4 << std::endl;
+
+				glmTransform = AssimpToGLMMatrixConverter(translate_matr) * AssimpToGLMMatrixConverter(rotate_matr) * AssimpToGLMMatrixConverter(scaling_matr);
+
+				std::cout << "Bone Name: " << bone->BoneName << " Frame: " << frame << std::endl;
+				std::cout << glmTransform[0].x << "  " << glmTransform[0].y << "  " << glmTransform[0].z << "  " << glmTransform[0].w << std::endl;
+				std::cout << glmTransform[1].x << "  " << glmTransform[1].y << "  " << glmTransform[1].z << "  " << glmTransform[1].w << std::endl;
+				std::cout << glmTransform[2].x << "  " << glmTransform[2].y << "  " << glmTransform[2].z << "  " << glmTransform[2].w << std::endl;
+				std::cout << glmTransform[3].x << "  " << glmTransform[3].y << "  " << glmTransform[3].z << "  " << glmTransform[3].w << std::endl;
+
+				int a = 34;
+			}
+		}
+	}
+
 	glm::mat4 GlobalTransform = ParentMatrix * glmTransform;
 
 	for (auto bone : BoneList)
@@ -270,7 +323,21 @@ void Model::InvertBoneMatrix(const glm::mat4& GlobalInverseTransformMatrix, cons
 
 	for (int x = 0; x < p_node->mNumChildren; x++)
 	{
-		InvertBoneMatrix(GlobalInverseTransformMatrix, p_node->mChildren[x], GlobalTransform);
+		UpdateSkeleton(p_node->mChildren[x], GlobalTransform, Scene);
+	}
+}
+
+void Model::Update(const std::string& FilePath)
+{
+	Assimp::Importer ModelImporter;
+
+	const aiScene* Scene = ModelImporter.ReadFile(FilePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	UpdateSkeleton(Scene->mRootNode, glm::mat4(1.0f), Scene);
+
+	frame++;
+	if (frame > 4)
+	{
+		frame = 0;
 	}
 }
 
