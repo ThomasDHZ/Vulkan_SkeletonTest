@@ -17,6 +17,8 @@ struct Vertex
 	glm::ivec4 BoneID = glm::ivec4(0);
 	glm::vec4 BoneWeights = glm::vec4(0.0f);
 
+	void addBoneData(unsigned int bone_id, float weight);
+
 	static VkVertexInputBindingDescription GetBindingDescription()
 	{
 		VkVertexInputBindingDescription BindingDescription = {};

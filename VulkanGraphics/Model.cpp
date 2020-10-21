@@ -116,35 +116,11 @@ void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Ve
 		AffectedVertices.resize(VertexList.size(), 0);
 
 		aiBone* bone = mesh->mBones[x];
-		for (int y = 0; y < bone->mNumWeights; y++)
+		for (unsigned int j = 0; j < mesh->mBones[x]->mNumWeights; j++)
 		{
-			unsigned int vertexID = bone->mWeights[y].mVertexId;
-			float weight = bone->mWeights[y].mWeight;
-			AffectedVertices[vertexID]++;
-			switch (AffectedVertices[vertexID])
-			{
-			case 1:
-				VertexList[vertexID].BoneID.x = x;
-				VertexList[vertexID].BoneWeights.x = weight;
-				break;
-			case 2:
-				VertexList[vertexID].BoneID.y = x;
-				VertexList[vertexID].BoneWeights.y = weight;
-				break;
-			case 3:
-				VertexList[vertexID].BoneID.z = x;
-				VertexList[vertexID].BoneWeights.z = weight;
-				break;
-			case 4:
-				VertexList[vertexID].BoneID.w = x;
-				VertexList[vertexID].BoneWeights.w = weight;
-				break;
-			}
-
-			std::cout << "VertexID: " << vertexID << std::endl;
-			std::cout << "BoneID: " << x << std::endl;
-			std::cout << "BoneWeight " << weight << std::endl;
-			int a = 34;
+			unsigned int vertex_id = mesh->mBones[x]->mWeights[j].mVertexId;
+			float weight = mesh->mBones[x]->mWeights[j].mWeight;
+			VertexList[vertex_id].addBoneData(x, weight);
 		}
 	}
 
@@ -165,6 +141,19 @@ void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Ve
 	}
 
 	UpdateSkeleton(RootNode, glm::mat4(1.0f), scene);
+}
+
+void Vertex::addBoneData(unsigned int bone_id, float weight)
+{
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		if (BoneWeights[i] == 0.0)
+		{
+			BoneID[i] = bone_id;
+			BoneWeights[i] = weight;
+			return;
+		}
+	}
 }
 
 void Model::LoadAnimations(const aiScene* scene)
@@ -268,22 +257,22 @@ void Model::UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix, c
 				aiMatrix4x4 scaling_matr;
 				aiMatrix4x4::Scaling(scaling_vector, scaling_matr);
 
-				std::cout << "Scale: Bone Name: " << bone->BoneName << " Frame: " << frame << std::endl;
+			/*	std::cout << "Scale: Bone Name: " << bone->BoneName << " Frame: " << frame << std::endl;
 				std::cout << scaling_matr.a1 << "  " << scaling_matr.a2 << "  " << scaling_matr.a3 << "  " << scaling_matr.a4 << std::endl;
 				std::cout << scaling_matr.b1 << "  " << scaling_matr.b2 << "  " << scaling_matr.b3 << "  " << scaling_matr.b4 << std::endl;
 				std::cout << scaling_matr.c1 << "  " << scaling_matr.c2 << "  " << scaling_matr.c3 << "  " << scaling_matr.c4 << std::endl;
-				std::cout << scaling_matr.d1 << "  " << scaling_matr.c1 << "  " << scaling_matr.d3 << "  " << scaling_matr.d4 << std::endl;
+				std::cout << scaling_matr.d1 << "  " << scaling_matr.c1 << "  " << scaling_matr.d3 << "  " << scaling_matr.d4 << std::endl;*/
 
 				//rotation
 				//aiQuaternion rotate_quat = node_anim->mRotationKeys[2].mValue;
 				aiQuaternion rotate_quat = node_anim->mRotationKeys[frame].mValue;
 				aiMatrix4x4 rotate_matr = aiMatrix4x4(rotate_quat.GetMatrix());
 
-				std::cout << "Rotate: Bone Name: " << bone->BoneName << " Frame: " << frame << std::endl;
+		/*		std::cout << "Rotate: Bone Name: " << bone->BoneName << " Frame: " << frame << std::endl;
 				std::cout << rotate_matr.a1 << "  " << rotate_matr.a2 << "  " << rotate_matr.a3 << "  " << rotate_matr.a4 << std::endl;
 				std::cout << rotate_matr.b1 << "  " << rotate_matr.b2 << "  " << rotate_matr.b3 << "  " << rotate_matr.b4 << std::endl;
 				std::cout << rotate_matr.c1 << "  " << rotate_matr.c2 << "  " << rotate_matr.c3 << "  " << rotate_matr.c4 << std::endl;
-				std::cout << rotate_matr.d1 << "  " << rotate_matr.c1 << "  " << rotate_matr.d3 << "  " << rotate_matr.d4 << std::endl;
+				std::cout << rotate_matr.d1 << "  " << rotate_matr.c1 << "  " << rotate_matr.d3 << "  " << rotate_matr.d4 << std::endl;*/
 
 				//translation
 				//aiVector3D translate_vector = node_anim->mPositionKeys[2].mValue;
@@ -291,19 +280,19 @@ void Model::UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix, c
 				aiMatrix4x4 translate_matr;
 				aiMatrix4x4::Translation(translate_vector, translate_matr);
 
-				std::cout << "Translate: Bone Name: " << bone->BoneName << " Frame: " << frame << std::endl;
-				std::cout << translate_matr.a1 << "  " << translate_matr.a2 << "  " << translate_matr.a3 << "  " << translate_matr.a4 << std::endl;
-				std::cout << translate_matr.b1 << "  " << translate_matr.b2 << "  " << translate_matr.b3 << "  " << translate_matr.b4 << std::endl;
-				std::cout << translate_matr.c1 << "  " << translate_matr.c2 << "  " << translate_matr.c3 << "  " << translate_matr.c4 << std::endl;
-				std::cout << translate_matr.d1 << "  " << translate_matr.c1 << "  " << translate_matr.d3 << "  " << translate_matr.d4 << std::endl;
+				//std::cout << "Translate: Bone Name: " << bone->BoneName << " Frame: " << frame << std::endl;
+				//std::cout << translate_matr.a1 << "  " << translate_matr.a2 << "  " << translate_matr.a3 << "  " << translate_matr.a4 << std::endl;
+				//std::cout << translate_matr.b1 << "  " << translate_matr.b2 << "  " << translate_matr.b3 << "  " << translate_matr.b4 << std::endl;
+				//std::cout << translate_matr.c1 << "  " << translate_matr.c2 << "  " << translate_matr.c3 << "  " << translate_matr.c4 << std::endl;
+				//std::cout << translate_matr.d1 << "  " << translate_matr.c1 << "  " << translate_matr.d3 << "  " << translate_matr.d4 << std::endl;
 
 				glmTransform = AssimpToGLMMatrixConverter(translate_matr) * AssimpToGLMMatrixConverter(rotate_matr) * AssimpToGLMMatrixConverter(scaling_matr);
 
-				std::cout << "Bone Name: " << bone->BoneName << " Frame: " << frame << std::endl;
-				std::cout << glmTransform[0].x << "  " << glmTransform[0].y << "  " << glmTransform[0].z << "  " << glmTransform[0].w << std::endl;
-				std::cout << glmTransform[1].x << "  " << glmTransform[1].y << "  " << glmTransform[1].z << "  " << glmTransform[1].w << std::endl;
-				std::cout << glmTransform[2].x << "  " << glmTransform[2].y << "  " << glmTransform[2].z << "  " << glmTransform[2].w << std::endl;
-				std::cout << glmTransform[3].x << "  " << glmTransform[3].y << "  " << glmTransform[3].z << "  " << glmTransform[3].w << std::endl;
+				//std::cout << "Bone Name: " << bone->BoneName << " Frame: " << frame << std::endl;
+				//std::cout << glmTransform[0].x << "  " << glmTransform[0].y << "  " << glmTransform[0].z << "  " << glmTransform[0].w << std::endl;
+				//std::cout << glmTransform[1].x << "  " << glmTransform[1].y << "  " << glmTransform[1].z << "  " << glmTransform[1].w << std::endl;
+				//std::cout << glmTransform[2].x << "  " << glmTransform[2].y << "  " << glmTransform[2].z << "  " << glmTransform[2].w << std::endl;
+				//std::cout << glmTransform[3].x << "  " << glmTransform[3].y << "  " << glmTransform[3].z << "  " << glmTransform[3].w << std::endl;
 
 				int a = 34;
 			}
