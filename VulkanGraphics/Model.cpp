@@ -44,7 +44,7 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		LoadVertices(mesh);
 		LoadIndices(mesh);
-		LoadBones(scene->mRootNode, mesh, VertexList, scene);
+		LoadBones(scene->mRootNode, mesh, VertexList);
 		LoadAnimations(scene);
 	}
 
@@ -101,7 +101,7 @@ void Model::LoadIndices(aiMesh* mesh)
 	}
 }
 
-void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList, const aiScene* scene)
+void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList)
 {
 	for (int x = 0; x < mesh->mNumBones; x++)
 	{
@@ -140,7 +140,7 @@ void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Ve
 		}
 	}
 
-	UpdateSkeleton(RootNode, glm::mat4(1.0f), scene);
+	UpdateSkeleton(RootNode, glm::mat4(1.0f));
 }
 
 void Model::BoneWeightPlacement(unsigned int vertexID, unsigned int bone_id, float weight)
@@ -193,7 +193,7 @@ void Model::LoadAnimations(const aiScene* scene)
 			{
 				KeyFrameRotationInfo RotKeyFrame;
 				RotKeyFrame.Time = channel->mRotationKeys[z].mTime;
-				RotKeyFrame.AnimationInfo = aiQuaternion(channel->mRotationKeys[z].mValue.x, channel->mRotationKeys[z].mValue.y, channel->mRotationKeys[z].mValue.z);
+				RotKeyFrame.AnimationInfo = aiQuaternion(channel->mRotationKeys[z].mValue.w, channel->mRotationKeys[z].mValue.x, channel->mRotationKeys[z].mValue.y, channel->mRotationKeys[z].mValue.z);
 				keyframe.BoneRotation.emplace_back(RotKeyFrame);
 			}
 
@@ -238,11 +238,8 @@ const aiNodeAnim* Model::FindNodeAnim(const aiAnimation* pAnimation, const std::
 
 	return NULL;
 }
-void Model::UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix, const aiScene* Scene)
+void Model::UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix)
 {
-	const aiAnimation* animation = Scene->mAnimations[0];
-	aiMatrix4x4 node_transform = p_node->mTransformation;
-
 	auto glmTransform = AssimpToGLMMatrixConverter(p_node->mTransformation);
 	if (AnimationList.size() != 0)
 	{
@@ -250,20 +247,19 @@ void Model::UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix, c
 		{
 			if (p_node->mName.C_Str() == bone->GetBoneName())
 			{
-				const aiNodeAnim* node_anim = FindNodeAnim(animation, bone->GetBoneName());
+				aiMatrix4x4 ScaleMatrix;
+				aiMatrix4x4 TranslateMatrix;
 
-				aiVector3D scaling_vector = node_anim->mScalingKeys[frame].mValue;
-				aiMatrix4x4 scaling_matr;
-				aiMatrix4x4::Scaling(scaling_vector, scaling_matr);
+				aiVector3D scaling_vector = AnimationList[0].BoneKeyFrameList[bone->BoneID].BoneScale[frame].AnimationInfo;
+				aiMatrix4x4::Scaling(scaling_vector, ScaleMatrix);
 
-				aiQuaternion rotate_quat = node_anim->mRotationKeys[frame].mValue;
+				aiQuaternion rotate_quat = AnimationList[0].BoneKeyFrameList[bone->BoneID].BoneRotation[frame].AnimationInfo;
 				aiMatrix4x4 rotate_matr = aiMatrix4x4(rotate_quat.GetMatrix());
 
-				aiVector3D translate_vector = node_anim->mPositionKeys[frame].mValue;
-				aiMatrix4x4 translate_matr;
-				aiMatrix4x4::Translation(translate_vector, translate_matr);
+				aiVector3D translate_vector = AnimationList[0].BoneKeyFrameList[bone->BoneID].BonePosition[frame].AnimationInfo;
+				aiMatrix4x4::Translation(translate_vector, TranslateMatrix);
 
-				glmTransform = AssimpToGLMMatrixConverter(translate_matr) * AssimpToGLMMatrixConverter(rotate_matr) * AssimpToGLMMatrixConverter(scaling_matr);
+				glmTransform = AssimpToGLMMatrixConverter(TranslateMatrix * rotate_matr * ScaleMatrix);
 			}
 		}
 	}
@@ -281,7 +277,7 @@ void Model::UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix, c
 
 	for (int x = 0; x < p_node->mNumChildren; x++)
 	{
-		UpdateSkeleton(p_node->mChildren[x], GlobalTransform, Scene);
+		UpdateSkeleton(p_node->mChildren[x], GlobalTransform);
 	}
 }
 
@@ -290,7 +286,7 @@ void Model::Update(const std::string& FilePath)
 	Assimp::Importer ModelImporter;
 
 	const aiScene* Scene = ModelImporter.ReadFile(FilePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
-	UpdateSkeleton(Scene->mRootNode, glm::mat4(1.0f), Scene);
+	UpdateSkeleton(Scene->mRootNode, glm::mat4(1.0f));
 
 	frame++;
 	if (frame > 4)

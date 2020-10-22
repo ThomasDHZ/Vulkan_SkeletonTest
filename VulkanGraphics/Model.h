@@ -27,11 +27,11 @@ private:
 
 	void LoadVertices(aiMesh* mesh);
 	void LoadIndices(aiMesh* mesh);
-	void LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList, const aiScene* scene);
+	void LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
 	void LoadAnimations(const aiScene* scene);
 
 	void BoneWeightPlacement(unsigned int vertexID, unsigned int bone_id, float weight);
-	void UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix, const aiScene* Scene);
+	void UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix);
 	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 matrix);
 
 	const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
