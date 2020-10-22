@@ -19,13 +19,3 @@ Bone::Bone(const std::string& boneName, int boneId, glm::mat4 boneTransformMatri
 Bone::~Bone()
 {
 }
-
-void Bone::SetParentBone(const glm::mat4& GlobalInverseTransformMatrix, std::shared_ptr<Bone> parentBone)
-{
-	ParentBone = parentBone;
-}
-
-void Bone::AddChildBone(std::shared_ptr<Bone> bone)
-{
-	ChildrenBoneList.emplace_back(bone);
-}

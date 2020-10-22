@@ -14,6 +14,16 @@
 #include "assimp\Importer.hpp"
 #include "assimp\scene.h"
 #include "assimp\postprocess.h"
+
+struct NodeMap
+{
+	std::string NodeString;
+	aiMatrix4x4 NodeTransform;
+	 int ParentNodeID;
+	 int NodeID;
+	std::vector<int> ChildNodeList;
+};
+
 class Model
 {
 private:
@@ -28,17 +38,15 @@ private:
 	void LoadVertices(aiMesh* mesh);
 	void LoadIndices(aiMesh* mesh);
 	void LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
+	void LoadNodeTree(const aiNode* RootNode,  int ParentNodeID);
 	void LoadAnimations(const aiScene* scene);
 
 	void BoneWeightPlacement(unsigned int vertexID, unsigned int bone_id, float weight);
 	void UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix);
+	int GetFrame(const Animation3D& animation, const float Time);
+
 	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 matrix);
 
-	const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
-
-	aiVector3D calcInterpolatedPosition(float p_animation_time, const aiNodeAnim* p_node_anim);
-	aiQuaternion calcInterpolatedRotation(float p_animation_time, const aiNodeAnim* p_node_anim);
-	aiVector3D calcInterpolatedScaling(float p_animation_time, const aiNodeAnim* p_node_anim);
 public:
 	Model();
 	Model(const std::string& FilePath);
@@ -50,5 +58,6 @@ public:
 	std::vector<uint16_t> IndexList;
 	std::vector<std::shared_ptr<Bone>> BoneList;
 	std::vector<Animation3D> AnimationList;
+	std::vector<NodeMap> NodeMapList;
 };
 

@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <GLFW\glfw3.h>
 Model::Model()
 {
 }
@@ -14,6 +15,10 @@ Model::Model()
 Model::Model(const std::string& FilePath)
 {
 	LoadModel(FilePath);
+	if (AnimationList.size() > 0)
+	{
+		CurrentAnimation = AnimationList[0];
+	}
 }
 
 Model::~Model()
@@ -45,6 +50,7 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
 		LoadVertices(mesh);
 		LoadIndices(mesh);
 		LoadBones(scene->mRootNode, mesh, VertexList);
+		LoadNodeTree(scene->mRootNode, -1);
 		LoadAnimations(scene);
 	}
 
@@ -143,6 +149,26 @@ void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Ve
 	UpdateSkeleton(RootNode, glm::mat4(1.0f));
 }
 
+void Model::LoadNodeTree(const aiNode* Node, int parentNodeID = -1)
+{
+	NodeMap node;
+	node.NodeID = NodeMapList.size();
+	node.ParentNodeID = parentNodeID;
+	node.NodeString = Node->mName.C_Str();
+	node.NodeTransform = Node->mTransformation;
+	if (parentNodeID != -1)
+	{
+		NodeMapList[parentNodeID].ChildNodeList.emplace_back(node.NodeID);
+	}
+	NodeMapList.emplace_back(node);
+
+	for (int x = 0; x < Node->mNumChildren; x++)
+	{
+		LoadNodeTree(Node->mChildren[x], node.NodeID);
+	}
+}
+
+
 void Model::BoneWeightPlacement(unsigned int vertexID, unsigned int bone_id, float weight)
 {
 	for (unsigned int i = 0; i < 4; i++)
@@ -212,37 +238,14 @@ void Model::LoadAnimations(const aiScene* scene)
 	}
 }
 
-aiVector3D Model::calcInterpolatedPosition(float p_animation_time, const aiNodeAnim* p_node_anim)
-{
-	return p_node_anim->mPositionKeys[frame].mValue;
-}
-
-aiQuaternion Model::calcInterpolatedRotation(float p_animation_time, const aiNodeAnim* p_node_anim)
-{
-	return p_node_anim->mRotationKeys[frame].mValue;
-}
-
-aiVector3D Model::calcInterpolatedScaling(float p_animation_time, const aiNodeAnim* p_node_anim)
-{
-	return p_node_anim->mScalingKeys[frame].mValue;
-}
-const aiNodeAnim* Model::FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)
-{
-	for (unsigned int i = 0; i < pAnimation->mNumChannels; i++) {
-		const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
-
-		if (std::string(pNodeAnim->mNodeName.data) == NodeName) {
-			return pNodeAnim;
-		}
-	}
-
-	return NULL;
-}
 void Model::UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix)
 {
-	auto glmTransform = AssimpToGLMMatrixConverter(p_node->mTransformation);
+	glm::mat4 glmTransform = AssimpToGLMMatrixConverter(p_node->mTransformation);
 	if (AnimationList.size() != 0)
 	{
+		auto Time = (float)glfwGetTime() * CurrentAnimation.TicksPerSec;
+		float AnimationTime = fmod(Time, CurrentAnimation.AnimationTime);
+		frame = GetFrame(CurrentAnimation, AnimationTime);
 		for (auto bone : BoneList)
 		{
 			if (p_node->mName.C_Str() == bone->GetBoneName())
@@ -250,13 +253,13 @@ void Model::UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix)
 				aiMatrix4x4 ScaleMatrix;
 				aiMatrix4x4 TranslateMatrix;
 
-				aiVector3D scaling_vector = AnimationList[0].BoneKeyFrameList[bone->BoneID].BoneScale[frame].AnimationInfo;
+				aiVector3D scaling_vector = CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneScale[frame].AnimationInfo;
 				aiMatrix4x4::Scaling(scaling_vector, ScaleMatrix);
 
-				aiQuaternion rotate_quat = AnimationList[0].BoneKeyFrameList[bone->BoneID].BoneRotation[frame].AnimationInfo;
+				aiQuaternion rotate_quat = CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneRotation[frame].AnimationInfo;
 				aiMatrix4x4 rotate_matr = aiMatrix4x4(rotate_quat.GetMatrix());
 
-				aiVector3D translate_vector = AnimationList[0].BoneKeyFrameList[bone->BoneID].BonePosition[frame].AnimationInfo;
+				aiVector3D translate_vector = CurrentAnimation.BoneKeyFrameList[bone->BoneID].BonePosition[frame].AnimationInfo;
 				aiMatrix4x4::Translation(translate_vector, TranslateMatrix);
 
 				glmTransform = AssimpToGLMMatrixConverter(TranslateMatrix * rotate_matr * ScaleMatrix);
@@ -281,12 +284,25 @@ void Model::UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix)
 	}
 }
 
+int Model::GetFrame(const Animation3D& animation, const float Time)
+{
+	for (int x = animation.BoneKeyFrameList[0].BonePosition.size() - 1; x > 0; x--)
+	{
+		if (Time >= animation.BoneKeyFrameList[0].BonePosition[x].Time)
+		{
+			return x;
+		}
+	}
+}
+
 void Model::Update(const std::string& FilePath)
 {
+	
 	Assimp::Importer ModelImporter;
 
 	const aiScene* Scene = ModelImporter.ReadFile(FilePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 	UpdateSkeleton(Scene->mRootNode, glm::mat4(1.0f));
+
 
 	frame++;
 	if (frame > 4)
