@@ -7,12 +7,11 @@ Bone::Bone()
 	FinalTransformMatrix = glm::mat4(1.0f);
 }
 
-Bone::Bone(const std::string& boneName, int boneId, glm::mat4 boneTransformMatrix, glm::mat4 offsetMatrix)
+Bone::Bone(const std::string& boneName, int boneId, glm::mat4 offsetMatrix)
 {
 	BoneID = boneId;
 	BoneName = boneName;
 	OffsetMatrix = offsetMatrix; 
-	BoneTransformMatrix = boneTransformMatrix;
 	FinalTransformMatrix = glm::mat4(1.0f);
 }
 

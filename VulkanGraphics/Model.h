@@ -30,7 +30,6 @@ private:
 
 	glm::mat4 GlobalInverseTransformMatrix;
 	Animation3D CurrentAnimation;
-	int frame = 0;
 
 	void LoadModel(const std::string& FilePath);
 	void ProcessNode(aiNode* node, const aiScene* scene);
@@ -41,18 +40,22 @@ private:
 	void LoadNodeTree(const aiNode* RootNode,  int ParentNodeID);
 	void LoadAnimations(const aiScene* scene);
 
+	aiVector3D InterpolatePosition(const std::shared_ptr<Bone> bone, float AnimationTime, const int NodeID);
+	aiQuaternion InterpolateRotation(const std::shared_ptr<Bone> bone, float AnimationTime, const int NodeID);
+	aiVector3D InterpolateScaling(const std::shared_ptr<Bone> bone, float AnimationTime, const int NodeID);
+
 	void BoneWeightPlacement(unsigned int vertexID, unsigned int bone_id, float weight);
-	void UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix);
-	int GetFrame(const Animation3D& animation, const float Time);
+	void UpdateSkeleton(const int NodeID, const glm::mat4 ParentMatrix);
 
 	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 matrix);
+	aiQuaternion nlerp(aiQuaternion a, aiQuaternion b, float blend);
 
 public:
 	Model();
 	Model(const std::string& FilePath);
 	~Model();
 
-	void Update(const std::string& FilePath);
+	void Update();
 
 	std::vector<Vertex> VertexList;
 	std::vector<uint16_t> IndexList;

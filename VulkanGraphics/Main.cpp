@@ -96,7 +96,7 @@ public:
     {
         initWindow();
         initVulkan();
-        camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(800, 600), glm::vec3(8.4f, 5.0f, 2.8), -188.500153, -29.1000175));
+        camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(800, 600), glm::vec3(11.1203861f, 5.14665794f, 3.79012537f), -166.200195f, -2.10000825f));
         mainLoop();
         cleanup();
     }
@@ -1257,11 +1257,11 @@ private:
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
         camera->Update();
-        ModelInfo.Update("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/TestAnimModel/model.dae");
-       // animation.UpdateBones(BoneList, ModelInfo.GlobalInverseTransform);
-
+        ModelInfo.Update();
+    
         UniformBufferObject ubo{};
         ubo.model = glm::mat4(1.0f);
+        ubo.model = glm::rotate(ubo.model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         ubo.view = camera->GetViewMatrix();
         ubo.proj = camera->GetProjectionMatrix();
         ubo.proj[1][1] *= -1;
@@ -1269,12 +1269,6 @@ private:
         for (auto bone : BoneList)
         {
             ubo.BoneTransform[bone->GetBoneID()] = bone->GetFinalBoneTransformMatrix();
-
-          /*  std::cout << bone->GetBoneName() << std::endl;
-            std::cout << bone->GetBoneTransformMatrix()[0].x << "  " << bone->GetBoneTransformMatrix()[0].y << "  " << bone->GetBoneTransformMatrix()[0].z << "  " << bone->GetBoneTransformMatrix()[0].w << std::endl;
-            std::cout << bone->GetBoneTransformMatrix()[1].x << "  " << bone->GetBoneTransformMatrix()[1].y << "  " << bone->GetBoneTransformMatrix()[1].z << "  " << bone->GetBoneTransformMatrix()[1].w << std::endl;
-            std::cout << bone->GetBoneTransformMatrix()[2].x << "  " << bone->GetBoneTransformMatrix()[2].y << "  " << bone->GetBoneTransformMatrix()[2].z << "  " << bone->GetBoneTransformMatrix()[2].w << std::endl;
-            std::cout << bone->GetBoneTransformMatrix()[3].x << "  " << bone->GetBoneTransformMatrix()[3].y << "  " << bone->GetBoneTransformMatrix()[3].z << "  " << bone->GetBoneTransformMatrix()[3].w << std::endl;*/
         }
 
         void* data;

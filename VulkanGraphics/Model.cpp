@@ -47,10 +47,10 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+		LoadNodeTree(scene->mRootNode, -1);
 		LoadVertices(mesh);
 		LoadIndices(mesh);
 		LoadBones(scene->mRootNode, mesh, VertexList);
-		LoadNodeTree(scene->mRootNode, -1);
 		LoadAnimations(scene);
 	}
 
@@ -112,8 +112,7 @@ void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Ve
 	for (int x = 0; x < mesh->mNumBones; x++)
 	{
 		auto node = RootNode->FindNode(mesh->mBones[x]->mName.data);
-		auto nodeTransform = AssimpToGLMMatrixConverter(node->mTransformation);
-		BoneList.emplace_back(std::make_shared<Bone>(mesh->mBones[x]->mName.data, x, nodeTransform, AssimpToGLMMatrixConverter(mesh->mBones[x]->mOffsetMatrix)));
+		BoneList.emplace_back(std::make_shared<Bone>(mesh->mBones[x]->mName.data, x, AssimpToGLMMatrixConverter(mesh->mBones[x]->mOffsetMatrix)));
 	}
 
 	for (int x = 0; x < mesh->mNumBones; x++)
@@ -146,7 +145,7 @@ void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Ve
 		}
 	}
 
-	UpdateSkeleton(RootNode, glm::mat4(1.0f));
+	UpdateSkeleton(0, glm::mat4(1.0f));
 }
 
 void Model::LoadNodeTree(const aiNode* Node, int parentNodeID = -1)
@@ -238,28 +237,138 @@ void Model::LoadAnimations(const aiScene* scene)
 	}
 }
 
-void Model::UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix)
+aiVector3D Model::InterpolatePosition(const std::shared_ptr<Bone> bone, float AnimationTime, const int NodeID)
 {
-	glm::mat4 glmTransform = AssimpToGLMMatrixConverter(p_node->mTransformation);
+	int Frame = 0;
+	for (int x = CurrentAnimation.BoneKeyFrameList[0].BonePosition.size() - 1; x > 0; x--)
+	{
+		if (AnimationTime >= CurrentAnimation.BoneKeyFrameList[0].BonePosition[x].Time)
+		{
+			Frame = x;
+			break;
+		}
+	}
+	
+	int NextFrame = Frame + 1;
+	if (NextFrame >= CurrentAnimation.BoneKeyFrameList[0].BonePosition.size() - 1)
+	{
+		NextFrame = 0;
+	}
+
+	float delta_time = (float)(CurrentAnimation.BoneKeyFrameList[bone->BoneID].BonePosition[NextFrame].Time - CurrentAnimation.BoneKeyFrameList[bone->BoneID].BonePosition[Frame].Time);
+	float factor = (AnimationTime - (float)CurrentAnimation.BoneKeyFrameList[bone->BoneID].BonePosition[Frame].Time) / delta_time;
+
+	aiVector3D StartPos = CurrentAnimation.BoneKeyFrameList[bone->BoneID].BonePosition[Frame].AnimationInfo;
+	aiVector3D EndPos = CurrentAnimation.BoneKeyFrameList[bone->BoneID].BonePosition[NextFrame].AnimationInfo;
+	aiVector3D Diffrence = EndPos - StartPos;
+
+	return StartPos + factor * Diffrence;
+}
+
+aiQuaternion Model::InterpolateRotation(const std::shared_ptr<Bone> bone, float AnimationTime, const int NodeID)
+{
+	int Frame = 0;
+	for (int x = CurrentAnimation.BoneKeyFrameList[0].BoneRotation.size() - 1; x > 0; x--)
+	{
+		if (AnimationTime >= CurrentAnimation.BoneKeyFrameList[0].BoneRotation[x].Time)
+		{
+			Frame = x;
+			break;
+		}
+	}
+
+	int NextFrame = Frame + 1;
+	if (NextFrame >= CurrentAnimation.BoneKeyFrameList[0].BoneRotation.size() - 1)
+	{
+		NextFrame = 0;
+	}
+
+	float delta_time = (float)(CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneRotation[NextFrame].Time - CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneRotation[Frame].Time);
+	float factor = (AnimationTime - (float)CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneRotation[Frame].Time) / delta_time;
+
+	aiQuaternion StartPos = CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneRotation[Frame].AnimationInfo;
+	aiQuaternion EndPos = CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneRotation[NextFrame].AnimationInfo;
+	
+	return nlerp(StartPos, EndPos, factor);
+}
+
+aiQuaternion Model::nlerp(aiQuaternion a, aiQuaternion b, float blend)
+{
+	a.Normalize();
+	b.Normalize();
+
+	aiQuaternion result;
+	float dot_product = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+	float one_minus_blend = 1.0f - blend;
+
+	if (dot_product < 0.0f)
+	{
+		result.x = a.x * one_minus_blend + blend * -b.x;
+		result.y = a.y * one_minus_blend + blend * -b.y;
+		result.z = a.z * one_minus_blend + blend * -b.z;
+		result.w = a.w * one_minus_blend + blend * -b.w;
+	}
+	else
+	{
+		result.x = a.x * one_minus_blend + blend * b.x;
+		result.y = a.y * one_minus_blend + blend * b.y;
+		result.z = a.z * one_minus_blend + blend * b.z;
+		result.w = a.w * one_minus_blend + blend * b.w;
+	}
+
+	return result.Normalize();
+}
+
+aiVector3D Model::InterpolateScaling(const std::shared_ptr<Bone> bone, float AnimationTime, const int NodeID)
+{
+	int Frame = 0;
+	for (int x = CurrentAnimation.BoneKeyFrameList[0].BoneScale.size() - 1; x > 0; x--)
+	{
+		if (AnimationTime >= CurrentAnimation.BoneKeyFrameList[0].BoneScale[x].Time)
+		{
+			Frame = x;
+			break;
+		}
+	}
+
+	int NextFrame = Frame + 1;
+	if (NextFrame >= CurrentAnimation.BoneKeyFrameList[0].BoneScale.size() - 1)
+	{
+		NextFrame = 0;
+	}
+
+	float delta_time = (float)(CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneScale[NextFrame].Time - CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneScale[Frame].Time);
+	float factor = (AnimationTime - (float)CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneScale[Frame].Time) / delta_time;
+
+	aiVector3D StartPos = CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneScale[Frame].AnimationInfo;
+	aiVector3D EndPos = CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneScale[NextFrame].AnimationInfo;
+	aiVector3D Diffrence = EndPos - StartPos;
+
+	return StartPos + factor * Diffrence;
+}
+
+void Model::UpdateSkeleton(const int NodeID, const glm::mat4 ParentMatrix)
+{
+	glm::mat4 glmTransform = AssimpToGLMMatrixConverter(NodeMapList[NodeID].NodeTransform);
 	if (AnimationList.size() != 0)
 	{
 		auto Time = (float)glfwGetTime() * CurrentAnimation.TicksPerSec;
 		float AnimationTime = fmod(Time, CurrentAnimation.AnimationTime);
-		frame = GetFrame(CurrentAnimation, AnimationTime);
+
 		for (auto bone : BoneList)
 		{
-			if (p_node->mName.C_Str() == bone->GetBoneName())
+			if (NodeMapList[NodeID].NodeString == bone->GetBoneName())
 			{
 				aiMatrix4x4 ScaleMatrix;
 				aiMatrix4x4 TranslateMatrix;
 
-				aiVector3D scaling_vector = CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneScale[frame].AnimationInfo;
+				aiVector3D scaling_vector = InterpolateScaling(bone, AnimationTime, NodeID);
 				aiMatrix4x4::Scaling(scaling_vector, ScaleMatrix);
 
-				aiQuaternion rotate_quat = CurrentAnimation.BoneKeyFrameList[bone->BoneID].BoneRotation[frame].AnimationInfo;
+				aiQuaternion rotate_quat = InterpolateRotation(bone, AnimationTime, NodeID);
 				aiMatrix4x4 rotate_matr = aiMatrix4x4(rotate_quat.GetMatrix());
 
-				aiVector3D translate_vector = CurrentAnimation.BoneKeyFrameList[bone->BoneID].BonePosition[frame].AnimationInfo;
+				aiVector3D translate_vector = InterpolatePosition(bone, AnimationTime, NodeID);
 				aiMatrix4x4::Translation(translate_vector, TranslateMatrix);
 
 				glmTransform = AssimpToGLMMatrixConverter(TranslateMatrix * rotate_matr * ScaleMatrix);
@@ -271,44 +380,21 @@ void Model::UpdateSkeleton(const aiNode* p_node, const glm::mat4 ParentMatrix)
 
 	for (auto bone : BoneList)
 	{
-		if (p_node->mName.C_Str() == bone->GetBoneName())
+		if (NodeMapList[NodeID].NodeString == bone->GetBoneName())
 		{
-			bone->BoneTransformMatrix = AssimpToGLMMatrixConverter(p_node->mTransformation);
 			bone->FinalTransformMatrix = GlobalInverseTransformMatrix * GlobalTransform * bone->OffsetMatrix;
 		}
 	}
 
-	for (int x = 0; x < p_node->mNumChildren; x++)
+	for (int x = 0; x < NodeMapList[NodeID].ChildNodeList.size(); x++)
 	{
-		UpdateSkeleton(p_node->mChildren[x], GlobalTransform);
+		UpdateSkeleton(NodeMapList[NodeID].ChildNodeList[x], GlobalTransform);
 	}
 }
 
-int Model::GetFrame(const Animation3D& animation, const float Time)
+void Model::Update()
 {
-	for (int x = animation.BoneKeyFrameList[0].BonePosition.size() - 1; x > 0; x--)
-	{
-		if (Time >= animation.BoneKeyFrameList[0].BonePosition[x].Time)
-		{
-			return x;
-		}
-	}
-}
-
-void Model::Update(const std::string& FilePath)
-{
-	
-	Assimp::Importer ModelImporter;
-
-	const aiScene* Scene = ModelImporter.ReadFile(FilePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
-	UpdateSkeleton(Scene->mRootNode, glm::mat4(1.0f));
-
-
-	frame++;
-	if (frame > 4)
-	{
-		frame = 0;
-	}
+	UpdateSkeleton(0, glm::mat4(1.0f));
 }
 
 glm::mat4 Model::AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix)
