@@ -25,6 +25,24 @@
     <Filter Include="Header Files\Renderer">
       <UniqueIdentifier>{9824d86f-db60-4b22-b8b7-76a47911bec9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Vulkan">
+      <UniqueIdentifier>{41ed92d8-833e-4c92-9785-e05018f3b8b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Vulkan">
+      <UniqueIdentifier>{d308bcc6-e562-4919-a575-23bd17ca8040}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Texture">
+      <UniqueIdentifier>{9393fae3-6f3b-4288-ac04-01a12d5ec8c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Texture">
+      <UniqueIdentifier>{d6bf29fa-fc4d-4cf2-956b-8aac8831ea26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Mesh">
+      <UniqueIdentifier>{35990ddb-5fbf-483b-b3e0-983df90045e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Mesh">
+      <UniqueIdentifier>{65ee210d-360e-4fd7-bb30-eaf5bbf194c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -68,6 +86,72 @@
     </ClCompile>
     <ClCompile Include="ImGui\imgui_impl_glfw.cpp">
       <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="InterfaceRenderPass.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanEngine.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanDebugger.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanSwapChain.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanUniformBuffer.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanWindow.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="IndicesBuffer.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderManager.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderPass.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Texuture2D.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedHDRColorTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteTexture2D.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RendereredTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedDepthTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedColorTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeMapTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseMesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBufferRenderingPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -126,6 +210,75 @@
     </ClInclude>
     <ClInclude Include="ImGui\imgui_impl_glfw.h">
       <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="InterfaceRenderPass.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanEngine.h">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanDebugger.h">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanSwapChain.h">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanUniformBuffer.h">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanWindow.h">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="IndicesBuffer.h">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanBufferManager.h">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderManager.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderPass.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Texuture2D.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedHDRColorTexture.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RendereredTexture.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteTexture2D.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedDepthTexture.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedColorTexture.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMapTexture.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseMesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferRenderingPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\Mesh</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
