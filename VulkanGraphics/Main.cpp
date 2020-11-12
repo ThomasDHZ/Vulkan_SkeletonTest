@@ -36,6 +36,7 @@
 #include "RenderManager.h"
 #include "FrameBufferRenderingPipeline.h"
 #include "Texuture2D.h"
+#include "Mesh.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -72,8 +73,24 @@ struct UniformBufferObject {
     glm::mat4 BoneTransform[100];
 };
 
-std::vector<Vertex> vertices;
-std::vector<uint16_t> indices;
+
+const std::vector<Vertex> vertices = {
+    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+
+    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+};
+
+const std::vector<uint16_t> indices = {
+    0, 1, 2, 2, 3, 0,
+    4, 5, 6, 6, 7, 4
+};
+
 std::vector<std::shared_ptr<Bone>> BoneList;
 Animation3D animation;
 
@@ -82,7 +99,7 @@ public:
     void run() 
     {
         initVulkan();
-        camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(800, 600), glm::vec3(11.1203861f, 5.14665794f, 3.79012537f), -166.200195f, -2.10000825f));
+        camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
         mainLoop();
         cleanup();
     }
@@ -96,13 +113,6 @@ private:
     Mouse mouse;
 
     Model ModelInfo;
-
-   // VkCommandPool commandPool;
-
-    //VkImage textureImage;
-    //VkDeviceMemory textureImageMemory;
-    //VkImageView textureImageView;
-    //VkSampler textureSampler;
 
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
@@ -139,10 +149,10 @@ private:
         vulkanEngine = VulkanEngine(window.GetWindowPtr());
         renderManager = RenderManager(vulkanEngine);
 
-        ModelInfo = Model("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/TestAnimModel/model.dae");
-        vertices = ModelInfo.VertexList;
-        indices = ModelInfo.IndexList;
-        BoneList = ModelInfo.BoneList;
+      //  ModelInfo = Model("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/TestAnimModel/model.dae");
+      //  vertices = ModelInfo.VertexList;
+       // indices = ModelInfo.IndexList;
+      //  BoneList = ModelInfo.BoneList;
         
         texture = Texture2D(vulkanEngine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/OpenGL_Skeleton_Test/OpenGL_Skeleton_Test/Model/TestAnimModel/diffuse.png", 0);
 
@@ -175,8 +185,6 @@ private:
         {
             throw std::runtime_error("failed to create graphics command pool!");
         }
-
-       // interfaceRenderPass = InterfaceRenderPass(vulkanEngine);
 
         VkDescriptorPoolSize pool_sizes[] =
         {
@@ -555,31 +563,49 @@ private:
 
 
 
-    void updateUniformBuffer(uint32_t currentImage) {
+    void updateUniformBuffer(uint32_t currentImage) 
+    {
         static auto startTime = std::chrono::high_resolution_clock::now();
 
         auto currentTime = std::chrono::high_resolution_clock::now();
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
         camera->Update();
-        ModelInfo.Update();
-    
+
         UniformBufferObject ubo{};
-        ubo.model = glm::mat4(1.0f);
-        ubo.model = glm::rotate(ubo.model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.view = camera->GetViewMatrix();
         ubo.proj = camera->GetProjectionMatrix();
         ubo.proj[1][1] *= -1;
-
-        for (auto bone : BoneList)
-        {
-            ubo.BoneTransform[bone->GetBoneID()] = bone->GetFinalBoneTransformMatrix();
-        }
 
         void* data;
         vkMapMemory(vulkanEngine.Device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
         memcpy(data, &ubo, sizeof(ubo));
         vkUnmapMemory(vulkanEngine.Device, uniformBuffersMemory[currentImage]);
+        //static auto startTime = std::chrono::high_resolution_clock::now();
+
+        //auto currentTime = std::chrono::high_resolution_clock::now();
+        //float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+        //camera->Update();
+        //ModelInfo.Update();
+    
+        //UniformBufferObject ubo{};
+        //ubo.model = glm::mat4(1.0f);
+        //ubo.model = glm::rotate(ubo.model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        //ubo.view = camera->GetViewMatrix();
+        //ubo.proj = camera->GetProjectionMatrix();
+        //ubo.proj[1][1] *= -1;
+
+        //for (auto bone : BoneList)
+        //{
+        //    ubo.BoneTransform[bone->GetBoneID()] = bone->GetFinalBoneTransformMatrix();
+        //}
+
+        //void* data;
+        //vkMapMemory(vulkanEngine.Device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
+        //memcpy(data, &ubo, sizeof(ubo));
+        //vkUnmapMemory(vulkanEngine.Device, uniformBuffersMemory[currentImage]);
     }
 
     void drawFrame() {
