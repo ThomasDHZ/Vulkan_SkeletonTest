@@ -4,7 +4,7 @@
 #include <array>
 #include "VulkanEngine.h"
 #include "RenderedDepthTexture.h"
-#include "FrameBufferRenderingPipeline.h"
+#include "ForwardRenderingPipeline.h"
 
 class MainRenderPass
 {

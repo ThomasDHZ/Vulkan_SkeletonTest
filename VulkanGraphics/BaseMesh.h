@@ -105,11 +105,9 @@ private:
 
 protected:
 
-    VertexBuffer MeshVertex;
-    IndicesBuffer MeshIndices;
+  
 
-    VkDescriptorPool DescriptorPool;
-    std::vector<VkDescriptorSet> DescriptorSets;
+
 
     std::shared_ptr<Texture> DiffuseTexture;
     std::shared_ptr<Texture> SpecularTexture;
@@ -130,7 +128,11 @@ protected:
     void CreateDescriptorSetsData(VulkanEngine& renderer, std::vector<WriteDescriptorSetInfo> descriptorWritesList);
 
 public:
+    VkDescriptorPool DescriptorPool;
+    std::vector<VkDescriptorSet> DescriptorSets;
 
+    VertexBuffer MeshVertex;
+    IndicesBuffer MeshIndices;
     glm::vec3 MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 MeshRotate = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 MeshScale = glm::vec3(1.0f);

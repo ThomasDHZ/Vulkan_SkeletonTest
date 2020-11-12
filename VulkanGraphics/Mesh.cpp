@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include <chrono>
 
 
 Mesh::Mesh() : BaseMesh()
@@ -13,7 +14,7 @@ Mesh::Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata) : Base
     }
 }
 
-Mesh::Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, VkDescriptorSetLayout desc, Texture& texture) : BaseMesh(renderer, vertexdata, indicesdata)
+Mesh::Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, ForwardRenderingPipeline desc, Texture& texture) : BaseMesh(renderer, vertexdata, indicesdata)
 {
     CreateUniformBuffers(renderer);
     CreateDescriptorPool(renderer);
@@ -158,9 +159,9 @@ void Mesh::CreateMaterialProperties(MeshTextures textures)
 void Mesh::CreateUniformBuffers(VulkanEngine& renderer)
 {
     uniformBuffer = VulkanUniformBuffer(renderer, sizeof(VertexMatrixObject));
-    lightBuffer = VulkanUniformBuffer(renderer, sizeof(LightBufferObject));
-    meshPropertiesBuffer = VulkanUniformBuffer(renderer, sizeof(MeshProperties));
-    ExtendedMeshProperitesBuffer.customBuffer = VulkanUniformBuffer(renderer, ExtendedMeshProperitesBuffer.ByteSize);
+    //lightBuffer = VulkanUniformBuffer(renderer, sizeof(LightBufferObject));
+    //meshPropertiesBuffer = VulkanUniformBuffer(renderer, sizeof(MeshProperties));
+    //ExtendedMeshProperitesBuffer.customBuffer = VulkanUniformBuffer(renderer, ExtendedMeshProperitesBuffer.ByteSize);
 }
 
 void Mesh::CreateDescriptorPool(VulkanEngine& renderer) {
@@ -173,9 +174,9 @@ void Mesh::CreateDescriptorPool(VulkanEngine& renderer) {
     BaseMesh::CreateDescriptorPool(renderer, std::vector<DescriptorPoolSizeInfo>(DescriptorPoolInfo.begin(), DescriptorPoolInfo.end()));
 }
 
-void Mesh::CreateDescriptorSets(VulkanEngine& renderer, VkDescriptorSetLayout desc, Texture textureManager)
+void Mesh::CreateDescriptorSets(VulkanEngine& renderer, ForwardRenderingPipeline desc, Texture textureManager)
 {
-    BaseMesh::CreateDescriptorSets(renderer, desc);
+    BaseMesh::CreateDescriptorSets(renderer, desc.ShaderPipelineDescriptorLayout);
 
     VkDescriptorImageInfo DiffuseMap = {};
     DiffuseMap.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -216,25 +217,29 @@ void Mesh::Update(VulkanEngine& renderer)
 
 void Mesh::Update(VulkanEngine& renderer, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, void* CustomBufferinfo)
 {
-    ubo.model = TransformMatrix;
-    ubo.model = glm::translate(ubo.model, MeshPosition);
-    ubo.model = glm::scale(ubo.model, MeshScale);
-    ubo.view = camera->GetViewMatrix();
-    ubo.proj = camera->GetProjectionMatrix();
-    ubo.proj[1][1] *= -1;
+
+    static auto startTime = std::chrono::high_resolution_clock::now();
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+    VertexMatrixObject ubo2{};
+         ubo.model = glm::mat4(1.0f);
+         ubo.model = glm::rotate(ubo2.model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+         ubo.view = camera->GetViewMatrix();
+         ubo.proj = camera->GetProjectionMatrix();
+         ubo.proj[1][1] *= -1;
 
    // properites.timer = glfwGetTime();
-    UpdateUniformBuffer(renderer, ubo, Lightbuffer, CustomBufferinfo);
+    UpdateUniformBuffer(renderer, ubo2, Lightbuffer, CustomBufferinfo);
 }
 
 void Mesh::Update(VulkanEngine& renderer, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, void* CustomBufferinfo)
 {
-    ubo.model = TransformMatrix;
-    ubo.model = glm::translate(ubo.model, MeshPosition);
-    ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.model = glm::scale(ubo.model, MeshScale);
+    static auto startTime = std::chrono::high_resolution_clock::now();
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+    VertexMatrixObject ubo2{};
+    ubo.model = glm::mat4(1.0f);
+    ubo.model = glm::rotate(ubo2.model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     ubo.view = camera->GetViewMatrix();
     ubo.proj = camera->GetProjectionMatrix();
     ubo.proj[1][1] *= -1;
@@ -262,25 +267,25 @@ void Mesh::UpdateUniformBuffer(VulkanEngine& renderer, VertexMatrixObject ubo, v
 void Mesh::UpdateUniformBuffer(VulkanEngine& renderer, VertexMatrixObject ubo, LightBufferObject Lightbuffer, void* CustomBufferinfo)
 {
     uniformBuffer.UpdateUniformBuffer(renderer, static_cast<void*>(&ubo));
-    lightBuffer.UpdateUniformBuffer(renderer, static_cast<void*>(&Lightbuffer));
+  //  lightBuffer.UpdateUniformBuffer(renderer, static_cast<void*>(&Lightbuffer));
    // meshPropertiesBuffer.UpdateUniformBuffer(renderer, static_cast<void*>(&properites));
-    if (!CustomBufferinfo == NULL)
-    {
-        ExtendedMeshProperitesBuffer.customBuffer.UpdateUniformBuffer(renderer, CustomBufferinfo);
-    }
-    else
-    {
-        Empty empty = {};
-        empty.empty = 1.0f;
-        ExtendedMeshProperitesBuffer.customBuffer.UpdateUniformBuffer(renderer, static_cast<void*>(&empty));
-    }
+    //if (!CustomBufferinfo == NULL)
+    //{
+    //    ExtendedMeshProperitesBuffer.customBuffer.UpdateUniformBuffer(renderer, CustomBufferinfo);
+    //}
+    //else
+    //{
+    //    Empty empty = {};
+    //    empty.empty = 1.0f;
+    //    ExtendedMeshProperitesBuffer.customBuffer.UpdateUniformBuffer(renderer, static_cast<void*>(&empty));
+    //}
 }
 
 void Mesh::Destory(VulkanEngine& renderer)
 {
     uniformBuffer.Destroy(renderer);
-    lightBuffer.Destroy(renderer);
-    meshPropertiesBuffer.Destroy(renderer);
-    ExtendedMeshProperitesBuffer.customBuffer.Destroy(renderer);
+    //lightBuffer.Destroy(renderer);
+    //meshPropertiesBuffer.Destroy(renderer);
+    //ExtendedMeshProperitesBuffer.customBuffer.Destroy(renderer);
     BaseMesh::Destory(renderer);
 }

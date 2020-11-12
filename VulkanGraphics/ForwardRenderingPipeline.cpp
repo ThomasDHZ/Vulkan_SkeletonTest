@@ -1,4 +1,4 @@
-#include "FrameBufferRenderingPipeline.h"
+#include "ForwardRenderingPipeline.h"
 #include "Vertex.h"
 
 ForwardRenderingPipeline::ForwardRenderingPipeline() : GraphicsPipeline()
