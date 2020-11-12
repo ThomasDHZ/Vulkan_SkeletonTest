@@ -108,16 +108,6 @@ private:
     Model ModelInfo;
     Mesh mesh;
 
-    VkBuffer vertexBuffer;
-    VkDeviceMemory vertexBufferMemory;
-    VkBuffer indexBuffer;
-    VkDeviceMemory indexBufferMemory;
-
-    std::vector<VkBuffer> uniformBuffers;
-    std::vector<VkDeviceMemory> uniformBuffersMemory;
-
-    VkDescriptorPool descriptorPool;
-    std::vector<VkDescriptorSet> descriptorSets;
 
     Texture2D texture;
 
@@ -150,13 +140,7 @@ private:
         
         texture = Texture2D(vulkanEngine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/OpenGL_Skeleton_Test/OpenGL_Skeleton_Test/Model/TestAnimModel/diffuse.png", 0);
         mesh = Mesh(vulkanEngine, vertices, indices, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, texture);
-
-        createVertexBuffer();
-        createIndexBuffer();
-        createUniformBuffers();
-        createDescriptorPool();
-        createDescriptorSets();
-        renderManager.CMDBuffer(vulkanEngine, vulkanEngine.GetRenderCommandPool(), vertexBuffer, indexBuffer, descriptorSets, indices.size());
+        renderManager.CMDBuffer(vulkanEngine, vulkanEngine.GetRenderCommandPool(), mesh.MeshVertex.GetVertexBuffer(), mesh.MeshIndices.GetIndiceBuffer(), mesh.DescriptorSets, indices.size());
 
         ImGui_ImplVulkan_InitInfo init_info = {};
         init_info.Instance = vulkanEngine.Instance;
@@ -278,19 +262,7 @@ private:
 
         vkDestroyRenderPass(vulkanEngine.Device, renderManager.mainRenderPass.GetRenderPass(), nullptr);
 
-        for (size_t i = 0; i < vulkanEngine.SwapChain.GetSwapChainImageCount(); i++) {
-            vkDestroyBuffer(vulkanEngine.Device, uniformBuffers[i], nullptr);
-            vkFreeMemory(vulkanEngine.Device, uniformBuffersMemory[i], nullptr);
-        }
-
-        vkDestroyDescriptorPool(vulkanEngine.Device, descriptorPool, nullptr);
-
-        vkDestroyBuffer(vulkanEngine.Device, indexBuffer, nullptr);
-        vkFreeMemory(vulkanEngine.Device, indexBufferMemory, nullptr);
-
-        vkDestroyBuffer(vulkanEngine.Device, vertexBuffer, nullptr);
-        vkFreeMemory(vulkanEngine.Device, vertexBufferMemory, nullptr);
-
+        mesh.Destory(vulkanEngine);
         vulkanEngine.Destory();
 
         glfwDestroyWindow(window.GetWindowPtr());
@@ -314,21 +286,11 @@ private:
 
         vkDestroySwapchainKHR(vulkanEngine.Device, vulkanEngine.SwapChain.GetSwapChain(), nullptr);
 
-        for (size_t i = 0; i < vulkanEngine.SwapChain.GetSwapChainImageCount(); i++) {
-            vkDestroyBuffer(vulkanEngine.Device, uniformBuffers[i], nullptr);
-            vkFreeMemory(vulkanEngine.Device, uniformBuffersMemory[i], nullptr);
-        }
-
-        vkDestroyDescriptorPool(vulkanEngine.Device, descriptorPool, nullptr);
 
         vulkanEngine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), vulkanEngine.Device, vulkanEngine.PhysicalDevice, vulkanEngine.Surface);
 
-        renderManager.UpdateRenderManager(vulkanEngine);
-
-        createUniformBuffers();
-        createDescriptorPool();
-        createDescriptorSets();
-        renderManager.CMDBuffer(vulkanEngine, vulkanEngine.GetRenderCommandPool(), vertexBuffer, indexBuffer, descriptorSets, indices.size());
+        renderManager.UpdateRenderManager(vulkanEngine);       
+        renderManager.CMDBuffer(vulkanEngine, vulkanEngine.GetRenderCommandPool(), mesh.MeshVertex.GetVertexBuffer(), mesh.MeshIndices.GetIndiceBuffer(), mesh.DescriptorSets, indices.size());
     }
 
     VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
@@ -359,121 +321,7 @@ private:
         return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
     }
 
-    void createVertexBuffer() {
-        VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
-
-        VkBuffer stagingBuffer;
-        VkDeviceMemory stagingBufferMemory;
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-        void* data;
-        vkMapMemory(vulkanEngine.Device, stagingBufferMemory, 0, bufferSize, 0, &data);
-        memcpy(data, vertices.data(), (size_t)bufferSize);
-        vkUnmapMemory(vulkanEngine.Device, stagingBufferMemory);
-
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
-
-        copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-
-        vkDestroyBuffer(vulkanEngine.Device, stagingBuffer, nullptr);
-        vkFreeMemory(vulkanEngine.Device, stagingBufferMemory, nullptr);
-    }
-
-    void createIndexBuffer() {
-        VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
-
-        VkBuffer stagingBuffer;
-        VkDeviceMemory stagingBufferMemory;
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-        void* data;
-        vkMapMemory(vulkanEngine.Device, stagingBufferMemory, 0, bufferSize, 0, &data);
-        memcpy(data, indices.data(), (size_t)bufferSize);
-        vkUnmapMemory(vulkanEngine.Device, stagingBufferMemory);
-
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
-
-        copyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-        vkDestroyBuffer(vulkanEngine.Device, stagingBuffer, nullptr);
-        vkFreeMemory(vulkanEngine.Device, stagingBufferMemory, nullptr);
-    }
-
-    void createUniformBuffers() {
-        VkDeviceSize bufferSize = sizeof(VertexMatrixObject);
-
-        uniformBuffers.resize(vulkanEngine.SwapChain.GetSwapChainImageCount());
-        uniformBuffersMemory.resize(vulkanEngine.SwapChain.GetSwapChainImageCount());
-
-        for (size_t i = 0; i < vulkanEngine.SwapChain.GetSwapChainImageCount(); i++) {
-            createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
-        }
-    }
-
-    void createDescriptorPool() {
-        std::array<VkDescriptorPoolSize, 2> poolSizes{};
-        poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSizes[0].descriptorCount = static_cast<uint32_t>(vulkanEngine.SwapChain.GetSwapChainImageCount());
-        poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        poolSizes[1].descriptorCount = static_cast<uint32_t>(vulkanEngine.SwapChain.GetSwapChainImageCount());
-
-        VkDescriptorPoolCreateInfo poolInfo{};
-        poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-        poolInfo.pPoolSizes = poolSizes.data();
-        poolInfo.maxSets = static_cast<uint32_t>(vulkanEngine.SwapChain.GetSwapChainImageCount());
-
-        if (vkCreateDescriptorPool(vulkanEngine.Device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create descriptor pool!");
-        }
-    }
-
-    void createDescriptorSets() {
-        std::vector<VkDescriptorSetLayout> layouts(vulkanEngine.SwapChain.GetSwapChainImageCount(), renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
-        VkDescriptorSetAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo.descriptorPool = descriptorPool;
-        allocInfo.descriptorSetCount = static_cast<uint32_t>(vulkanEngine.SwapChain.GetSwapChainImageCount());
-        allocInfo.pSetLayouts = layouts.data();
-
-        descriptorSets.resize(vulkanEngine.SwapChain.GetSwapChainImageCount());
-        if (vkAllocateDescriptorSets(vulkanEngine.Device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate descriptor sets!");
-        }
-
-        for (size_t i = 0; i < vulkanEngine.SwapChain.GetSwapChainImageCount(); i++) {
-            VkDescriptorBufferInfo bufferInfo{};
-            bufferInfo.buffer = uniformBuffers[i];
-            bufferInfo.offset = 0;
-            bufferInfo.range = sizeof(VertexMatrixObject);
-
-            VkDescriptorImageInfo imageInfo{};
-            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            imageInfo.imageView = texture.GetTextureView();
-            imageInfo.sampler = texture.GetTextureSampler();
-
-            std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
-
-            descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrites[0].dstSet = descriptorSets[i];
-            descriptorWrites[0].dstBinding = 0;
-            descriptorWrites[0].dstArrayElement = 0;
-            descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            descriptorWrites[0].descriptorCount = 1;
-            descriptorWrites[0].pBufferInfo = &bufferInfo;
-
-            descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrites[1].dstSet = descriptorSets[i];
-            descriptorWrites[1].dstBinding = 1;
-            descriptorWrites[1].dstArrayElement = 0;
-            descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            descriptorWrites[1].descriptorCount = 1;
-            descriptorWrites[1].pImageInfo = &imageInfo;
-
-            vkUpdateDescriptorSets(vulkanEngine.Device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-        }
-    }
-
+   
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
         VkBufferCreateInfo bufferInfo{};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -565,18 +413,20 @@ private:
         auto currentTime = std::chrono::high_resolution_clock::now();
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
+        LightBufferObject light = {};
         camera->Update();
+        mesh.Update(vulkanEngine, camera, light);
 
-        VertexMatrixObject ubo{};
-        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo.view = camera->GetViewMatrix();
-        ubo.proj = camera->GetProjectionMatrix();
-        ubo.proj[1][1] *= -1;
+        //VertexMatrixObject ubo{};
+        //ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        //ubo.view = camera->GetViewMatrix();
+        //ubo.proj = camera->GetProjectionMatrix();
+        //ubo.proj[1][1] *= -1;
 
-        void* data;
-        vkMapMemory(vulkanEngine.Device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
-        memcpy(data, &ubo, sizeof(ubo));
-        vkUnmapMemory(vulkanEngine.Device, uniformBuffersMemory[currentImage]);
+        //void* data;
+        //vkMapMemory(vulkanEngine.Device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
+        //memcpy(data, &ubo, sizeof(ubo));
+        //vkUnmapMemory(vulkanEngine.Device, uniformBuffersMemory[currentImage]);
         //static auto startTime = std::chrono::high_resolution_clock::now();
 
         //auto currentTime = std::chrono::high_resolution_clock::now();
@@ -606,8 +456,7 @@ private:
     void drawFrame() {
         vkWaitForFences(vulkanEngine.Device, 1, &vulkanEngine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
-        uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(vulkanEngine.Device, vulkanEngine.SwapChain.GetSwapChain(), UINT64_MAX, vulkanEngine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &imageIndex);
+        VkResult result = vkAcquireNextImageKHR(vulkanEngine.Device, vulkanEngine.SwapChain.GetSwapChain(), UINT64_MAX, vulkanEngine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &vulkanEngine.DrawFrame);
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
             recreateSwapChain();
@@ -617,24 +466,24 @@ private:
             throw std::runtime_error("failed to acquire swap chain image!");
         }
 
-        updateUniformBuffer(imageIndex);
+        updateUniformBuffer(vulkanEngine.DrawFrame);
 
-        if (vulkanEngine.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
-            vkWaitForFences(vulkanEngine.Device, 1, &vulkanEngine.imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
+        if (vulkanEngine.imagesInFlight[vulkanEngine.DrawFrame] != VK_NULL_HANDLE) {
+            vkWaitForFences(vulkanEngine.Device, 1, &vulkanEngine.imagesInFlight[vulkanEngine.DrawFrame], VK_TRUE, UINT64_MAX);
         }
-        vulkanEngine.imagesInFlight[imageIndex] = vulkanEngine.inFlightFences[currentFrame];
+        vulkanEngine.imagesInFlight[vulkanEngine.DrawFrame] = vulkanEngine.inFlightFences[currentFrame];
 
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        if (vkBeginCommandBuffer(ImGuiCommandBuffers[imageIndex], &beginInfo) != VK_SUCCESS) {
+        if (vkBeginCommandBuffer(ImGuiCommandBuffers[vulkanEngine.DrawFrame], &beginInfo) != VK_SUCCESS) {
             throw std::runtime_error("failed to begin recording command buffer!");
         }
 
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = renderManager.interfaceRenderPass.GetRenderPass();
-        renderPassInfo.framebuffer = renderManager.interfaceRenderPass.SwapChainFramebuffers[imageIndex];
+        renderPassInfo.framebuffer = renderManager.interfaceRenderPass.SwapChainFramebuffers[vulkanEngine.DrawFrame];
         renderPassInfo.renderArea.offset = { 0, 0 };
         renderPassInfo.renderArea.extent = vulkanEngine.SwapChain.GetSwapChainResolution();
 
@@ -646,16 +495,16 @@ private:
         renderPassInfo.pClearValues = clearValues.data();
 
 
-        vkCmdBeginRenderPass(ImGuiCommandBuffers[imageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), ImGuiCommandBuffers[imageIndex]);
-        vkCmdEndRenderPass(ImGuiCommandBuffers[imageIndex]);
+        vkCmdBeginRenderPass(ImGuiCommandBuffers[vulkanEngine.DrawFrame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), ImGuiCommandBuffers[vulkanEngine.DrawFrame]);
+        vkCmdEndRenderPass(ImGuiCommandBuffers[vulkanEngine.DrawFrame]);
 
-        if (vkEndCommandBuffer(ImGuiCommandBuffers[imageIndex]) != VK_SUCCESS) {
+        if (vkEndCommandBuffer(ImGuiCommandBuffers[vulkanEngine.DrawFrame]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
 
         std::array<VkCommandBuffer, 2> submitCommandBuffers =
-        { renderManager.commandBuffers[imageIndex], ImGuiCommandBuffers[imageIndex] };
+        { renderManager.commandBuffers[vulkanEngine.DrawFrame], ImGuiCommandBuffers[vulkanEngine.DrawFrame] };
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -688,7 +537,7 @@ private:
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = swapChains;
 
-        presentInfo.pImageIndices = &imageIndex;
+        presentInfo.pImageIndices = &vulkanEngine.DrawFrame;
 
         result = vkQueuePresentKHR(vulkanEngine.PresentQueue, &presentInfo);
 
