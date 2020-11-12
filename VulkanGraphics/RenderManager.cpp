@@ -21,13 +21,13 @@ void RenderManager::UpdateRenderManager(VulkanEngine& engine)
 	interfaceRenderPass.UpdateSwapChain(engine);
 }
 
-void RenderManager::CMDBuffer(VulkanEngine& engine, VkBuffer vertexBuffer, VkBuffer indexBuffer, std::vector<VkDescriptorSet> descriptorSets, uint32_t indices)
+void RenderManager::CMDBuffer(VulkanEngine& engine, VkCommandPool commandPool, VkBuffer vertexBuffer, VkBuffer indexBuffer, std::vector<VkDescriptorSet> descriptorSets, uint32_t indices)
 {
     commandBuffers.resize(mainRenderPass.SwapChainFramebuffers.size());
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine.GetRenderCommandPool();
+    allocInfo.commandPool = commandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
 

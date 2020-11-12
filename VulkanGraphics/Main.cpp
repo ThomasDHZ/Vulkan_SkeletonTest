@@ -97,6 +97,13 @@ private:
 
     Model ModelInfo;
 
+   // VkCommandPool commandPool;
+
+    //VkImage textureImage;
+    //VkDeviceMemory textureImageMemory;
+    //VkImageView textureImageView;
+    //VkSampler textureSampler;
+
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
     VkBuffer indexBuffer;
@@ -144,7 +151,7 @@ private:
         createUniformBuffers();
         createDescriptorPool();
         createDescriptorSets();
-        renderManager.CMDBuffer(vulkanEngine, vertexBuffer, indexBuffer, descriptorSets, indices.size());
+        renderManager.CMDBuffer(vulkanEngine, vulkanEngine.GetRenderCommandPool(), vertexBuffer, indexBuffer, descriptorSets, indices.size());
 
         ImGui_ImplVulkan_InitInfo init_info = {};
         init_info.Instance = vulkanEngine.Instance;
@@ -318,7 +325,7 @@ private:
         createUniformBuffers();
         createDescriptorPool();
         createDescriptorSets();
-        renderManager.CMDBuffer(vulkanEngine, vertexBuffer, indexBuffer, descriptorSets, indices.size());
+        renderManager.CMDBuffer(vulkanEngine, vulkanEngine.GetRenderCommandPool(), vertexBuffer, indexBuffer, descriptorSets, indices.size());
     }
 
     VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
@@ -335,6 +342,18 @@ private:
         }
 
         throw std::runtime_error("failed to find supported format!");
+    }
+
+    VkFormat findDepthFormat() {
+        return findSupportedFormat(
+            { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+            VK_IMAGE_TILING_OPTIMAL,
+            VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
+        );
+    }
+
+    bool hasStencilComponent(VkFormat format) {
+        return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
     }
 
     void createVertexBuffer() {

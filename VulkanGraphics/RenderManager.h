@@ -17,7 +17,7 @@ public:
 	RenderManager(VulkanEngine& vEngine);
 	~RenderManager();
 
-	void CMDBuffer(VulkanEngine& engine, VkBuffer vertexBuffer, VkBuffer indexBuffer, std::vector<VkDescriptorSet> descriptorSets, uint32_t indices);
+	void CMDBuffer(VulkanEngine& engine, VkCommandPool commnadPool, VkBuffer vertexBuffer, VkBuffer indexBuffer, std::vector<VkDescriptorSet> descriptorSets, uint32_t indices);
 	void UpdateRenderManager(VulkanEngine& engine);
 	void Draw(VulkanEngine& vEngine);
 	void Destroy(VulkanEngine& vEngine);
