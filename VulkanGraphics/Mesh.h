@@ -101,7 +101,7 @@ protected:
 
     virtual void CreateUniformBuffers(VulkanEngine& renderer);
     virtual void CreateDescriptorPool(VulkanEngine& renderer);
-    virtual void CreateDescriptorSets(VulkanEngine& renderer, ForwardRenderingPipeline desc, Texture textureManager);
+    virtual void CreateDescriptorSets(VulkanEngine& renderer, VkDescriptorSetLayout desc, Texture textureManager);
     virtual void UpdateUniformBuffer(VulkanEngine& renderer, VertexMatrixObject ubo, void* CustomBufferinfo = nullptr);
     virtual void UpdateUniformBuffer(VulkanEngine& renderer, VertexMatrixObject ubo, LightBufferObject Lightbuffer, void* CustomBufferinfo = nullptr);
 
@@ -111,7 +111,7 @@ public:
 
     Mesh();
     Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata);
-    Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, ForwardRenderingPipeline desc, Texture& texture);
+    Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, VkDescriptorSetLayout desc, Texture& texture);
     Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata);
     Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, CustomBuffer customBuffer);
     //Mesh(RendererManager& renderer, std::shared_ptr<TextureManager>textureManager, const MeshData& meshData);

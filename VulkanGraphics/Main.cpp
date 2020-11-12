@@ -66,13 +66,6 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-struct UniformBufferObject {
-    alignas(16) glm::mat4 model;
-    alignas(16) glm::mat4 view;
-    alignas(16) glm::mat4 proj;
-    glm::mat4 BoneTransform[100];
-};
-
 
 const std::vector<Vertex> vertices = {
     {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
@@ -113,6 +106,7 @@ private:
     Mouse mouse;
 
     Model ModelInfo;
+    Mesh mesh;
 
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
@@ -155,6 +149,7 @@ private:
       //  BoneList = ModelInfo.BoneList;
         
         texture = Texture2D(vulkanEngine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/OpenGL_Skeleton_Test/OpenGL_Skeleton_Test/Model/TestAnimModel/diffuse.png", 0);
+        mesh = Mesh(vulkanEngine, vertices, indices, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, texture);
 
         createVertexBuffer();
         createIndexBuffer();
@@ -405,7 +400,7 @@ private:
     }
 
     void createUniformBuffers() {
-        VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+        VkDeviceSize bufferSize = sizeof(VertexMatrixObject);
 
         uniformBuffers.resize(vulkanEngine.SwapChain.GetSwapChainImageCount());
         uniformBuffersMemory.resize(vulkanEngine.SwapChain.GetSwapChainImageCount());
@@ -450,7 +445,7 @@ private:
             VkDescriptorBufferInfo bufferInfo{};
             bufferInfo.buffer = uniformBuffers[i];
             bufferInfo.offset = 0;
-            bufferInfo.range = sizeof(UniformBufferObject);
+            bufferInfo.range = sizeof(VertexMatrixObject);
 
             VkDescriptorImageInfo imageInfo{};
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -572,7 +567,7 @@ private:
 
         camera->Update();
 
-        UniformBufferObject ubo{};
+        VertexMatrixObject ubo{};
         ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.view = camera->GetViewMatrix();
         ubo.proj = camera->GetProjectionMatrix();

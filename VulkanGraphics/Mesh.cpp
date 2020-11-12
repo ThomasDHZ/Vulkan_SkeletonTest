@@ -14,7 +14,7 @@ Mesh::Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata) : Base
     }
 }
 
-Mesh::Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, ForwardRenderingPipeline desc, Texture& texture) : BaseMesh(renderer, vertexdata, indicesdata)
+Mesh::Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, VkDescriptorSetLayout desc, Texture& texture) : BaseMesh(renderer, vertexdata, indicesdata)
 {
     CreateUniformBuffers(renderer);
     CreateDescriptorPool(renderer);
@@ -174,9 +174,9 @@ void Mesh::CreateDescriptorPool(VulkanEngine& renderer) {
     BaseMesh::CreateDescriptorPool(renderer, std::vector<DescriptorPoolSizeInfo>(DescriptorPoolInfo.begin(), DescriptorPoolInfo.end()));
 }
 
-void Mesh::CreateDescriptorSets(VulkanEngine& renderer, ForwardRenderingPipeline desc, Texture textureManager)
+void Mesh::CreateDescriptorSets(VulkanEngine& renderer, VkDescriptorSetLayout desc, Texture textureManager)
 {
-    BaseMesh::CreateDescriptorSets(renderer, desc.ShaderPipelineDescriptorLayout);
+    BaseMesh::CreateDescriptorSets(renderer, desc);
 
     VkDescriptorImageInfo DiffuseMap = {};
     DiffuseMap.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
