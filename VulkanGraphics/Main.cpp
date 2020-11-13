@@ -108,12 +108,6 @@ private:
     Mouse mouse;
 
     Model ModelInfo;
-    Mesh mesh;
-
-
-    Texture2D texture;
-
-    /*size_t currentFrame = 0;*/
 
     VkDescriptorPool ImGuiDescriptorPool;
     VkCommandPool ImGuiCommandPool;
@@ -126,18 +120,9 @@ private:
         renderManager = RenderManager(vulkanEngine);
         textureManager = std::make_shared<TextureManager>(vulkanEngine);
         ModelInfo = Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
-        /*vertices = ModelInfo.VertexList;
-        indices = ModelInfo.IndexList;
-        BoneList = ModelInfo.BoneList;*/
-        
-        texture = Texture2D(vulkanEngine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/OpenGL_Skeleton_Test/OpenGL_Skeleton_Test/Model/TestAnimModel/diffuse.png", 0);
 
-        MeshTextures Textures = {};
-        Textures.DiffuseMap = "C:/Users/dotha/source/repos/OpenGL_Skeleton_Test/OpenGL_Skeleton_Test/Model/TestAnimModel/diffuse.png";
-
-
-        mesh = Mesh(vulkanEngine, textureManager, ModelInfo.SubMeshList[0], renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
-        renderManager.CMDBuffer(vulkanEngine, mesh);
+       
+        renderManager.CMDBuffer(vulkanEngine, ModelInfo);
 
         ImGui_ImplVulkan_InitInfo init_info = {};
         init_info.Instance = vulkanEngine.Instance;
@@ -244,7 +229,6 @@ private:
 
     void cleanup() 
     {
-        texture.Delete(vulkanEngine);
 
         vkDestroyDescriptorPool(vulkanEngine.Device, ImGuiDescriptorPool, nullptr);
         vkFreeCommandBuffers(vulkanEngine.Device, ImGuiCommandPool, static_cast<uint32_t>(renderManager.ImGuiCommandBuffers.size()), renderManager.ImGuiCommandBuffers.data());
@@ -258,7 +242,7 @@ private:
 
         vkDestroyRenderPass(vulkanEngine.Device, renderManager.mainRenderPass.GetRenderPass(), nullptr);
 
-        mesh.Destory(vulkanEngine);
+        ModelInfo.Destroy(vulkanEngine);
         textureManager->UnloadAllTextures(vulkanEngine);
         vulkanEngine.Destory();
 
@@ -267,7 +251,7 @@ private:
     }
 
     void recreateSwapChain() {
-        renderManager.UpdateRenderManager(vulkanEngine, window.GetWindowPtr(), mesh);
+        renderManager.UpdateRenderManager(vulkanEngine, window.GetWindowPtr(), ModelInfo);
     }
 
    
@@ -343,8 +327,6 @@ private:
         throw std::runtime_error("failed to find suitable memory type!");
     }
 
-
-
     void updateUniformBuffer(uint32_t currentImage) 
     {
         static auto startTime = std::chrono::high_resolution_clock::now();
@@ -354,13 +336,13 @@ private:
 
         LightBufferObject light = {};
         camera->Update(vulkanEngine);
-        mesh.Update(vulkanEngine, camera, light, ModelInfo.BoneList);
+        ModelInfo.Update(vulkanEngine, camera, light);
     }
 
     void drawFrame() 
     {
         updateUniformBuffer(vulkanEngine.DrawFrame);
-        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), mesh);
+        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), ModelInfo);
     }
 
 };

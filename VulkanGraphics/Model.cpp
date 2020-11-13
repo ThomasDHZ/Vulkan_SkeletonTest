@@ -29,10 +29,10 @@ Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManag
 
 	LoadMeshTransform(0, ModelTransformMatrix);
 
-	//if (AnimationList.size() > 0)
-	//{
-	//	AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
-	//}
+	if (AnimationList.size() > 0)
+	{
+		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
+	}
 
 	//SendDrawMessage(renderer);
 }
@@ -590,20 +590,20 @@ glm::mat4 Model::AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix)
 
 void Model::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera, LightBufferObject& light)
 {
-	//glm::mat4 modelMatrix = ModelTransformMatrix;
-	//modelMatrix.model = glm::mat4(1.0f);
-	//modelMatrix.model = glm::rotate(modelMatrix.model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	//modelMatrix.view = camera->GetViewMatrix();
-	//modelMatrix.proj = camera->GetProjectionMatrix();
-	//modelMatrix.proj[1][1] *= -1;
-	//LoadMeshTransform(0, modelMatrix);
-	//AnimationPlayer.Update();
-	//for (auto mesh : MeshList)
-	//{
-	//	mesh->properites.material.specular = glm::vec3(0.02f);
-	//	mesh->properites.EmissionStrength = abs(sin(glfwGetTime()));
-	//	mesh->Update(engine, camera, light, BoneList);
-	//}
+	glm::mat4 modelMatrix = ModelTransformMatrix;
+	modelMatrix = glm::translate(modelMatrix, ModelPosition);
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(ModelRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(ModelRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	modelMatrix = glm::scale(modelMatrix, ModelScale);
+	LoadMeshTransform(0, modelMatrix);
+	AnimationPlayer.Update();
+	for (auto mesh : MeshList)
+	{
+		//mesh->properites.material.specular = glm::vec3(0.02f);
+		//mesh->properites.EmissionStrength = abs(sin(glfwGetTime()));
+		mesh->Update(engine, camera, light, BoneList);
+	}
 }
 
 void Model::UpdateImGUI()
@@ -627,17 +627,17 @@ void Model::UpdateImGUI()
 		ImGui::TreePop();
 	}
 
-	if (ImGui::Button("Play"))
-	{
-		if (AnimationPlayer.GetPlayAnimationFlag())
-		{
-			AnimationPlayer.SetPlayAnimationFlag(false);
-		}
-		else
-		{
-			AnimationPlayer.SetPlayAnimationFlag(true);
-		}
-	}
+	//if (ImGui::Button("Play"))
+	//{
+	//	if (AnimationPlayer.GetPlayAnimationFlag())
+	//	{
+	//		AnimationPlayer.SetPlayAnimationFlag(false);
+	//	}
+	//	else
+	//	{
+	//		AnimationPlayer.SetPlayAnimationFlag(true);
+	//	}
+	//}
 	ImGui::SliderFloat("Anibar", AnimationPlayer.GetAnimationTimePtr(), 0.0f, AnimationPlayer.GetAnimationLength());
 	ImGui::SliderFloat("PlaySpeed", AnimationPlayer.GetAnimationPlaySpeedPtr(), 0.0f, 10.0f);
 	ImGui::End();

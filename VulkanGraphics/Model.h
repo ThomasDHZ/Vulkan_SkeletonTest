@@ -24,7 +24,7 @@ private:
 	glm::mat4 ModelTransformMatrix = glm::mat4(1.0f);
 	glm::vec3 ModelPosition = glm::vec3(0.0f);
 	glm::vec3 ModelRotation = glm::vec3(0.0f);
-	glm::vec3 ModelScale = glm::vec3(0.167f);
+	glm::vec3 ModelScale = glm::vec3(1.0f);
 
 
 

@@ -18,7 +18,7 @@ RenderManager::~RenderManager()
 {
 }
 
-void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, Mesh& mesh)
+void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, Model& mesh)
 {
     int width = 0, height = 0;
     glfwGetFramebufferSize(window, &width, &height);
@@ -43,7 +43,7 @@ void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window
    CMDBuffer(engine, mesh);
 }
 
-void RenderManager::CMDBuffer(VulkanEngine& engine, Mesh& mesh)
+void RenderManager::CMDBuffer(VulkanEngine& engine, Model& mesh)
 {
     commandBuffers.resize(mainRenderPass.SwapChainFramebuffers.size());
 
@@ -83,15 +83,15 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, Mesh& mesh)
 
         vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderPass.forwardRendereringPipeline->ShaderPipeline);
 
-        VkBuffer vertexBuffers[] = { mesh.MeshVertex.GetVertexBuffer() };
+        VkBuffer vertexBuffers[] = { mesh.MeshList[0]->MeshVertex.GetVertexBuffer() };
         VkDeviceSize offsets[] = { 0 };
         vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
 
-        vkCmdBindIndexBuffer(commandBuffers[i], mesh.MeshIndices.GetIndiceBuffer(), 0, VK_INDEX_TYPE_UINT16);
+        vkCmdBindIndexBuffer(commandBuffers[i], mesh.MeshList[0]->MeshIndices.GetIndiceBuffer(), 0, VK_INDEX_TYPE_UINT16);
 
-        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &mesh.DescriptorSets[i], 0, nullptr);
+        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &mesh.MeshList[0]->DescriptorSets[i], 0, nullptr);
 
-        vkCmdDrawIndexed(commandBuffers[i], mesh.MeshIndices.GetIndiceCount(), 1, 0, 0, 0);
+        vkCmdDrawIndexed(commandBuffers[i], mesh.MeshList[0]->MeshIndices.GetIndiceCount(), 1, 0, 0, 0);
 
         vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -101,7 +101,7 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, Mesh& mesh)
     }
 }
 
-void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, Mesh& mesh)
+void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, Model& mesh)
 {
     vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 

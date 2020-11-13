@@ -3,6 +3,7 @@
 #include "MainRenderPass.h"
 #include "InterfaceRenderPass.h"
 #include "Mesh.h"
+#include "Model.h"
 
 class RenderManager
 {
@@ -25,9 +26,9 @@ public:
 	RenderManager(VulkanEngine& vEngine);
 	~RenderManager();
 
-	void CMDBuffer(VulkanEngine& engine, Mesh& mesh);
-	void UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, Mesh& mesh);
-	void Draw(VulkanEngine& engine, GLFWwindow* window, Mesh& mesh);
+	void CMDBuffer(VulkanEngine& engine, Model& mesh);
+	void UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, Model& mesh);
+	void Draw(VulkanEngine& engine, GLFWwindow* window, Model& mesh);
 	void Destroy(VulkanEngine& engine);
 };
 
