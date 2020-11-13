@@ -3,64 +3,61 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "Mesh.h"
 #include <unordered_map>
-#include "Vertex.h"
-#include <memory>
-#include "Bone.h"
 #include "Animation3D.h"
-#include "glm\gtc\quaternion.hpp"
+#include "AnimationPlayer3D.h"
 
+const unsigned int MAX_BONE_VERTEX_COUNT = 4;
 
-#include "assimp\Importer.hpp"
-#include "assimp\scene.h"
-#include "assimp\postprocess.h"
-
-struct NodeMap
+class Node
 {
-	std::string NodeString;
-	aiMatrix4x4 NodeTransform;
-	 int ParentNodeID;
-	 int NodeID;
-	std::vector<int> ChildNodeList;
+	unsigned int NodeID;
+	std::shared_ptr<Node> ParentNode;
+	std::vector<std::shared_ptr<Node>> Children;
 };
 
 class Model
 {
 private:
+	std::string ModelName;
+	glm::mat4 ModelTransformMatrix = glm::mat4(1.0f);
+	glm::vec3 ModelPosition = glm::vec3(0.0f);
+	glm::vec3 ModelRotation = glm::vec3(0.0f);
+	glm::vec3 ModelScale = glm::vec3(0.167f);
 
-	glm::mat4 GlobalInverseTransformMatrix;
-	Animation3D CurrentAnimation;
 
-	void LoadModel(const std::string& FilePath);
-	void ProcessNode(aiNode* node, const aiScene* scene);
 
-	void LoadVertices(aiMesh* mesh);
-	void LoadIndices(aiMesh* mesh);
-	void LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
-	void LoadNodeTree(const aiNode* RootNode,  int ParentNodeID);
-	void LoadAnimations(const aiScene* scene);
-
-	aiVector3D InterpolatePosition(const std::shared_ptr<Bone> bone, float AnimationTime, const int NodeID);
-	aiQuaternion InterpolateRotation(const std::shared_ptr<Bone> bone, float AnimationTime, const int NodeID);
-	aiVector3D InterpolateScaling(const std::shared_ptr<Bone> bone, float AnimationTime, const int NodeID);
-
-	void BoneWeightPlacement(unsigned int vertexID, unsigned int bone_id, float weight);
-	void UpdateSkeleton(const int NodeID, const glm::mat4 ParentMatrix);
-
-	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 matrix);
-	aiQuaternion nlerp(aiQuaternion a, aiQuaternion b, float blend);
-
-public:
-	Model();
-	Model(const std::string& FilePath);
-	~Model();
-
-	void Update();
-
-	std::vector<Vertex> VertexList;
-	std::vector<uint16_t> IndexList;
-	std::vector<std::shared_ptr<Bone>> BoneList;
 	std::vector<Animation3D> AnimationList;
 	std::vector<NodeMap> NodeMapList;
-};
+	glm::mat4 GlobalInverseTransformMatrix;
+	AnimationPlayer3D AnimationPlayer;
 
+	std::vector<MeshData> SubMeshList;
+
+	void LoadMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
+	std::vector<Vertex> LoadVertices(aiMesh* mesh);
+	std::vector<uint16_t> LoadIndices(aiMesh* mesh);
+	void LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
+	void LoadNodeTree(const aiNode* Node, int parentNodeID = -1);
+	void LoadAnimations(const aiScene* scene);
+	void LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshData& Properties, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
+//	void SendDrawMessage(VulkanEngine& engine);
+
+	void LoadMeshTransform(const int NodeID = 0, const glm::mat4 ParentMatrix = glm::mat4(1.0f));
+	void BoneWeightPlacement(std::vector<Vertex>& VertexList, unsigned int vertexID, unsigned int bone_id, float weight);
+
+	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 matrix);
+
+public:
+	std::vector<std::shared_ptr<Mesh>> MeshList;
+	std::vector<std::shared_ptr<Bone>> BoneList;
+
+	Model();
+	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout);
+	~Model();
+
+	void Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera, LightBufferObject& light);
+	void UpdateImGUI();
+	void Destroy(VulkanEngine& engine);
+};

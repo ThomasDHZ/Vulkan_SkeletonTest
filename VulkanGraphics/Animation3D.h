@@ -24,7 +24,7 @@ struct KeyFrame
 class Animation3D
 {
 private:
-	
+
 
 public:
 	std::vector<KeyFrame> BoneKeyFrameList;
@@ -35,5 +35,4 @@ public:
 	~Animation3D();
 
 	void AddBoneKeyFrame(KeyFrame keyFrame);
-	void UpdateBones(std::vector<std::shared_ptr<Bone>> Skeleton, glm::mat4 GlobalInverseTransform);
 };

@@ -337,12 +337,8 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
 
 void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, void* CustomBufferinfo)
 {
-    ubo.model = TransformMatrix;
-    ubo.model = glm::translate(ubo.model, MeshPosition);
-    ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.model = glm::scale(ubo.model, MeshScale);
+    ubo.model = glm::mat4(1.0f);
+    ubo.model = glm::rotate(ubo.model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     ubo.view = camera->GetViewMatrix();
     ubo.proj = camera->GetProjectionMatrix();
     ubo.proj[1][1] *= -1;

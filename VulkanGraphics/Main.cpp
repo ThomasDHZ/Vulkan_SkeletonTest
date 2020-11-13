@@ -137,7 +137,7 @@ private:
 
 
         mesh = Mesh(vulkanEngine, textureManager, vertices, indices, Textures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
-        renderManager.CMDBuffer(vulkanEngine, vulkanEngine.GetRenderCommandPool(), mesh.MeshVertex.GetVertexBuffer(), mesh.MeshIndices.GetIndiceBuffer(), mesh.DescriptorSets, indices.size());
+        renderManager.CMDBuffer(vulkanEngine, mesh);
 
         ImGui_ImplVulkan_InitInfo init_info = {};
         init_info.Instance = vulkanEngine.Instance;

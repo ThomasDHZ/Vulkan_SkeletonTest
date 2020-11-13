@@ -147,6 +147,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation3D.cpp" />
+    <ClCompile Include="AnimationPlayer3D.cpp" />
     <ClCompile Include="BaseMesh.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="camera.cpp" />
@@ -190,6 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation3D.h" />
+    <ClInclude Include="AnimationPlayer3D.h" />
     <ClInclude Include="BaseMesh.h" />
     <ClInclude Include="Bone.h" />
     <ClInclude Include="Camera.h" />

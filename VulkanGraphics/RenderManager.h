@@ -25,7 +25,7 @@ public:
 	RenderManager(VulkanEngine& vEngine);
 	~RenderManager();
 
-	void CMDBuffer(VulkanEngine& engine, VkCommandPool commnadPool, VkBuffer vertexBuffer, VkBuffer indexBuffer, std::vector<VkDescriptorSet> descriptorSets, uint32_t indices);
+	void CMDBuffer(VulkanEngine& engine, Mesh& mesh);
 	void UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, Mesh& mesh);
 	void Draw(VulkanEngine& engine, GLFWwindow* window, Mesh& mesh);
 	void Destroy(VulkanEngine& engine);
