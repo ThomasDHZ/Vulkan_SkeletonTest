@@ -33,7 +33,7 @@ private:
 	glm::mat4 GlobalInverseTransformMatrix;
 	AnimationPlayer3D AnimationPlayer;
 
-	std::vector<MeshData> SubMeshList;
+	
 
 	void LoadMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
@@ -50,6 +50,7 @@ private:
 	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 matrix);
 
 public:
+	std::vector<MeshData> SubMeshList;
 	std::vector<std::shared_ptr<Mesh>> MeshList;
 	std::vector<std::shared_ptr<Bone>> BoneList;
 

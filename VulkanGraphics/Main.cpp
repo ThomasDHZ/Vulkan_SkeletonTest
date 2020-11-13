@@ -125,10 +125,10 @@ private:
         vulkanEngine = VulkanEngine(window.GetWindowPtr());
         renderManager = RenderManager(vulkanEngine);
         textureManager = std::make_shared<TextureManager>(vulkanEngine);
-      //  ModelInfo = Model("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/TestAnimModel/model.dae");
-      //  vertices = ModelInfo.VertexList;
-       // indices = ModelInfo.IndexList;
-      //  BoneList = ModelInfo.BoneList;
+        ModelInfo = Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
+        /*vertices = ModelInfo.VertexList;
+        indices = ModelInfo.IndexList;
+        BoneList = ModelInfo.BoneList;*/
         
         texture = Texture2D(vulkanEngine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/OpenGL_Skeleton_Test/OpenGL_Skeleton_Test/Model/TestAnimModel/diffuse.png", 0);
 
@@ -136,7 +136,7 @@ private:
         Textures.DiffuseMap = "C:/Users/dotha/source/repos/OpenGL_Skeleton_Test/OpenGL_Skeleton_Test/Model/TestAnimModel/diffuse.png";
 
 
-        mesh = Mesh(vulkanEngine, textureManager, vertices, indices, Textures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
+        mesh = Mesh(vulkanEngine, textureManager, ModelInfo.SubMeshList[0], renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
         renderManager.CMDBuffer(vulkanEngine, mesh);
 
         ImGui_ImplVulkan_InitInfo init_info = {};
@@ -354,7 +354,7 @@ private:
 
         LightBufferObject light = {};
         camera->Update(vulkanEngine);
-        mesh.Update(vulkanEngine, camera, light);
+        mesh.Update(vulkanEngine, camera, light, ModelInfo.BoneList);
     }
 
     void drawFrame() 

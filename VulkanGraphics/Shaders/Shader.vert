@@ -22,7 +22,14 @@ layout(location = 0) out vec2 fragTexCoord;
 
 void main() 
 {
-    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
+    mat4 BoneTransform = ubo.BoneTransform[BoneID[0]] * BoneWeights[0];
+		 BoneTransform += ubo.BoneTransform[BoneID[1]] * BoneWeights[1];
+	     BoneTransform += ubo.BoneTransform[BoneID[2]] * BoneWeights[2];
+	     BoneTransform += ubo.BoneTransform[BoneID[3]] * BoneWeights[3];
+
+    vec4 BonePosisition = BoneTransform * vec4(inPosition, 1.0);
+
+    gl_Position = ubo.proj * ubo.view * ubo.model * BonePosisition;
     fragTexCoord = inTexCoord;
 }
 
