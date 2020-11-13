@@ -1,14 +1,16 @@
 #pragma once
-#pragma once
 #include <vector>
 #include <memory>
 #include "Vertex.h"
 #include "VulkanEngine.h"
-#include "Texture.h"
+#include "GraphicsPipeline.h"
 #include "VertexBuffer.h"
 #include "IndicesBuffer.h"
-#include "GraphicsPipeline.h"
+#include "Camera.h"
 #include "CubeMapTexture.h"
+#include "TextureManager.h"
+#include "VulkanUniformBuffer.h"
+#include "Bone.h"
 
 const  std::string DefaultTexture = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/DefaultTexture.bmp";
 
@@ -105,9 +107,7 @@ private:
 
 protected:
 
-  
-
-
+ 
 
     std::shared_ptr<Texture> DiffuseTexture;
     std::shared_ptr<Texture> SpecularTexture;
@@ -118,36 +118,38 @@ protected:
     std::shared_ptr<Texture> ReflectionTexture;
     std::shared_ptr<CubeMapTexture> SkyBoxTexture;
 
-   // std::vector<std::shared_ptr<RendererDrawMessage>> DrawMessageList;
+    //std::vector<std::shared_ptr<RendererDrawMessage>> DrawMessageList;
 
     bool MeshDeletedFlag = false;
 
-    //void LoadTextures(RendererManager& renderer, std::shared_ptr<TextureManager> textureManager, MeshTextures textures);
-    void CreateDescriptorPool(VulkanEngine& renderer, std::vector<DescriptorPoolSizeInfo> DescriptorPoolInfo);
-    void CreateDescriptorSets(VulkanEngine& renderer, VkDescriptorSetLayout layout);
-    void CreateDescriptorSetsData(VulkanEngine& renderer, std::vector<WriteDescriptorSetInfo> descriptorWritesList);
+    void LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshTextures textures);
+    void CreateDescriptorPool(VulkanEngine& engine, std::vector<DescriptorPoolSizeInfo> DescriptorPoolInfo);
+    void CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout layout);
+    void CreateDescriptorSetsData(VulkanEngine& engine, std::vector<WriteDescriptorSetInfo> descriptorWritesList);
 
 public:
-    VkDescriptorPool DescriptorPool;
-    std::vector<VkDescriptorSet> DescriptorSets;
 
     VertexBuffer MeshVertex;
     IndicesBuffer MeshIndices;
+
+    VkDescriptorPool DescriptorPool;
+    std::vector<VkDescriptorSet> DescriptorSets;
+
     glm::vec3 MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 MeshRotate = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 MeshScale = glm::vec3(1.0f);
 
     BaseMesh();
-    BaseMesh(VulkanEngine& renderer, const MeshData& meshData);
-    BaseMesh(VulkanEngine& renderer, const std::vector<Vertex>& Vertexdata, const std::vector<uint16_t>& Indicesdata);
-    BaseMesh(VulkanEngine& renderer, const std::vector<Vertex>& Vertexdata);
+    BaseMesh(VulkanEngine& engine, const MeshData& meshData);
+    BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, const std::vector<uint16_t>& Indicesdata);
+    BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata);
     ~BaseMesh();
 
-    void CreateDrawMessage(VulkanEngine& renderer, unsigned int RendererID, std::shared_ptr<GraphicsPipeline> pipeline);
+   // void CreateDrawMessage(VulkanEngine& engine, unsigned int RendererID, std::shared_ptr<GraphicsPipeline> pipeline);
 
-    virtual void Draw(VulkanEngine& renderer, std::shared_ptr<GraphicsPipeline> pipeline);
-    virtual void Update(VulkanEngine& renderer);
-    virtual void Destory(VulkanEngine& renderer);
+    virtual void Draw();
+    virtual void Update(VulkanEngine& engine);
+    virtual void Destory(VulkanEngine& engine);
 
     void SetPosition2D(glm::vec2 Pos);
     void SetPosition2D(float x, float y);

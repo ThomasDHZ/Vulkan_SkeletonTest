@@ -1,9 +1,6 @@
 #pragma once
 #include "BaseMesh.h"
 #include "PerspectiveCamera.h"
-#include "VulkanUniformBuffer.h"
-#include "Bone.h"
-#include "ForwardRenderingPipeline.h"
 
 struct DirectionalLightStruct {
     alignas(16) glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);
@@ -89,7 +86,8 @@ private:
     std::shared_ptr<Mesh> ParentMesh;
     std::vector<std::shared_ptr<Mesh>> ChildrenMesh;
 
- 
+    VertexMatrixObject ubo;
+
 protected:
 
     VulkanUniformBuffer uniformBuffer;
@@ -99,33 +97,31 @@ protected:
 
     void CreateMaterialProperties(MeshTextures textures);
 
-    virtual void CreateUniformBuffers(VulkanEngine& renderer);
-    virtual void CreateDescriptorPool(VulkanEngine& renderer);
-    virtual void CreateDescriptorSets(VulkanEngine& renderer, VkDescriptorSetLayout desc, Texture textureManager);
-    virtual void UpdateUniformBuffer(VulkanEngine& renderer, VertexMatrixObject ubo, void* CustomBufferinfo = nullptr);
-    virtual void UpdateUniformBuffer(VulkanEngine& renderer, VertexMatrixObject ubo, LightBufferObject Lightbuffer, void* CustomBufferinfo = nullptr);
+    virtual void CreateUniformBuffers(VulkanEngine& engine);
+    virtual void CreateDescriptorPool(VulkanEngine& engine);
+    virtual void CreateDescriptorSets(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout layout);
+    virtual void UpdateUniformBuffer(VulkanEngine& engine, VertexMatrixObject ubo, void* CustomBufferinfo = nullptr);
+    virtual void UpdateUniformBuffer(VulkanEngine& engine, VertexMatrixObject ubo, LightBufferObject Lightbuffer, void* CustomBufferinfo = nullptr);
 
 public:
-   // MeshProperties properites;
-    VertexMatrixObject ubo;
+    MeshProperties properites;
 
     Mesh();
-    Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata);
-    Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, VkDescriptorSetLayout desc, Texture& texture);
-    Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata);
-    Mesh(VulkanEngine& renderer, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, CustomBuffer customBuffer);
-    //Mesh(RendererManager& renderer, std::shared_ptr<TextureManager>textureManager, const MeshData& meshData);
-    //Mesh(RendererManager& renderer, std::shared_ptr<TextureManager>textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures);
-    //Mesh(RendererManager& renderer, std::shared_ptr<TextureManager>textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer);
+    Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata);
+    Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata);
+    Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, CustomBuffer customBuffer);
+    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, const MeshData& meshData, VkDescriptorSetLayout layout);
+    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout layout);
+    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout layout);
     ~Mesh();
 
     void SetTransformMatrix(glm::mat4 NewTranformMatrix);
 
-    virtual void Update(VulkanEngine& renderer) override;
-    virtual void Update(VulkanEngine& renderer, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, void* CustomBufferinfo = nullptr);
-    virtual void Update(VulkanEngine& renderer, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, void* CustomBufferinfo = nullptr);
-   // virtual void ScreenResizeUpdate(RendererManager& renderer, std::shared_ptr<TextureManager> textureManager);
-    virtual void Destory(VulkanEngine& renderer) override;
+    virtual void Update(VulkanEngine& engine) override;
+    virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, void* CustomBufferinfo = nullptr);
+    virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, void* CustomBufferinfo = nullptr);
+    virtual void ScreenResizeUpdate(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout layout);
+    virtual void Destory(VulkanEngine& engine) override;
 
     std::string GetMeshName() { return MeshName; }
     unsigned int GetNodeId() { return NodeId; }

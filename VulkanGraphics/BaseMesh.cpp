@@ -1,116 +1,117 @@
 #include "BaseMesh.h"
+#include "VulkanBufferManager.h"
 
 BaseMesh::BaseMesh()
 {
 }
 
-BaseMesh::BaseMesh(VulkanEngine& renderer, const MeshData& meshData)
+BaseMesh::BaseMesh(VulkanEngine& engine, const MeshData& meshData)
 {
-    MeshVertex = VertexBuffer(renderer, meshData.VertexList);
+    MeshVertex = VertexBuffer(engine, meshData.VertexList);
     if (meshData.IndexList.size() != 0)
     {
-        MeshIndices = IndicesBuffer(renderer, meshData.IndexList);
+        MeshIndices = IndicesBuffer(engine, meshData.IndexList);
     }
 }
 
-BaseMesh::BaseMesh(VulkanEngine& renderer, const std::vector<Vertex>& Vertexdata, const std::vector<uint16_t>& Indicesdata)
+BaseMesh::BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, const std::vector<uint16_t>& Indicesdata)
 {
-    MeshVertex = VertexBuffer(renderer, Vertexdata);
+    MeshVertex = VertexBuffer(engine, Vertexdata);
     if (Indicesdata.size() != 0)
     {
-        MeshIndices = IndicesBuffer(renderer, Indicesdata);
+        MeshIndices = IndicesBuffer(engine, Indicesdata);
     }
 }
-BaseMesh::BaseMesh(VulkanEngine& renderer, const std::vector<Vertex>& Vertexdata)
+BaseMesh::BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata)
 {
-    MeshVertex = VertexBuffer(renderer, Vertexdata);
+    MeshVertex = VertexBuffer(engine, Vertexdata);
 }
 
 BaseMesh::~BaseMesh()
 {
 }
 
-//void BaseMesh::LoadTextures(RendererManager& renderer, std::shared_ptr<TextureManager> textureManager, MeshTextures textures)
-//{
-//    if (textures.RendererDiffuseMap)
-//    {
-//        DiffuseTexture = textures.RendererDiffuseMap;
-//    }
-//    else
-//    {
-//        DiffuseTexture = textureManager->LoadTexture(renderer, textures.DiffuseMap, VK_FORMAT_R8G8B8A8_SRGB);
-//    }
-//
-//    if (textures.RendererSpecularMap)
-//    {
-//        SpecularTexture = textures.RendererSpecularMap;
-//    }
-//    else
-//    {
-//        SpecularTexture = textureManager->LoadTexture(renderer, textures.SpecularMap, VK_FORMAT_R8G8B8A8_UNORM);
-//    }
-//
-//    if (textures.RendererNormalMap)
-//    {
-//        NormalTexture = textures.RendererNormalMap;
-//    }
-//    else
-//    {
-//        NormalTexture = textureManager->LoadTexture(renderer, textures.NormalMap, VK_FORMAT_R8G8B8A8_UNORM);
-//    }
-//
-//    if (textures.RendererDepthMap)
-//    {
-//        DepthTexture = textures.RendererDepthMap;
-//    }
-//    else
-//    {
-//        DepthTexture = textureManager->LoadTexture(renderer, textures.DepthMap, VK_FORMAT_R8G8B8A8_UNORM);
-//    }
-//
-//    if (textures.RendererAlphaMap)
-//    {
-//        AlphaTexture = textures.RendererAlphaMap;
-//    }
-//    else
-//    {
-//        AlphaTexture = textureManager->LoadTexture(renderer, textures.AlphaMap, VK_FORMAT_R8G8B8A8_UNORM);
-//    }
-//
-//    if (textures.RendererEmissionMap)
-//    {
-//        EmissionTexture = textures.RendererEmissionMap;
-//    }
-//    else
-//    {
-//        EmissionTexture = textureManager->LoadTexture(renderer, textures.EmissionMap, VK_FORMAT_R8G8B8A8_UNORM);
-//    }
-//
-//    if (textures.RendererReflectionMap)
-//    {
-//        ReflectionTexture = textures.RendererReflectionMap;
-//    }
-//    else
-//    {
-//        ReflectionTexture = textureManager->LoadTexture(renderer, textures.ReflectionMap, VK_FORMAT_R8G8B8A8_UNORM);
-//    }
-//
-//    if (!textures.CubeMap[0].empty() &&
-//        !textures.CubeMap[1].empty() &&
-//        !textures.CubeMap[2].empty() &&
-//        !textures.CubeMap[3].empty() &&
-//        !textures.CubeMap[4].empty() &&
-//        !textures.CubeMap[5].empty())
-//    {
-//        SkyBoxTexture = textureManager->LoadTexture(renderer, textures.CubeMap);
-//    }
-//    else if (textures.RendererReflectionMap)
-//    {
-//        SkyBoxTexture = textures.RendererCubeMap;
-//    }
-//}
+void BaseMesh::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshTextures textures)
+{
+    if (textures.RendererDiffuseMap)
+    {
+        DiffuseTexture = textures.RendererDiffuseMap;
+    }
+    else
+    {
+        DiffuseTexture = textureManager->LoadTexture(engine, textures.DiffuseMap, VK_FORMAT_R8G8B8A8_SRGB);
+    }
 
-void BaseMesh::CreateDescriptorPool(VulkanEngine& renderer, std::vector<DescriptorPoolSizeInfo> DescriptorPoolInfo)
+    //if (textures.RendererSpecularMap)
+    //{
+    //    SpecularTexture = textures.RendererSpecularMap;
+    //}
+    //else
+    //{
+    //    SpecularTexture = textureManager->LoadTexture(engine, textures.SpecularMap, VK_FORMAT_R8G8B8A8_UNORM);
+    //}
+
+    //if (textures.RendererNormalMap)
+    //{
+    //    NormalTexture = textures.RendererNormalMap;
+    //}
+    //else
+    //{
+    //    NormalTexture = textureManager->LoadTexture(engine, textures.NormalMap, VK_FORMAT_R8G8B8A8_UNORM);
+    //}
+
+    //if (textures.RendererDepthMap)
+    //{
+    //    DepthTexture = textures.RendererDepthMap;
+    //}
+    //else
+    //{
+    //    DepthTexture = textureManager->LoadTexture(engine, textures.DepthMap, VK_FORMAT_R8G8B8A8_UNORM);
+    //}
+
+    //if (textures.RendererAlphaMap)
+    //{
+    //    AlphaTexture = textures.RendererAlphaMap;
+    //}
+    //else
+    //{
+    //    AlphaTexture = textureManager->LoadTexture(engine, textures.AlphaMap, VK_FORMAT_R8G8B8A8_UNORM);
+    //}
+
+    //if (textures.RendererEmissionMap)
+    //{
+    //    EmissionTexture = textures.RendererEmissionMap;
+    //}
+    //else
+    //{
+    //    EmissionTexture = textureManager->LoadTexture(engine, textures.EmissionMap, VK_FORMAT_R8G8B8A8_UNORM);
+    //}
+
+    //if (textures.RendererReflectionMap)
+    //{
+    //    ReflectionTexture = textures.RendererReflectionMap;
+    //}
+    //else
+    //{
+    //    ReflectionTexture = textureManager->LoadTexture(engine, textures.ReflectionMap, VK_FORMAT_R8G8B8A8_UNORM);
+    //}
+
+    //if (!textures.CubeMap[0].empty() &&
+    //    !textures.CubeMap[1].empty() &&
+    //    !textures.CubeMap[2].empty() &&
+    //    !textures.CubeMap[3].empty() &&
+    //    !textures.CubeMap[4].empty() &&
+    //    !textures.CubeMap[5].empty())
+    //{
+    //    SkyBoxTexture = textureManager->LoadTexture(engine, textures.CubeMap);
+    //}
+    //else if (textures.RendererReflectionMap)
+    //{
+    //    SkyBoxTexture = textures.RendererCubeMap;
+    //}
+}
+
+void BaseMesh::CreateDescriptorPool(VulkanEngine& engine, std::vector<DescriptorPoolSizeInfo> DescriptorPoolInfo)
 {
     std::vector<VkDescriptorPoolSize> DescriptorPoolList = {};
 
@@ -118,7 +119,7 @@ void BaseMesh::CreateDescriptorPool(VulkanEngine& renderer, std::vector<Descript
     {
         VkDescriptorPoolSize DescriptorPoolBinding = {};
         DescriptorPoolBinding.type = DescriptorPool.DescriptorType;
-        DescriptorPoolBinding.descriptorCount = static_cast<uint32_t>(renderer.SwapChain.GetSwapChainImageCount());
+        DescriptorPoolBinding.descriptorCount = static_cast<uint32_t>(engine.SwapChain.GetSwapChainImageCount());
         DescriptorPoolList.emplace_back(DescriptorPoolBinding);
     }
 
@@ -126,29 +127,29 @@ void BaseMesh::CreateDescriptorPool(VulkanEngine& renderer, std::vector<Descript
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount = static_cast<uint32_t>(DescriptorPoolList.size());
     poolInfo.pPoolSizes = DescriptorPoolList.data();
-    poolInfo.maxSets = static_cast<uint32_t>(renderer.SwapChain.GetSwapChainImageCount());
+    poolInfo.maxSets = static_cast<uint32_t>(engine.SwapChain.GetSwapChainImageCount());
 
-    if (vkCreateDescriptorPool(renderer.Device, &poolInfo, nullptr, &DescriptorPool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(engine.Device, &poolInfo, nullptr, &DescriptorPool) != VK_SUCCESS) {
         throw std::runtime_error("failed to create descriptor pool!");
     }
 }
 
-void BaseMesh::CreateDescriptorSets(VulkanEngine& renderer, VkDescriptorSetLayout layout)
+void BaseMesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout layout)
 {
-    std::vector<VkDescriptorSetLayout> layouts(renderer.SwapChain.GetSwapChainImageCount(), layout);
+    std::vector<VkDescriptorSetLayout> layouts(engine.SwapChain.GetSwapChainImageCount(), layout);
     VkDescriptorSetAllocateInfo allocInfo = {};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = DescriptorPool;
-    allocInfo.descriptorSetCount = static_cast<uint32_t>(renderer.SwapChain.GetSwapChainImageCount());
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(engine.SwapChain.GetSwapChainImageCount());
     allocInfo.pSetLayouts = layouts.data();
 
-    DescriptorSets.resize(renderer.SwapChain.GetSwapChainImageCount());
-    if (vkAllocateDescriptorSets(renderer.Device, &allocInfo, DescriptorSets.data()) != VK_SUCCESS) {
+    DescriptorSets.resize(engine.SwapChain.GetSwapChainImageCount());
+    if (vkAllocateDescriptorSets(engine.Device, &allocInfo, DescriptorSets.data()) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate descriptor sets!");
     }
 }
 
-void BaseMesh::CreateDescriptorSetsData(VulkanEngine& renderer, std::vector<WriteDescriptorSetInfo> descriptorWritesList)
+void BaseMesh::CreateDescriptorSetsData(VulkanEngine& engine, std::vector<WriteDescriptorSetInfo> descriptorWritesList)
 {
     std::vector<VkWriteDescriptorSet>  WriteDescriptorInfo = {};
 
@@ -172,7 +173,7 @@ void BaseMesh::CreateDescriptorSetsData(VulkanEngine& renderer, std::vector<Writ
         WriteDescriptorInfo.emplace_back(DescriptorSet);
     }
 
-    vkUpdateDescriptorSets(renderer.Device, static_cast<uint32_t>(WriteDescriptorInfo.size()), WriteDescriptorInfo.data(), 0, nullptr);
+    vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(WriteDescriptorInfo.size()), WriteDescriptorInfo.data(), 0, nullptr);
 }
 
 void BaseMesh::SetPosition2D(glm::vec2 Pos)
@@ -234,60 +235,43 @@ void BaseMesh::SetScale3D(float x, float y, float z)
 {
     MeshScale = glm::vec3(x, y, z);
 }
-//
-//void BaseMesh::CreateDrawMessage(VulkanEngine& renderer, unsigned int RendererID, std::shared_ptr<GraphicsPipeline> pipeline)
+
+//void BaseMesh::CreateDrawMessage(VulkanEngine& engine, unsigned int RendererID, std::shared_ptr<GraphicsPipeline> pipeline)
 //{
-//    RendererDrawMessage DrawMessage = {};
-//    DrawMessage.RendererID = RendererID;
-//    DrawMessage.MeshVertex = MeshVertex;
-//    DrawMessage.MeshIndices = MeshIndices;
-//    DrawMessage.DescriptorSets = DescriptorSets;
-//    DrawMessage.pipeline = pipeline;
+//    //RendererDrawMessage DrawMessage = {};
+//    //DrawMessage.RendererID = RendererID;
+//    //DrawMessage.MeshVertex = MeshVertex;
+//    //DrawMessage.MeshIndices = MeshIndices;
+//    //DrawMessage.DescriptorSets = DescriptorSets;
+//    //DrawMessage.pipeline = pipeline;
 //
-//    std::shared_ptr<RendererDrawMessage> DrawMessagePtr = std::make_shared<RendererDrawMessage>(DrawMessage);
-//    renderer.DrawMessageList.emplace_back(DrawMessagePtr);
-//    DrawMessageList.emplace_back(DrawMessagePtr);
+//    //std::shared_ptr<RendererDrawMessage> DrawMessagePtr = std::make_shared<RendererDrawMessage>(DrawMessage);
+//    //renderer.DrawMessageList.emplace_back(DrawMessagePtr);
+//    //DrawMessageList.emplace_back(DrawMessagePtr);
 //}
 
-void BaseMesh::Draw(VulkanEngine& renderer, std::shared_ptr<GraphicsPipeline> pipeline)
+void BaseMesh::Draw()
 {
-    //VkBuffer vertexBuffers[] = { MeshVertex.GetVertexBuffer() };
-    //VkDeviceSize offsets[] = { 0 };
-
-    //{
-    //    vkCmdBindPipeline(renderer.RenderCommandBuffer[renderer.DrawFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->ShaderPipeline);
-    //    vkCmdBindVertexBuffers(renderer.RenderCommandBuffer[renderer.DrawFrame], 0, 1, vertexBuffers, offsets);
-    //    vkCmdBindDescriptorSets(renderer.RenderCommandBuffer[renderer.DrawFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->ShaderPipelineLayout, 0, 1, &DescriptorSets[renderer.DrawFrame], 0, nullptr);
-    //    if (MeshIndices.GetIndiceBuffer() == 0)
-    //    {
-    //        vkCmdDraw(renderer.RenderCommandBuffer[renderer.DrawFrame], MeshVertex.GetVertexCount(), 1, 0, 0);
-    //    }
-    //    else
-    //    {
-    //        vkCmdBindIndexBuffer(renderer.RenderCommandBuffer[renderer.DrawFrame], MeshIndices.GetIndiceBuffer(), 0, VK_INDEX_TYPE_UINT16);
-    //        vkCmdDrawIndexed(renderer.RenderCommandBuffer[renderer.DrawFrame], static_cast<uint32_t>(MeshIndices.GetIndiceCount()), 1, 0, 0, 0);
-    //    }
-    //}
 }
 
-void BaseMesh::Update(VulkanEngine& renderer)
+void BaseMesh::Update(VulkanEngine& engine)
 {
 }
 
 
-void BaseMesh::Destory(VulkanEngine& renderer)
+void BaseMesh::Destory(VulkanEngine& engine)
 {
-    MeshVertex.Destory(renderer);
-    MeshVertex.Destory(renderer);
-    MeshIndices.Destory(renderer);
+    MeshVertex.Destory(engine);
+    MeshVertex.Destory(engine);
+    MeshIndices.Destory(engine);
 
-    vkDestroyDescriptorPool(renderer.Device, DescriptorPool, nullptr);
+    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
     DescriptorPool = VK_NULL_HANDLE;
 
- /*   for (auto drawMessage : DrawMessageList)
-    {
-        renderer.RemoveDrawMessage(drawMessage);
-    }*/
+    //for (auto drawMessage : DrawMessageList)
+    //{
+    //    renderer.RemoveDrawMessage(drawMessage);
+    //}
 
     MeshDeletedFlag = true;
 }

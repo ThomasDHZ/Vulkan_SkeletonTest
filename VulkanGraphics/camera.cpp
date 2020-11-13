@@ -8,7 +8,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::Update()
+void Camera::Update(VulkanEngine& engine)
 {
 }
 

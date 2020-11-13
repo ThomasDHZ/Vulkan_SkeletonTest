@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <vector>
+#include "VulkanEngine.h"
 
 enum Camera_Movement {
     FORWARD,
@@ -22,9 +23,6 @@ protected:
 
     glm::vec3 Position;
 
-    float Width;
-    float Height;
-    float Aspect;
     float Zoom;
     float MovementSpeed = 5.0f;
 
@@ -32,7 +30,7 @@ public:
     Camera();
     ~Camera();
 
-    virtual void Update();
+    virtual void Update(VulkanEngine& engine);
     virtual void UpdateScreenSize(int NewWidth, int NewHeight);
     virtual void UpdateScreenSize(glm::vec2& ScreenSize);
     virtual void ProcessKeyboard(Camera_Movement direction, float deltaTime);

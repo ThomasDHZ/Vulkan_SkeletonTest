@@ -24,11 +24,8 @@ public:
     PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position, float pitch, float yaw);
     ~PerspectiveCamera();
 
-    virtual void UpdateScreenSize(int NewWidth, int NewHeight);
-    virtual void UpdateScreenSize(glm::vec2& ScreenSize);
     void ProcessKeyboard(Camera_Movement direction, float deltaTime) override;
-    
     void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
     void MouseScroll(float yoffset);
-    void Update() override;
+    void Update(VulkanEngine& engine) override;
 };

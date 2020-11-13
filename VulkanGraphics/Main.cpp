@@ -100,6 +100,8 @@ public:
 private:
     VulkanWindow window;
     VulkanEngine vulkanEngine;
+    RenderManager renderManager;
+    std::shared_ptr<TextureManager> textureManager;
 
     std::shared_ptr<PerspectiveCamera> camera;
     Keyboard keyboard;
@@ -111,35 +113,30 @@ private:
 
     Texture2D texture;
 
-    size_t currentFrame = 0;
+    /*size_t currentFrame = 0;*/
 
-    RenderManager renderManager;
-    ForwardRenderingPipeline pipeline;
-  
     VkDescriptorPool ImGuiDescriptorPool;
     VkCommandPool ImGuiCommandPool;
-    std::vector<VkCommandBuffer> ImGuiCommandBuffers;
 
-    bool framebufferResized = false;
-
-    static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-        auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
-        app->framebufferResized = true;
-    }
 
     void initVulkan() 
     {
         window = VulkanWindow(800, 600, "Vulkan Engine");
         vulkanEngine = VulkanEngine(window.GetWindowPtr());
         renderManager = RenderManager(vulkanEngine);
-
+        textureManager = std::make_shared<TextureManager>(vulkanEngine);
       //  ModelInfo = Model("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/TestAnimModel/model.dae");
       //  vertices = ModelInfo.VertexList;
        // indices = ModelInfo.IndexList;
       //  BoneList = ModelInfo.BoneList;
         
         texture = Texture2D(vulkanEngine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/OpenGL_Skeleton_Test/OpenGL_Skeleton_Test/Model/TestAnimModel/diffuse.png", 0);
-        mesh = Mesh(vulkanEngine, vertices, indices, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, texture);
+
+        MeshTextures Textures = {};
+        Textures.DiffuseMap = "C:/Users/dotha/source/repos/OpenGL_Skeleton_Test/OpenGL_Skeleton_Test/Model/TestAnimModel/diffuse.png";
+
+
+        mesh = Mesh(vulkanEngine, textureManager, vertices, indices, Textures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
         renderManager.CMDBuffer(vulkanEngine, vulkanEngine.GetRenderCommandPool(), mesh.MeshVertex.GetVertexBuffer(), mesh.MeshIndices.GetIndiceBuffer(), mesh.DescriptorSets, indices.size());
 
         ImGui_ImplVulkan_InitInfo init_info = {};
@@ -153,7 +150,6 @@ private:
         init_info.MinImageCount = vulkanEngine.SwapChain.GetSwapChainMinImageCount();
         init_info.ImageCount = vulkanEngine.SwapChain.GetSwapChainImageCount();
 
-        ImGuiCommandBuffers.resize(init_info.ImageCount);
 
         VkCommandPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -195,9 +191,9 @@ private:
         allocInfo2.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo2.commandPool = ImGuiCommandPool;
         allocInfo2.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo2.commandBufferCount = (uint32_t)ImGuiCommandBuffers.size();
+        allocInfo2.commandBufferCount = (uint32_t)renderManager.ImGuiCommandBuffers.size();
 
-        if (vkAllocateCommandBuffers(init_info.Device, &allocInfo2, ImGuiCommandBuffers.data()) != VK_SUCCESS) {
+        if (vkAllocateCommandBuffers(init_info.Device, &allocInfo2, renderManager.ImGuiCommandBuffers.data()) != VK_SUCCESS) {
             throw std::runtime_error("failed to allocate command buffers!");
         }
 
@@ -251,7 +247,7 @@ private:
         texture.Delete(vulkanEngine);
 
         vkDestroyDescriptorPool(vulkanEngine.Device, ImGuiDescriptorPool, nullptr);
-        vkFreeCommandBuffers(vulkanEngine.Device, ImGuiCommandPool, static_cast<uint32_t>(ImGuiCommandBuffers.size()), ImGuiCommandBuffers.data());
+        vkFreeCommandBuffers(vulkanEngine.Device, ImGuiCommandPool, static_cast<uint32_t>(renderManager.ImGuiCommandBuffers.size()), renderManager.ImGuiCommandBuffers.data());
         vkDestroyCommandPool(vulkanEngine.Device, ImGuiCommandPool, nullptr);
 
         ImGui_ImplVulkan_Shutdown();
@@ -263,6 +259,7 @@ private:
         vkDestroyRenderPass(vulkanEngine.Device, renderManager.mainRenderPass.GetRenderPass(), nullptr);
 
         mesh.Destory(vulkanEngine);
+        textureManager->UnloadAllTextures(vulkanEngine);
         vulkanEngine.Destory();
 
         glfwDestroyWindow(window.GetWindowPtr());
@@ -270,55 +267,7 @@ private:
     }
 
     void recreateSwapChain() {
-        int width = 0, height = 0;
-        glfwGetFramebufferSize(window.GetWindowPtr(), &width, &height);
-        while (width == 0 || height == 0) {
-            glfwGetFramebufferSize(window.GetWindowPtr(), &width, &height);
-            glfwWaitEvents();
-        }
-
-        vkDeviceWaitIdle(vulkanEngine.Device);
-
-
-        for (auto imageView : vulkanEngine.SwapChain.GetSwapChainImageViews()) {
-            vkDestroyImageView(vulkanEngine.Device, imageView, nullptr);
-        }
-
-        vkDestroySwapchainKHR(vulkanEngine.Device, vulkanEngine.SwapChain.GetSwapChain(), nullptr);
-
-
-        vulkanEngine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), vulkanEngine.Device, vulkanEngine.PhysicalDevice, vulkanEngine.Surface);
-
-        renderManager.UpdateRenderManager(vulkanEngine);       
-        renderManager.CMDBuffer(vulkanEngine, vulkanEngine.GetRenderCommandPool(), mesh.MeshVertex.GetVertexBuffer(), mesh.MeshIndices.GetIndiceBuffer(), mesh.DescriptorSets, indices.size());
-    }
-
-    VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
-        for (VkFormat format : candidates) {
-            VkFormatProperties props;
-            vkGetPhysicalDeviceFormatProperties(vulkanEngine.PhysicalDevice, format, &props);
-
-            if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
-                return format;
-            }
-            else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
-                return format;
-            }
-        }
-
-        throw std::runtime_error("failed to find supported format!");
-    }
-
-    VkFormat findDepthFormat() {
-        return findSupportedFormat(
-            { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
-            VK_IMAGE_TILING_OPTIMAL,
-            VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
-        );
-    }
-
-    bool hasStencilComponent(VkFormat format) {
-        return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
+        renderManager.UpdateRenderManager(vulkanEngine, window.GetWindowPtr(), mesh);
     }
 
    
@@ -381,16 +330,6 @@ private:
         vkFreeCommandBuffers(vulkanEngine.Device, vulkanEngine.GetRenderCommandPool(), 1, &commandBuffer);
     }
 
-    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
-        VkCommandBuffer commandBuffer = beginSingleTimeCommands();
-
-        VkBufferCopy copyRegion{};
-        copyRegion.size = size;
-        vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
-
-        endSingleTimeCommands(commandBuffer);
-    }
-
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
         VkPhysicalDeviceMemoryProperties memProperties;
         vkGetPhysicalDeviceMemoryProperties(vulkanEngine.PhysicalDevice, &memProperties);
@@ -414,175 +353,14 @@ private:
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
         LightBufferObject light = {};
-        camera->Update();
+        camera->Update(vulkanEngine);
         mesh.Update(vulkanEngine, camera, light);
-
-        //VertexMatrixObject ubo{};
-        //ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        //ubo.view = camera->GetViewMatrix();
-        //ubo.proj = camera->GetProjectionMatrix();
-        //ubo.proj[1][1] *= -1;
-
-        //void* data;
-        //vkMapMemory(vulkanEngine.Device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
-        //memcpy(data, &ubo, sizeof(ubo));
-        //vkUnmapMemory(vulkanEngine.Device, uniformBuffersMemory[currentImage]);
-        //static auto startTime = std::chrono::high_resolution_clock::now();
-
-        //auto currentTime = std::chrono::high_resolution_clock::now();
-        //float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-        //camera->Update();
-        //ModelInfo.Update();
-    
-        //UniformBufferObject ubo{};
-        //ubo.model = glm::mat4(1.0f);
-        //ubo.model = glm::rotate(ubo.model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        //ubo.view = camera->GetViewMatrix();
-        //ubo.proj = camera->GetProjectionMatrix();
-        //ubo.proj[1][1] *= -1;
-
-        //for (auto bone : BoneList)
-        //{
-        //    ubo.BoneTransform[bone->GetBoneID()] = bone->GetFinalBoneTransformMatrix();
-        //}
-
-        //void* data;
-        //vkMapMemory(vulkanEngine.Device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
-        //memcpy(data, &ubo, sizeof(ubo));
-        //vkUnmapMemory(vulkanEngine.Device, uniformBuffersMemory[currentImage]);
     }
 
-    void drawFrame() {
-        vkWaitForFences(vulkanEngine.Device, 1, &vulkanEngine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
-
-        VkResult result = vkAcquireNextImageKHR(vulkanEngine.Device, vulkanEngine.SwapChain.GetSwapChain(), UINT64_MAX, vulkanEngine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &vulkanEngine.DrawFrame);
-
-        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-            recreateSwapChain();
-            return;
-        }
-        else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-            throw std::runtime_error("failed to acquire swap chain image!");
-        }
-
+    void drawFrame() 
+    {
         updateUniformBuffer(vulkanEngine.DrawFrame);
-
-        if (vulkanEngine.imagesInFlight[vulkanEngine.DrawFrame] != VK_NULL_HANDLE) {
-            vkWaitForFences(vulkanEngine.Device, 1, &vulkanEngine.imagesInFlight[vulkanEngine.DrawFrame], VK_TRUE, UINT64_MAX);
-        }
-        vulkanEngine.imagesInFlight[vulkanEngine.DrawFrame] = vulkanEngine.inFlightFences[currentFrame];
-
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-        if (vkBeginCommandBuffer(ImGuiCommandBuffers[vulkanEngine.DrawFrame], &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("failed to begin recording command buffer!");
-        }
-
-        VkRenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = renderManager.interfaceRenderPass.GetRenderPass();
-        renderPassInfo.framebuffer = renderManager.interfaceRenderPass.SwapChainFramebuffers[vulkanEngine.DrawFrame];
-        renderPassInfo.renderArea.offset = { 0, 0 };
-        renderPassInfo.renderArea.extent = vulkanEngine.SwapChain.GetSwapChainResolution();
-
-        std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-        clearValues[1].depthStencil = { 1.0f, 0 };
-
-        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        renderPassInfo.pClearValues = clearValues.data();
-
-
-        vkCmdBeginRenderPass(ImGuiCommandBuffers[vulkanEngine.DrawFrame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), ImGuiCommandBuffers[vulkanEngine.DrawFrame]);
-        vkCmdEndRenderPass(ImGuiCommandBuffers[vulkanEngine.DrawFrame]);
-
-        if (vkEndCommandBuffer(ImGuiCommandBuffers[vulkanEngine.DrawFrame]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to record command buffer!");
-        }
-
-        std::array<VkCommandBuffer, 2> submitCommandBuffers =
-        { renderManager.commandBuffers[vulkanEngine.DrawFrame], ImGuiCommandBuffers[vulkanEngine.DrawFrame] };
-
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-        VkSemaphore waitSemaphores[] = { vulkanEngine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore };
-        VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-        submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
-        submitInfo.pWaitDstStageMask = waitStages;
-        submitInfo.commandBufferCount = static_cast<uint32_t>(submitCommandBuffers.size());
-        submitInfo.pCommandBuffers = submitCommandBuffers.data();
-
-        VkSemaphore signalSemaphores[] = { vulkanEngine.vulkanSemaphores[currentFrame].RenderCompleteSemaphore };
-        submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = signalSemaphores;
-
-        vkResetFences(vulkanEngine.Device, 1, &vulkanEngine.inFlightFences[currentFrame]);
-
-        if (vkQueueSubmit(vulkanEngine.GraphicsQueue, 1, &submitInfo, vulkanEngine.inFlightFences[currentFrame]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to submit draw command buffer!");
-        }
-
-        VkPresentInfoKHR presentInfo{};
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores;
-
-        VkSwapchainKHR swapChains[] = { vulkanEngine.SwapChain.GetSwapChain() };
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = swapChains;
-
-        presentInfo.pImageIndices = &vulkanEngine.DrawFrame;
-
-        result = vkQueuePresentKHR(vulkanEngine.PresentQueue, &presentInfo);
-
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-            framebufferResized = false;
-            recreateSwapChain();
-        }
-        else if (result != VK_SUCCESS) {
-            throw std::runtime_error("failed to present swap chain image!");
-        }
-
-        currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-    }
-
-
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
-        QueueFamilyIndices indices;
-
-        uint32_t queueFamilyCount = 0;
-        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-
-        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
-
-        int i = 0;
-        for (const auto& queueFamily : queueFamilies) {
-            if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-                indices.graphicsFamily = i;
-            }
-
-            VkBool32 presentSupport = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, vulkanEngine.Surface, &presentSupport);
-
-            if (presentSupport) {
-                indices.presentFamily = i;
-            }
-
-            if (indices.isComplete()) {
-                break;
-            }
-
-            i++;
-        }
-
-        return indices;
+        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), mesh);
     }
 
 };

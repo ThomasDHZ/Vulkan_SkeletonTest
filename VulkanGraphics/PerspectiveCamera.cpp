@@ -2,10 +2,6 @@
 
 PerspectiveCamera::PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position) : Camera()
 {
-    Width = ScreenSize.x;
-    Height = ScreenSize.y;
-    Aspect = Width / Height;
-
     Position = position;
     Up = glm::vec3(0.0f, 1.0f, 0.0f);
     Front = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -23,10 +19,6 @@ PerspectiveCamera::PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position) :
 
 PerspectiveCamera::PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position, float pitch, float yaw)
 {
-    Width = ScreenSize.x;
-    Height = ScreenSize.y;
-    Aspect = Width / Height;
-
     Position = position;
     Up = glm::vec3(0.0f, 1.0f, 0.0f);
     Front = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -44,24 +36,6 @@ PerspectiveCamera::PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position, f
 
 PerspectiveCamera::~PerspectiveCamera()
 {
-}
-
-void PerspectiveCamera::UpdateScreenSize(int NewWidth, int NewHeight)
-{
-    Width = NewWidth;
-    Height = NewHeight;
-    Aspect = Width / Height;
-
-    ViewScreenSize = glm::vec2((float)NewWidth, (float)NewHeight);
-}
-
-void PerspectiveCamera::UpdateScreenSize(glm::vec2& ScreenSize)
-{
-    Width = ScreenSize.x;
-    Height = ScreenSize.y;
-    Aspect = Width / Height;
-
-    ViewScreenSize = glm::vec2(Width, Height);
 }
 
 void PerspectiveCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
@@ -107,7 +81,7 @@ void PerspectiveCamera::MouseScroll(float yoffset)
         Zoom = 45.0f;
 }
 
-void PerspectiveCamera::Update()
+void PerspectiveCamera::Update(VulkanEngine& engine)
 {
     glm::vec3 front;
     front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
@@ -119,5 +93,5 @@ void PerspectiveCamera::Update()
     Up = glm::normalize(glm::cross(Right, Front));
 
     ViewMatrix = glm::lookAt(Position, Position + Front, Up);
-    ProjectionMatrix = glm::perspective(glm::radians(Zoom), Aspect, 0.1f, 10000.0f);
+    ProjectionMatrix = glm::perspective(glm::radians(Zoom), engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height, 0.1f, 10000.0f);
 }

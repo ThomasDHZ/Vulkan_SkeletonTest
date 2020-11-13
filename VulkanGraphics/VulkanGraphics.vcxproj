@@ -175,6 +175,7 @@
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="SpriteTexture2D.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Texuture2D.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VulkanDebugger.cpp" />
@@ -218,6 +219,7 @@
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="SpriteTexture2D.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Texuture2D.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VertexBuffer.h" />
