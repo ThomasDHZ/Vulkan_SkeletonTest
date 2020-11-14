@@ -5,13 +5,11 @@ RenderManager::RenderManager()
 {
 }
 
-RenderManager::RenderManager(VulkanEngine& engine)
+RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
 {
 
 	mainRenderPass = MainRenderPass(engine);
-	interfaceRenderPass = InterfaceRenderPass(engine);
-
-    ImGuiCommandBuffers.resize(engine.SwapChain.GetSwapChainImageCount());
+	interfaceRenderPass = InterfaceRenderPass(engine, window);
 }
 
 RenderManager::~RenderManager()
@@ -73,26 +71,14 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, Model& mesh)
         renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
 
         std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = { 0.0f, 0.0f, 0.2f, 1.0f };
+        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
         clearValues[1].depthStencil = { 1.0f, 0 };
 
         renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
         renderPassInfo.pClearValues = clearValues.data();
 
         vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-        vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderPass.forwardRendereringPipeline->ShaderPipeline);
-
-        VkBuffer vertexBuffers[] = { mesh.MeshList[0]->MeshVertex.GetVertexBuffer() };
-        VkDeviceSize offsets[] = { 0 };
-        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
-
-        vkCmdBindIndexBuffer(commandBuffers[i], mesh.MeshList[0]->MeshIndices.GetIndiceBuffer(), 0, VK_INDEX_TYPE_UINT16);
-
-        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &mesh.MeshList[0]->DescriptorSets[i], 0, nullptr);
-
-        vkCmdDrawIndexed(commandBuffers[i], mesh.MeshList[0]->MeshIndices.GetIndiceCount(), 1, 0, 0, 0);
-
+        mesh.Draw(commandBuffers[i], mainRenderPass.forwardRendereringPipeline, i);
         vkCmdEndRenderPass(commandBuffers[i]);
 
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
@@ -121,38 +107,10 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, Model& mesh)
     }
     engine.imagesInFlight[engine.DrawFrame] = engine.inFlightFences[currentFrame];
 
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    if (vkBeginCommandBuffer(ImGuiCommandBuffers[engine.DrawFrame], &beginInfo) != VK_SUCCESS) {
-        throw std::runtime_error("failed to begin recording command buffer!");
-    }
-
-    VkRenderPassBeginInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = interfaceRenderPass.GetRenderPass();
-    renderPassInfo.framebuffer = interfaceRenderPass.SwapChainFramebuffers[engine.DrawFrame];
-    renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
-
-    std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[1].depthStencil = { 1.0f, 0 };
-
-    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-    renderPassInfo.pClearValues = clearValues.data();
-
-
-    vkCmdBeginRenderPass(ImGuiCommandBuffers[engine.DrawFrame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), ImGuiCommandBuffers[engine.DrawFrame]);
-    vkCmdEndRenderPass(ImGuiCommandBuffers[engine.DrawFrame]);
-
-    if (vkEndCommandBuffer(ImGuiCommandBuffers[engine.DrawFrame]) != VK_SUCCESS) {
-        throw std::runtime_error("failed to record command buffer!");
-    }
+    interfaceRenderPass.Draw(engine);
 
     std::array<VkCommandBuffer, 2> submitCommandBuffers =
-    { commandBuffers[engine.DrawFrame], ImGuiCommandBuffers[engine.DrawFrame] };
+    { commandBuffers[engine.DrawFrame], interfaceRenderPass.ImGuiCommandBuffers[engine.DrawFrame] };
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

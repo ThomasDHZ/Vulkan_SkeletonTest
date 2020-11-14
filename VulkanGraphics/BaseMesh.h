@@ -147,7 +147,7 @@ public:
 
    // void CreateDrawMessage(VulkanEngine& engine, unsigned int RendererID, std::shared_ptr<GraphicsPipeline> pipeline);
 
-    virtual void Draw();
+    virtual void Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber);
     virtual void Update(VulkanEngine& engine);
     virtual void Destory(VulkanEngine& engine);
 

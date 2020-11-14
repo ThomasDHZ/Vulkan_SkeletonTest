@@ -117,85 +117,12 @@ private:
     {
         window = VulkanWindow(800, 600, "Vulkan Engine");
         vulkanEngine = VulkanEngine(window.GetWindowPtr());
-        renderManager = RenderManager(vulkanEngine);
+        renderManager = RenderManager(vulkanEngine, window.GetWindowPtr());
         textureManager = std::make_shared<TextureManager>(vulkanEngine);
         ModelInfo = Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
 
        
         renderManager.CMDBuffer(vulkanEngine, ModelInfo);
-
-        ImGui_ImplVulkan_InitInfo init_info = {};
-        init_info.Instance = vulkanEngine.Instance;
-        init_info.PhysicalDevice = vulkanEngine.PhysicalDevice;
-        init_info.Device = vulkanEngine.Device;
-        init_info.QueueFamily = 0;
-        init_info.Queue = vulkanEngine.GraphicsQueue;
-        init_info.PipelineCache = VK_NULL_HANDLE;
-        init_info.Allocator = nullptr;
-        init_info.MinImageCount = vulkanEngine.SwapChain.GetSwapChainMinImageCount();
-        init_info.ImageCount = vulkanEngine.SwapChain.GetSwapChainImageCount();
-
-
-        VkCommandPoolCreateInfo poolInfo{};
-        poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-        poolInfo.queueFamilyIndex = init_info.QueueFamily;
-
-        if (vkCreateCommandPool(init_info.Device, &poolInfo, nullptr, &ImGuiCommandPool) != VK_SUCCESS)
-        {
-            throw std::runtime_error("failed to create graphics command pool!");
-        }
-
-        VkDescriptorPoolSize pool_sizes[] =
-        {
-            { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
-            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
-            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
-            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
-            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
-            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
-            { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
-        };
-
-        VkDescriptorPoolCreateInfo pool_info = {};
-        pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        pool_info.maxSets = 1000 * IM_ARRAYSIZE(pool_sizes);
-        pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
-        pool_info.pPoolSizes = pool_sizes;
-
-        if (vkCreateDescriptorPool(init_info.Device, &pool_info, nullptr, &ImGuiDescriptorPool) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create descriptor pool!");
-        }
-
-        VkCommandBufferAllocateInfo allocInfo2{};
-        allocInfo2.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo2.commandPool = ImGuiCommandPool;
-        allocInfo2.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo2.commandBufferCount = (uint32_t)renderManager.ImGuiCommandBuffers.size();
-
-        if (vkAllocateCommandBuffers(init_info.Device, &allocInfo2, renderManager.ImGuiCommandBuffers.data()) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate command buffers!");
-        }
-
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-        ImGui::StyleColorsDark();
-
-        ImGui_ImplGlfw_InitForVulkan(window.GetWindowPtr(), true);
-        init_info.DescriptorPool = ImGuiDescriptorPool;
-        init_info.CheckVkResultFn = check_vk_result;
-        ImGui_ImplVulkan_Init(&init_info, renderManager.interfaceRenderPass.GetRenderPass());
-
-        VkCommandBuffer commandBuffer = beginSingleTimeCommands(); 
-        ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
-        endSingleTimeCommands(commandBuffer);
     }
 
     static void check_vk_result(VkResult err)
@@ -229,15 +156,6 @@ private:
 
     void cleanup() 
     {
-
-        vkDestroyDescriptorPool(vulkanEngine.Device, ImGuiDescriptorPool, nullptr);
-        vkFreeCommandBuffers(vulkanEngine.Device, ImGuiCommandPool, static_cast<uint32_t>(renderManager.ImGuiCommandBuffers.size()), renderManager.ImGuiCommandBuffers.data());
-        vkDestroyCommandPool(vulkanEngine.Device, ImGuiCommandPool, nullptr);
-
-        ImGui_ImplVulkan_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
-
         renderManager.Destroy(vulkanEngine);
 
         vkDestroyRenderPass(vulkanEngine.Device, renderManager.mainRenderPass.GetRenderPass(), nullptr);

@@ -566,15 +566,6 @@ void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 	Properties.TextureList = meshTextures;
 }
 
-//void Model::SendDrawMessage(VulkanEngine& engine)
-//{
-//	for (auto mesh : MeshList)
-//	{
-//		mesh->CreateDrawMessage(renderer, 1, renderer.forwardRenderer.forwardRendereringPipeline);
-//		mesh->CreateDrawMessage(renderer, 4, renderer.sceneRenderer.renderer3DPipeline);
-//	}
-//}
-
 glm::mat4 Model::AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix)
 {
 	glm::mat4 GLMMatrix;
@@ -588,6 +579,14 @@ glm::mat4 Model::AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix)
 	return GLMMatrix;
 }
 
+void Model::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber)
+{
+	for (auto mesh : MeshList)
+	{
+		mesh->Draw(RenderCommandBuffer, pipeline, FrameNumber);
+	}
+}
+
 void Model::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera, LightBufferObject& light)
 {
 	glm::mat4 modelMatrix = ModelTransformMatrix;
@@ -596,8 +595,10 @@ void Model::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& cam
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(ModelRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	modelMatrix = glm::scale(modelMatrix, ModelScale);
+
 	LoadMeshTransform(0, modelMatrix);
 	AnimationPlayer.Update();
+	
 	for (auto mesh : MeshList)
 	{
 		//mesh->properites.material.specular = glm::vec3(0.02f);

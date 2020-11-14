@@ -17,13 +17,12 @@ private:
 	}
 public:
 	std::vector<VkCommandBuffer> commandBuffers;
-	std::vector<VkCommandBuffer> ImGuiCommandBuffers;
 
 	MainRenderPass mainRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 
 	RenderManager();
-	RenderManager(VulkanEngine& vEngine);
+	RenderManager(VulkanEngine& vEngine, GLFWwindow* window);
 	~RenderManager();
 
 	void CMDBuffer(VulkanEngine& engine, Model& mesh);
