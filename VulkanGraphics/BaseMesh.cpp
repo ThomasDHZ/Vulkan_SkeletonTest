@@ -31,6 +31,53 @@ BaseMesh::~BaseMesh()
 {
 }
 
+VkDescriptorPoolSize BaseMesh::AddDsecriptorPoolBinding(VulkanEngine& engine, VkDescriptorType descriptorType)
+{
+    VkDescriptorPoolSize DescriptorPoolBinding = {};
+    DescriptorPoolBinding.type = descriptorType;
+    DescriptorPoolBinding.descriptorCount = static_cast<uint32_t>(engine.SwapChain.GetSwapChainImageCount());
+
+    return DescriptorPoolBinding;
+}
+
+VkDescriptorImageInfo BaseMesh::AddImageDescriptorInfo(VulkanEngine& engine, VkImageLayout ImageLayout, std::shared_ptr<Texture> texture)
+{
+    VkDescriptorImageInfo DescriptorImage = {};
+    DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    DescriptorImage.imageView = texture->GetTextureView();
+    DescriptorImage.sampler = texture->GetTextureSampler();
+    return DescriptorImage;
+}
+
+WriteDescriptorSetInfo BaseMesh::AddDescriptorSetTextureInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo)
+{
+    WriteDescriptorSetInfo TextureDescriptor;
+    TextureDescriptor.DstBinding = BindingNumber;
+    TextureDescriptor.DstSet = DescriptorSet;
+    TextureDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    TextureDescriptor.DescriptorImageInfo = TextureImageInfo;
+    return TextureDescriptor;
+}
+
+VkDescriptorBufferInfo BaseMesh::AddBufferDescriptorInfo(VulkanEngine& engine, VkBuffer Buffer, VkDeviceSize BufferSize)
+{
+    VkDescriptorBufferInfo BufferInfo = {};
+    BufferInfo.buffer = Buffer;
+    BufferInfo.offset = 0;
+    BufferInfo.range = BufferSize;
+    return BufferInfo;
+}
+
+WriteDescriptorSetInfo BaseMesh::AddDescriptorSetBufferInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo)
+{
+    WriteDescriptorSetInfo BufferDescriptor;
+    BufferDescriptor.DstBinding = BindingNumber;
+    BufferDescriptor.DstSet = DescriptorSet;
+    BufferDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    BufferDescriptor.DescriptorBufferInfo = BufferInfo;
+    return BufferDescriptor;
+}
+
 void BaseMesh::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshTextures textures)
 {
     if (textures.RendererDiffuseMap)
@@ -111,22 +158,12 @@ void BaseMesh::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager
     //}
 }
 
-void BaseMesh::CreateDescriptorPool(VulkanEngine& engine, std::vector<DescriptorPoolSizeInfo> DescriptorPoolInfo)
+void BaseMesh::CreateDescriptorPool(VulkanEngine& engine, std::vector<VkDescriptorPoolSize> DescriptorPoolInfo)
 {
-    std::vector<VkDescriptorPoolSize> DescriptorPoolList = {};
-
-    for (auto DescriptorPool : DescriptorPoolInfo)
-    {
-        VkDescriptorPoolSize DescriptorPoolBinding = {};
-        DescriptorPoolBinding.type = DescriptorPool.DescriptorType;
-        DescriptorPoolBinding.descriptorCount = static_cast<uint32_t>(engine.SwapChain.GetSwapChainImageCount());
-        DescriptorPoolList.emplace_back(DescriptorPoolBinding);
-    }
-
     VkDescriptorPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    poolInfo.poolSizeCount = static_cast<uint32_t>(DescriptorPoolList.size());
-    poolInfo.pPoolSizes = DescriptorPoolList.data();
+    poolInfo.poolSizeCount = static_cast<uint32_t>(DescriptorPoolInfo.size());
+    poolInfo.pPoolSizes = DescriptorPoolInfo.data();
     poolInfo.maxSets = static_cast<uint32_t>(engine.SwapChain.GetSwapChainImageCount());
 
     if (vkCreateDescriptorPool(engine.Device, &poolInfo, nullptr, &DescriptorPool) != VK_SUCCESS) {

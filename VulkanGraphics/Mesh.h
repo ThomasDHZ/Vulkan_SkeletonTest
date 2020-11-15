@@ -117,6 +117,8 @@ public:
 
     void SetTransformMatrix(glm::mat4 NewTranformMatrix);
 
+    static std::array<DescriptorSetLayoutBindingInfo, 2> DescriptorLayout();
+
     virtual void Update(VulkanEngine& engine) override;
     virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, void* CustomBufferinfo = nullptr);
     virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, void* CustomBufferinfo = nullptr);

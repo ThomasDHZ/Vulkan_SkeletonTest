@@ -78,7 +78,7 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, Model& mesh)
         renderPassInfo.pClearValues = clearValues.data();
 
         vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        mesh.Draw(commandBuffers[i], mainRenderPass.forwardRendereringPipeline, i);
+        mesh.Draw(commandBuffers[i], mainRenderPass.wireFrameRendereringPipeline, i);
         vkCmdEndRenderPass(commandBuffers[i]);
 
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {

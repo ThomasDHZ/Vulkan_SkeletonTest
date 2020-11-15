@@ -96,6 +96,24 @@ void Mesh::SetTransformMatrix(glm::mat4 NewTranformMatrix)
     TransformMatrix = NewTranformMatrix;
 }
 
+std::array<DescriptorSetLayoutBindingInfo, 2> Mesh::DescriptorLayout()
+{
+
+    std::array<DescriptorSetLayoutBindingInfo, 2> LayoutBindingInfo = {};
+
+    LayoutBindingInfo[0].Binding = 0;
+    LayoutBindingInfo[0].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    LayoutBindingInfo[0].StageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    LayoutBindingInfo[1].Binding = 1;
+    LayoutBindingInfo[1].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    LayoutBindingInfo[1].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+    return LayoutBindingInfo;
+}
+
+
+
 void Mesh::CreateMaterialProperties(MeshTextures textures)
 {
     if (textures.DiffuseMap != DefaultTexture)
@@ -153,162 +171,54 @@ void Mesh::CreateUniformBuffers(VulkanEngine& engine)
 
 void Mesh::CreateDescriptorPool(VulkanEngine& engine) {
 
-    std::array<DescriptorPoolSizeInfo, 2>  DescriptorPoolInfo = {};
+    std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
 
-    DescriptorPoolInfo[0].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    DescriptorPoolInfo[1].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    //DescriptorPoolInfo[2].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    //DescriptorPoolInfo[3].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    //DescriptorPoolInfo[4].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    //DescriptorPoolInfo[5].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    //DescriptorPoolInfo[6].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    //DescriptorPoolInfo[7].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    //DescriptorPoolInfo[8].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    //DescriptorPoolInfo[9].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    //DescriptorPoolInfo[10].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
 
-    BaseMesh::CreateDescriptorPool(engine, std::vector<DescriptorPoolSizeInfo>(DescriptorPoolInfo.begin(), DescriptorPoolInfo.end()));
+    BaseMesh::CreateDescriptorPool(engine, DescriptorPoolList);
 }
 
 void Mesh::CreateDescriptorSets(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, VkDescriptorSetLayout layout)
 {
     BaseMesh::CreateDescriptorSets(engine, layout);
 
-    VkDescriptorImageInfo DiffuseMap = {};
-    DiffuseMap.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    DiffuseMap.imageView = DiffuseTexture->GetTextureView();
-    DiffuseMap.sampler = DiffuseTexture->GetTextureSampler();
-
-    //VkDescriptorImageInfo SpecularMap = {};
-    //SpecularMap.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    //SpecularMap.imageView = SpecularTexture->GetTextureView();
-    //SpecularMap.sampler = SpecularTexture->GetTextureSampler();
-
-    //VkDescriptorImageInfo NormalMap = {};
-    //NormalMap.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    //NormalMap.imageView = NormalTexture->GetTextureView();
-    //NormalMap.sampler = NormalTexture->GetTextureSampler();
-
-    //VkDescriptorImageInfo DisplacementMap = {};
-    //DisplacementMap.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    //DisplacementMap.imageView = DepthTexture->GetTextureView();
-    //DisplacementMap.sampler = DepthTexture->GetTextureSampler();
-
-    //VkDescriptorImageInfo AlphaMap = {};
-    //AlphaMap.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    //AlphaMap.imageView = DiffuseTexture->GetTextureView();
-    //AlphaMap.sampler = DiffuseTexture->GetTextureSampler();
-
-    //VkDescriptorImageInfo EmissionMap = {};
-    //EmissionMap.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    //EmissionMap.imageView = EmissionTexture->GetTextureView();
-    //EmissionMap.sampler = EmissionTexture->GetTextureSampler();
-
-    //VkDescriptorImageInfo ReflectionMap = {};
-    //ReflectionMap.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    //ReflectionMap.imageView = ReflectionTexture->GetTextureView();
-    //ReflectionMap.sampler = ReflectionTexture->GetTextureSampler();
-
-    //VkDescriptorImageInfo SkyBoxMap = {};
-    //SkyBoxMap.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    //SkyBoxMap.imageView = SkyBoxTexture->GetTextureView();
-    //SkyBoxMap.sampler = SkyBoxTexture->GetTextureSampler();
+    VkDescriptorImageInfo DiffuseMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, DiffuseTexture);
+    //VkDescriptorImageInfo SpecularMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, SpecularTexture);
+    //VkDescriptorImageInfo NormalMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, NormalTexture);
+    //VkDescriptorImageInfo DisplacementMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, DepthTexture);
+    //VkDescriptorImageInfo AlphaMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, AlphaTexture);
+    //VkDescriptorImageInfo EmissionMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, EmissionTexture);
+    //VkDescriptorImageInfo ReflectionMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, ReflectionTexture);
+    //VkDescriptorImageInfo SkyBoxMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, SkyBoxTexture);
 
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
     {
-        VkDescriptorBufferInfo PositionInfo = {};
-        PositionInfo.buffer = uniformBuffer.GetUniformBuffer(i);
-        PositionInfo.offset = 0;
-        PositionInfo.range = sizeof(VertexMatrixObject);
-
-        VkDescriptorBufferInfo LightInfo = {};
-        LightInfo.buffer = lightBuffer.GetUniformBuffer(i);
-        LightInfo.offset = 0;
-        LightInfo.range = sizeof(LightBufferObject);
-
-        VkDescriptorBufferInfo meshPropertiesInfo = {};
-        meshPropertiesInfo.buffer = meshPropertiesBuffer.GetUniformBuffer(i);
-        meshPropertiesInfo.offset = 0;
-        meshPropertiesInfo.range = sizeof(MeshProperties);
+        VkDescriptorBufferInfo PositionInfo = AddBufferDescriptorInfo(engine, uniformBuffer.GetUniformBuffer(i), sizeof(VertexMatrixObject));
+        //VkDescriptorBufferInfo LightInfo = AddBufferDescriptorInfo(engine, lightBuffer.GetUniformBuffer(i), sizeof(LightBufferObject));
+        //VkDescriptorBufferInfo meshPropertiesInfo = AddBufferDescriptorInfo(engine, meshPropertiesBuffer.GetUniformBuffer(i), sizeof(MeshProperties));
 
         std::vector<WriteDescriptorSetInfo> DescriptorList;
-
-        WriteDescriptorSetInfo PositionDescriptor;
-        PositionDescriptor.DstBinding = 0;
-        PositionDescriptor.DstSet = DescriptorSets[i];
-        PositionDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        PositionDescriptor.DescriptorBufferInfo = PositionInfo;
-        DescriptorList.emplace_back(PositionDescriptor);
-
-        WriteDescriptorSetInfo DiffuseMapDescriptor;
-        DiffuseMapDescriptor.DstBinding = 1;
-        DiffuseMapDescriptor.DstSet = DescriptorSets[i];
-        DiffuseMapDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        DiffuseMapDescriptor.DescriptorImageInfo = DiffuseMap;
-        DescriptorList.emplace_back(DiffuseMapDescriptor);
-
-        //WriteDescriptorSetInfo SpecularMapDescriptor;
-        //SpecularMapDescriptor.DstBinding = 2;
-        //SpecularMapDescriptor.DstSet = DescriptorSets[i];
-        //SpecularMapDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        //SpecularMapDescriptor.DescriptorImageInfo = SpecularMap;
-        //DescriptorList.emplace_back(SpecularMapDescriptor);
-
-        //WriteDescriptorSetInfo NormalMapDescriptor;
-        //NormalMapDescriptor.DstBinding = 3;
-        //NormalMapDescriptor.DstSet = DescriptorSets[i];
-        //NormalMapDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        //NormalMapDescriptor.DescriptorImageInfo = NormalMap;
-        //DescriptorList.emplace_back(NormalMapDescriptor);
-
-        //WriteDescriptorSetInfo DisplacementMapDescriptor;
-        //DisplacementMapDescriptor.DstBinding = 4;
-        //DisplacementMapDescriptor.DstSet = DescriptorSets[i];
-        //DisplacementMapDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        //DisplacementMapDescriptor.DescriptorImageInfo = DisplacementMap;
-        //DescriptorList.emplace_back(DisplacementMapDescriptor);
-
-        //WriteDescriptorSetInfo AlphaMapDescriptor;
-        //AlphaMapDescriptor.DstBinding = 5;
-        //AlphaMapDescriptor.DstSet = DescriptorSets[i];
-        //AlphaMapDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        //AlphaMapDescriptor.DescriptorImageInfo = AlphaMap;
-        //DescriptorList.emplace_back(AlphaMapDescriptor);
-
-        //WriteDescriptorSetInfo EmissionMapDescriptor;
-        //EmissionMapDescriptor.DstBinding = 6;
-        //EmissionMapDescriptor.DstSet = DescriptorSets[i];
-        //EmissionMapDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        //EmissionMapDescriptor.DescriptorImageInfo = EmissionMap;
-        //DescriptorList.emplace_back(EmissionMapDescriptor);
-
-        //WriteDescriptorSetInfo ReflectionMapDescriptor;
-        //ReflectionMapDescriptor.DstBinding = 7;
-        //ReflectionMapDescriptor.DstSet = DescriptorSets[i];
-        //ReflectionMapDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        //ReflectionMapDescriptor.DescriptorImageInfo = ReflectionMap;
-        //DescriptorList.emplace_back(ReflectionMapDescriptor);
-
-        //WriteDescriptorSetInfo SkyBoxDescriptor;
-        //SkyBoxDescriptor.DstBinding = 8;
-        //SkyBoxDescriptor.DstSet = DescriptorSets[i];
-        //SkyBoxDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        //SkyBoxDescriptor.DescriptorImageInfo = SkyBoxMap;
-        //DescriptorList.emplace_back(SkyBoxDescriptor);
-
-        //WriteDescriptorSetInfo  MeshPropertiesDescriptor;
-        //MeshPropertiesDescriptor.DstBinding = 9;
-        //MeshPropertiesDescriptor.DstSet = DescriptorSets[i];
-        //MeshPropertiesDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        //MeshPropertiesDescriptor.DescriptorBufferInfo = meshPropertiesInfo;
-        //DescriptorList.emplace_back(MeshPropertiesDescriptor);
-
-        //WriteDescriptorSetInfo LightDescriptor;
-        //LightDescriptor.DstBinding = 10;
-        //LightDescriptor.DstSet = DescriptorSets[i];
-        //LightDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        //LightDescriptor.DescriptorBufferInfo = LightInfo;
-        //DescriptorList.emplace_back(LightDescriptor);
+        DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 0, DescriptorSets[i], PositionInfo));
+        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 1, DescriptorSets[i], DiffuseMap));
+        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 2, DescriptorSets[i], SpecularMap));
+        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 3, DescriptorSets[i], NormalMap));
+        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 4, DescriptorSets[i], DisplacementMap));
+        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 5, DescriptorSets[i], AlphaMap));
+        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 6, DescriptorSets[i], EmissionMap));
+        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 7, DescriptorSets[i], ReflectionMap));
+        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 8, DescriptorSets[i], SkyBoxMap));
+        //DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 9, DescriptorSets[i], meshPropertiesInfo));
+        //DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 10, DescriptorSets[i], LightInfo));
 
         BaseMesh::CreateDescriptorSetsData(engine, DescriptorList);
     }

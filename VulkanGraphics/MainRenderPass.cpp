@@ -12,6 +12,7 @@ MainRenderPass::MainRenderPass(VulkanEngine& engine)
     CreateRendererFramebuffers(engine);
 
     forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass);
+    wireFrameRendereringPipeline = std::make_shared<WireFrameRenderingPipeline>(engine, RenderPass);
 }
 
 MainRenderPass::~MainRenderPass()
@@ -106,6 +107,7 @@ void MainRenderPass::UpdateSwapChain(VulkanEngine& engine)
 {
     DepthTexture.RecreateRendererTexture(engine);
     forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    wireFrameRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -125,6 +127,7 @@ void MainRenderPass::Destroy(VulkanEngine& engine)
     DepthTexture.Delete(engine);
 
     forwardRendereringPipeline->Destroy(engine);
+    wireFrameRendereringPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

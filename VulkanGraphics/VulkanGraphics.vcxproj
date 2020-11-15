@@ -184,6 +184,7 @@
     <ClCompile Include="VulkanSwapChain.cpp" />
     <ClCompile Include="VulkanUniformBuffer.cpp" />
     <ClCompile Include="VulkanWindow.cpp" />
+    <ClCompile Include="WireFrameRenderingPipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.frag" />
@@ -231,6 +232,7 @@
     <ClInclude Include="VulkanSwapChain.h" />
     <ClInclude Include="VulkanUniformBuffer.h" />
     <ClInclude Include="VulkanWindow.h" />
+    <ClInclude Include="WireFrameRenderingPipeline.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -37,9 +37,15 @@ enum RenderBitFlag
     RenderMainPass = 1 << 4,
     RenderEffectPass = 1 << 5
 };
+
+enum RenderDrawFlagsEnum
+{
+    RenderNormally = 1 << 0,
+    RenderWireFrame = 1 << 2
+};
+
 struct MeshTextures
 {
-
     std::string DiffuseMap = DefaultTexture;
     std::string SpecularMap = DefaultTexture;
     std::string NormalMap = DefaultTexture;
@@ -107,7 +113,13 @@ private:
 
 protected:
 
- 
+    VertexBuffer MeshVertex;
+    IndicesBuffer MeshIndices;
+
+    VkDescriptorPool DescriptorPool;
+    std::vector<VkDescriptorSet> DescriptorSets;
+
+    int RenderDrawFlags = RenderNormally;
 
     std::shared_ptr<Texture> DiffuseTexture;
     std::shared_ptr<Texture> SpecularTexture;
@@ -122,18 +134,18 @@ protected:
 
     bool MeshDeletedFlag = false;
 
+    VkDescriptorPoolSize AddDsecriptorPoolBinding(VulkanEngine& engine, VkDescriptorType descriptorType);
+    VkDescriptorImageInfo AddImageDescriptorInfo(VulkanEngine& engine, VkImageLayout ImageLayout, std::shared_ptr<Texture> texture);
+    WriteDescriptorSetInfo AddDescriptorSetTextureInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo);
+    VkDescriptorBufferInfo AddBufferDescriptorInfo(VulkanEngine& engine, VkBuffer Buffer, VkDeviceSize BufferSize);
+    WriteDescriptorSetInfo AddDescriptorSetBufferInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo);
+
     void LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshTextures textures);
-    void CreateDescriptorPool(VulkanEngine& engine, std::vector<DescriptorPoolSizeInfo> DescriptorPoolInfo);
+    void CreateDescriptorPool(VulkanEngine& engine, std::vector<VkDescriptorPoolSize> DescriptorPoolInfo);
     void CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout layout);
     void CreateDescriptorSetsData(VulkanEngine& engine, std::vector<WriteDescriptorSetInfo> descriptorWritesList);
 
 public:
-
-    VertexBuffer MeshVertex;
-    IndicesBuffer MeshIndices;
-
-    VkDescriptorPool DescriptorPool;
-    std::vector<VkDescriptorSet> DescriptorSets;
 
     glm::vec3 MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 MeshRotate = glm::vec3(0.0f, 0.0f, 0.0f);
