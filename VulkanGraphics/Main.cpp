@@ -121,7 +121,6 @@ private:
         textureManager = std::make_shared<TextureManager>(vulkanEngine);
         ModelInfo = Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
 
-       
         renderManager.CMDBuffer(vulkanEngine, ModelInfo);
     }
 
@@ -134,6 +133,7 @@ private:
             ImGui::NewFrame();
             {
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+              //  ImGui::Image(renderManager.shadowRenderPass.DepthTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
                 textureManager->UpdateIMGUIVRAM();
             }
             ImGui::Render();

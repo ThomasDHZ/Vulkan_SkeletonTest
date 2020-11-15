@@ -5,9 +5,8 @@
 #include "VulkanEngine.h"
 #include "RenderedDepthTexture.h"
 #include "ForwardRenderingPipeline.h"
-#include "WireFrameRenderingPipeline.h"
 
-class MainRenderPass
+class ShadowRenderPass
 {
 private:
 	VkRenderPass RenderPass;
@@ -16,15 +15,14 @@ private:
 	void CreateRendererFramebuffers(VulkanEngine& engine);
 
 public:
-	MainRenderPass();
-	MainRenderPass(VulkanEngine& engine);
-	~MainRenderPass();
+	ShadowRenderPass();
+	ShadowRenderPass(VulkanEngine& engine);
+	~ShadowRenderPass();
 
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<ForwardRenderingPipeline> forwardRendereringPipeline;
-	std::shared_ptr<WireFrameRenderingPipeline> wireFrameRendereringPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);

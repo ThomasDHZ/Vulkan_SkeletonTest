@@ -7,8 +7,9 @@ RenderManager::RenderManager()
 
 RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
 {
-
 	mainRenderPass = MainRenderPass(engine);
+    sceneRenderPass = SceneRenderPass(engine);
+    shadowRenderPass = ShadowRenderPass(engine);
 	interfaceRenderPass = InterfaceRenderPass(engine, window);
 }
 
@@ -36,6 +37,8 @@ void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window
     engine.SwapChain.UpdateSwapChain(window, engine.Device, engine.PhysicalDevice, engine.Surface);
 
     mainRenderPass.UpdateSwapChain(engine);
+    sceneRenderPass.UpdateSwapChain(engine);
+    shadowRenderPass.UpdateSwapChain(engine);
     interfaceRenderPass.UpdateSwapChain(engine);
 
    CMDBuffer(engine, mesh);
@@ -62,26 +65,8 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, Model& mesh)
         if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
             throw std::runtime_error("failed to begin recording command buffer!");
         }
-
-        VkRenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = mainRenderPass.GetRenderPass();
-        renderPassInfo.framebuffer = mainRenderPass.SwapChainFramebuffers[i];
-        renderPassInfo.renderArea.offset = { 0, 0 };
-        renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
-
-        std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-        clearValues[1].depthStencil = { 1.0f, 0 };
-
-        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        renderPassInfo.pClearValues = clearValues.data();
-
-        vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        mesh.Draw(commandBuffers[i], mainRenderPass.wireFrameRendereringPipeline, i);
-        mesh.Draw(commandBuffers[i], mainRenderPass.forwardRendereringPipeline, i);
-        vkCmdEndRenderPass(commandBuffers[i]);
-
+        MainRenderCMDBuffer(engine, mesh, i);
+       // SceneRenderCMDBuffer(engine, mesh, i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
@@ -162,5 +147,68 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, Model& mesh)
 void RenderManager::Destroy(VulkanEngine& engine)
 {
 	mainRenderPass.Destroy(engine);
+    sceneRenderPass.Destroy(engine);
+    shadowRenderPass.Destroy(engine);
 	interfaceRenderPass.Destroy(engine);
+}
+
+void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex)
+{
+    std::array<VkClearValue, 2> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].depthStencil = { 1.0f, 0 };
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = mainRenderPass.GetRenderPass();
+    renderPassInfo.framebuffer = mainRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    // mesh.Draw(commandBuffers[i], mainRenderPass.wireFrameRendereringPipeline, i);
+    model.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.forwardRendereringPipeline, SwapBufferImageIndex);
+    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+}
+
+void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex)
+{
+    std::array<VkClearValue, 3> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[2].depthStencil = { 1.0f, 0 };
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = sceneRenderPass.GetRenderPass();
+    renderPassInfo.framebuffer = sceneRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    model.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.forwardRendereringPipeline, SwapBufferImageIndex);
+    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+}
+
+void RenderManager::ShadowRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex)
+{
+    std::array<VkClearValue, 1> clearValues{};
+    clearValues[0].depthStencil = { 1.0f, 0 };
+
+    VkRenderPassBeginInfo renderPassInfo2{};
+    renderPassInfo2.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo2.renderPass = shadowRenderPass.GetRenderPass();
+    renderPassInfo2.framebuffer = shadowRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
+    renderPassInfo2.renderArea.offset = { 0, 0 };
+    renderPassInfo2.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+    renderPassInfo2.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo2.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo2, VK_SUBPASS_CONTENTS_INLINE);
+    model.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.forwardRendereringPipeline, SwapBufferImageIndex);
+    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }

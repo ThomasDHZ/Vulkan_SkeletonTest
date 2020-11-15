@@ -162,6 +162,12 @@
     <ClCompile Include="WireFrameRenderingPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowRenderPass.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneRenderPass.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.frag">
@@ -303,6 +309,12 @@
     </ClInclude>
     <ClInclude Include="WireFrameRenderingPipeline.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowRenderPass.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneRenderPass.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

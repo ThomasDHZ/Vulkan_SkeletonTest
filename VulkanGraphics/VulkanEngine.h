@@ -11,9 +11,7 @@ const std::vector<const char*> validationLayers = {
 };
 
 const std::vector<const char*> deviceExtensions = {
-	VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-	VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
-	VK_NV_RAY_TRACING_EXTENSION_NAME
+	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 const int MAX_FRAMES_IN_FLIGHT = 2;
 

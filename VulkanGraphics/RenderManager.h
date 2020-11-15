@@ -4,6 +4,8 @@
 #include "InterfaceRenderPass.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "SceneRenderPass.h"
+#include "ShadowRenderPass.h"
 
 class RenderManager
 {
@@ -15,10 +17,17 @@ private:
 		auto app = reinterpret_cast<RenderManager*>(glfwGetWindowUserPointer(window));
 		app->framebufferResized = true;
 	}
+
+	void MainRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex);
+	void SceneRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex);
+	void ShadowRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex);
+
 public:
 	std::vector<VkCommandBuffer> commandBuffers;
 
 	MainRenderPass mainRenderPass;
+	SceneRenderPass sceneRenderPass;
+	ShadowRenderPass shadowRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 
 	RenderManager();

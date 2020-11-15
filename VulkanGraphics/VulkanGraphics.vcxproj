@@ -174,6 +174,8 @@
     <ClCompile Include="RenderedHDRColorTexture.cpp" />
     <ClCompile Include="RendereredTexture.cpp" />
     <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="SceneRenderPass.cpp" />
+    <ClCompile Include="ShadowRenderPass.cpp" />
     <ClCompile Include="SpriteTexture2D.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
@@ -222,6 +224,8 @@
     <ClInclude Include="RenderedHDRColorTexture.h" />
     <ClInclude Include="RendereredTexture.h" />
     <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="SceneRenderPass.h" />
+    <ClInclude Include="ShadowRenderPass.h" />
     <ClInclude Include="SpriteTexture2D.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureManager.h" />

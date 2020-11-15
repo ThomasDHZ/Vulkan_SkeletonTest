@@ -6,7 +6,7 @@ MainRenderPass::MainRenderPass()
 
 MainRenderPass::MainRenderPass(VulkanEngine& engine)
 {
-    DepthTexture = RenderedDepthTexture(engine);
+    DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
@@ -85,7 +85,7 @@ void MainRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++) {
         std::array<VkImageView, 2> attachments = {
             engine.SwapChain.GetSwapChainImageViews()[i],
-            DepthTexture.GetTextureView()
+            DepthTexture->GetTextureView()
         };
 
         VkFramebufferCreateInfo framebufferInfo{};
@@ -105,7 +105,7 @@ void MainRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 
 void MainRenderPass::UpdateSwapChain(VulkanEngine& engine)
 {
-    DepthTexture.RecreateRendererTexture(engine);
+    DepthTexture->RecreateRendererTexture(engine);
     forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
     wireFrameRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
 
@@ -124,7 +124,7 @@ void MainRenderPass::UpdateSwapChain(VulkanEngine& engine)
 
 void MainRenderPass::Destroy(VulkanEngine& engine)
 {
-    DepthTexture.Delete(engine);
+    DepthTexture->Delete(engine);
 
     forwardRendereringPipeline->Destroy(engine);
     wireFrameRendereringPipeline->Destroy(engine);
