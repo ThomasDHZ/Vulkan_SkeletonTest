@@ -14,20 +14,6 @@
 
 const  std::string DefaultTexture = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/DefaultTexture.bmp";
 
-struct DescriptorPoolSizeInfo
-{
-    VkDescriptorType DescriptorType;
-};
-
-struct WriteDescriptorSetInfo
-{
-    uint32_t DstBinding;
-    VkDescriptorSet DstSet;
-    VkDescriptorType DescriptorType;
-    VkDescriptorBufferInfo DescriptorBufferInfo;
-    VkDescriptorImageInfo DescriptorImageInfo;
-};
-
 enum RenderBitFlag
 {
     RenderOnMainPass = 1 << 0,
@@ -38,10 +24,10 @@ enum RenderBitFlag
     RenderEffectPass = 1 << 5
 };
 
-enum RenderDrawFlagsEnum
+enum RenderDrawFlags
 {
-    RenderNormally = 1 << 0,
-    RenderWireFrame = 1 << 2
+    RenderNormally,
+    RenderWireFrame
 };
 
 struct MeshTextures
@@ -109,8 +95,6 @@ struct MeshData
 
 class BaseMesh
 {
-private:
-
 protected:
 
     VertexBuffer MeshVertex;
@@ -118,8 +102,6 @@ protected:
 
     VkDescriptorPool DescriptorPool;
     std::vector<VkDescriptorSet> DescriptorSets;
-
-    int RenderDrawFlags = RenderNormally;
 
     std::shared_ptr<Texture> DiffuseTexture;
     std::shared_ptr<Texture> SpecularTexture;
@@ -130,34 +112,30 @@ protected:
     std::shared_ptr<Texture> ReflectionTexture;
     std::shared_ptr<CubeMapTexture> SkyBoxTexture;
 
-    //std::vector<std::shared_ptr<RendererDrawMessage>> DrawMessageList;
+    glm::vec3 MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 MeshRotate = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 MeshScale = glm::vec3(1.0f);
 
     bool MeshDeletedFlag = false;
-
-    VkDescriptorPoolSize AddDsecriptorPoolBinding(VulkanEngine& engine, VkDescriptorType descriptorType);
-    VkDescriptorImageInfo AddImageDescriptorInfo(VulkanEngine& engine, VkImageLayout ImageLayout, std::shared_ptr<Texture> texture);
-    WriteDescriptorSetInfo AddDescriptorSetTextureInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo);
-    VkDescriptorBufferInfo AddBufferDescriptorInfo(VulkanEngine& engine, VkBuffer Buffer, VkDeviceSize BufferSize);
-    WriteDescriptorSetInfo AddDescriptorSetBufferInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo);
 
     void LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshTextures textures);
     void CreateDescriptorPool(VulkanEngine& engine, std::vector<VkDescriptorPoolSize> DescriptorPoolInfo);
     void CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout layout);
-    void CreateDescriptorSetsData(VulkanEngine& engine, std::vector<WriteDescriptorSetInfo> descriptorWritesList);
+    void CreateDescriptorSetsData(VulkanEngine& engine, std::vector<VkWriteDescriptorSet> DescriptorInfoList);
+
+    VkDescriptorPoolSize AddDsecriptorPoolBinding(VulkanEngine& engine, VkDescriptorType descriptorType);
+    VkDescriptorImageInfo AddImageDescriptorInfo(VulkanEngine& engine, VkImageLayout ImageLayout, std::shared_ptr<Texture> texture);
+    VkWriteDescriptorSet AddDescriptorSetTextureInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo);
+    VkDescriptorBufferInfo AddBufferDescriptorInfo(VulkanEngine& engine, VkBuffer Buffer, VkDeviceSize BufferSize);
+    VkWriteDescriptorSet AddDescriptorSetBufferInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo);
 
 public:
-
-    glm::vec3 MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 MeshRotate = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 MeshScale = glm::vec3(1.0f);
 
     BaseMesh();
     BaseMesh(VulkanEngine& engine, const MeshData& meshData);
     BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, const std::vector<uint16_t>& Indicesdata);
     BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata);
     ~BaseMesh();
-
-   // void CreateDrawMessage(VulkanEngine& engine, unsigned int RendererID, std::shared_ptr<GraphicsPipeline> pipeline);
 
     virtual void Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber);
     virtual void Update(VulkanEngine& engine);

@@ -620,9 +620,9 @@ void Model::UpdateImGUI()
 		{
 			ImGui::NextColumn();
 			ImGui::Text(MeshList[x]->GetMeshName().c_str());
-			ImGui::SliderFloat3("Position", &MeshList[x]->MeshPosition.x, 0.0f, 20.0f);
-			ImGui::SliderFloat3("Rotation", &MeshList[x]->MeshRotate.x, 0.0f, 360.0f);
-			ImGui::SliderFloat3("Scale", &MeshList[x]->MeshScale.x, 0.0f, 20.0f);
+			//ImGui::SliderFloat3("Position", &MeshList[x]->MeshPosition.x, 0.0f, 20.0f);
+			//ImGui::SliderFloat3("Rotation", &MeshList[x]->MeshRotate.x, 0.0f, 360.0f);
+			//ImGui::SliderFloat3("Scale", &MeshList[x]->MeshScale.x, 0.0f, 20.0f);
 			ImGui::NextColumn();
 		}
 		ImGui::TreePop();

@@ -170,6 +170,12 @@
     <None Include="Shaders\Shader.vert">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shaders\WireFrameShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\WireFrameShader.vert">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">

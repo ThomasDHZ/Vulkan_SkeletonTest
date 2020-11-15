@@ -157,15 +157,10 @@ private:
     void cleanup() 
     {
         renderManager.Destroy(vulkanEngine);
-
-        vkDestroyRenderPass(vulkanEngine.Device, renderManager.mainRenderPass.GetRenderPass(), nullptr);
-
         ModelInfo.Destroy(vulkanEngine);
         textureManager->UnloadAllTextures(vulkanEngine);
         vulkanEngine.Destory();
-
-        glfwDestroyWindow(window.GetWindowPtr());
-        glfwTerminate();
+        window.CleanUp();
     }
 
     void recreateSwapChain() {

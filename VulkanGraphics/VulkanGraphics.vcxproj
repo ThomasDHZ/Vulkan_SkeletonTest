@@ -189,6 +189,8 @@
   <ItemGroup>
     <None Include="Shaders\Shader.frag" />
     <None Include="Shaders\Shader.vert" />
+    <None Include="Shaders\WireFrameShader.frag" />
+    <None Include="Shaders\WireFrameShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation3D.h" />

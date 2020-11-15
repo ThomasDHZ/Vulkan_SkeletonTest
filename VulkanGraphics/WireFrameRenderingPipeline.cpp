@@ -32,8 +32,8 @@ void WireFrameRenderingPipeline::CreateDescriptorSetLayout(VulkanEngine& rendere
 
 void WireFrameRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
 {
-    auto vertShaderCode = ReadShaderFile("shaders/vert.spv");
-    auto fragShaderCode = ReadShaderFile("shaders/frag.spv");
+    auto vertShaderCode = ReadShaderFile("shaders/WireFrameVert.spv");
+    auto fragShaderCode = ReadShaderFile("shaders/WireFrameFrag.spv");
 
     VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(renderer, fragShaderCode);

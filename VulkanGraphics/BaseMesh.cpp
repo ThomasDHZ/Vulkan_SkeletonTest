@@ -49,13 +49,16 @@ VkDescriptorImageInfo BaseMesh::AddImageDescriptorInfo(VulkanEngine& engine, VkI
     return DescriptorImage;
 }
 
-WriteDescriptorSetInfo BaseMesh::AddDescriptorSetTextureInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo)
+VkWriteDescriptorSet BaseMesh::AddDescriptorSetTextureInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo)
 {
-    WriteDescriptorSetInfo TextureDescriptor;
-    TextureDescriptor.DstBinding = BindingNumber;
-    TextureDescriptor.DstSet = DescriptorSet;
-    TextureDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    TextureDescriptor.DescriptorImageInfo = TextureImageInfo;
+    VkWriteDescriptorSet TextureDescriptor = {};
+    TextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    TextureDescriptor.dstSet = DescriptorSet;
+    TextureDescriptor.dstBinding = BindingNumber;
+    TextureDescriptor.dstArrayElement = 0;
+    TextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    TextureDescriptor.descriptorCount = 1;
+    TextureDescriptor.pImageInfo = &TextureImageInfo;
     return TextureDescriptor;
 }
 
@@ -68,13 +71,16 @@ VkDescriptorBufferInfo BaseMesh::AddBufferDescriptorInfo(VulkanEngine& engine, V
     return BufferInfo;
 }
 
-WriteDescriptorSetInfo BaseMesh::AddDescriptorSetBufferInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo)
+VkWriteDescriptorSet BaseMesh::AddDescriptorSetBufferInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo)
 {
-    WriteDescriptorSetInfo BufferDescriptor;
-    BufferDescriptor.DstBinding = BindingNumber;
-    BufferDescriptor.DstSet = DescriptorSet;
-    BufferDescriptor.DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    BufferDescriptor.DescriptorBufferInfo = BufferInfo;
+    VkWriteDescriptorSet BufferDescriptor = {};
+    BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    BufferDescriptor.dstSet = DescriptorSet;
+    BufferDescriptor.dstBinding = BindingNumber;
+    BufferDescriptor.dstArrayElement = 0;
+    BufferDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    BufferDescriptor.descriptorCount = 1;
+    BufferDescriptor.pBufferInfo = &BufferInfo;
     return BufferDescriptor;
 }
 
@@ -186,31 +192,9 @@ void BaseMesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout 
     }
 }
 
-void BaseMesh::CreateDescriptorSetsData(VulkanEngine& engine, std::vector<WriteDescriptorSetInfo> descriptorWritesList)
+void BaseMesh::CreateDescriptorSetsData(VulkanEngine& engine, std::vector<VkWriteDescriptorSet> DescriptorInfoList)
 {
-    std::vector<VkWriteDescriptorSet>  WriteDescriptorInfo = {};
-
-    for (int x = 0; x < descriptorWritesList.size(); x++)
-    {
-        VkWriteDescriptorSet DescriptorSet = {};
-        DescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        DescriptorSet.dstSet = descriptorWritesList[x].DstSet;
-        DescriptorSet.dstBinding = descriptorWritesList[x].DstBinding;
-        DescriptorSet.dstArrayElement = 0;
-        DescriptorSet.descriptorType = descriptorWritesList[x].DescriptorType;
-        DescriptorSet.descriptorCount = 1;
-        if (descriptorWritesList[x].DescriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
-        {
-            DescriptorSet.pBufferInfo = &descriptorWritesList[x].DescriptorBufferInfo;
-        }
-        else
-        {
-            DescriptorSet.pImageInfo = &descriptorWritesList[x].DescriptorImageInfo;
-        }
-        WriteDescriptorInfo.emplace_back(DescriptorSet);
-    }
-
-    vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(WriteDescriptorInfo.size()), WriteDescriptorInfo.data(), 0, nullptr);
+    vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorInfoList.size()), DescriptorInfoList.data(), 0, nullptr);
 }
 
 void BaseMesh::SetPosition2D(glm::vec2 Pos)
@@ -273,20 +257,6 @@ void BaseMesh::SetScale3D(float x, float y, float z)
     MeshScale = glm::vec3(x, y, z);
 }
 
-//void BaseMesh::CreateDrawMessage(VulkanEngine& engine, unsigned int RendererID, std::shared_ptr<GraphicsPipeline> pipeline)
-//{
-//    //RendererDrawMessage DrawMessage = {};
-//    //DrawMessage.RendererID = RendererID;
-//    //DrawMessage.MeshVertex = MeshVertex;
-//    //DrawMessage.MeshIndices = MeshIndices;
-//    //DrawMessage.DescriptorSets = DescriptorSets;
-//    //DrawMessage.pipeline = pipeline;
-//
-//    //std::shared_ptr<RendererDrawMessage> DrawMessagePtr = std::make_shared<RendererDrawMessage>(DrawMessage);
-//    //renderer.DrawMessageList.emplace_back(DrawMessagePtr);
-//    //DrawMessageList.emplace_back(DrawMessagePtr);
-//}
-
 void BaseMesh::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber)
 {
     VkBuffer vertexBuffers[] = { MeshVertex.GetVertexBuffer() };
@@ -316,16 +286,10 @@ void BaseMesh::Update(VulkanEngine& engine)
 void BaseMesh::Destory(VulkanEngine& engine)
 {
     MeshVertex.Destory(engine);
-    MeshVertex.Destory(engine);
     MeshIndices.Destory(engine);
 
     vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
     DescriptorPool = VK_NULL_HANDLE;
-
-    //for (auto drawMessage : DrawMessageList)
-    //{
-    //    renderer.RemoveDrawMessage(drawMessage);
-    //}
 
     MeshDeletedFlag = true;
 }
