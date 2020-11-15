@@ -125,14 +125,6 @@ private:
         renderManager.CMDBuffer(vulkanEngine, ModelInfo);
     }
 
-    static void check_vk_result(VkResult err)
-    {
-        if (err == 0) return;
-        printf("VkResult %d\n", err);
-        if (err < 0)
-            abort();
-    }
-
     void mainLoop() {
         while (!glfwWindowShouldClose(window.GetWindowPtr())) {
             glfwPollEvents();
@@ -142,6 +134,7 @@ private:
             ImGui::NewFrame();
             {
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                textureManager->UpdateIMGUIVRAM();
             }
             ImGui::Render();
 
