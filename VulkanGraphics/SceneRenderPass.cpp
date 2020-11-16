@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <array>
 #include "Vertex.h"
+#include "ImGui/imgui_impl_vulkan.h"
 
 SceneRenderPass::SceneRenderPass()
 {
@@ -16,7 +17,7 @@ SceneRenderPass::SceneRenderPass(VulkanEngine& engine)
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
 
-    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass);
+    sceneRenderingPipeline = std::make_shared<SceneRenderingPipeline>(engine, RenderPass);
 }
 
 SceneRenderPass::~SceneRenderPass()
@@ -129,7 +130,7 @@ void SceneRenderPass::UpdateSwapChain(VulkanEngine& engine)
     ColorTexture->RecreateRendererTexture(engine);
     BloomTexture->RecreateRendererTexture(engine);
     DepthTexture->RecreateRendererTexture(engine);
-    forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    sceneRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -150,7 +151,7 @@ void SceneRenderPass::Destroy(VulkanEngine& engine)
     BloomTexture->Delete(engine);
     DepthTexture->Delete(engine);
 
-    forwardRendereringPipeline->Destroy(engine);
+    sceneRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

@@ -4,7 +4,7 @@
 #include <array>
 #include "VulkanEngine.h"
 #include "RenderedDepthTexture.h"
-#include "ForwardRenderingPipeline.h"
+#include "ShadowRenderingPipeline.h"
 
 class ShadowRenderPass
 {
@@ -22,7 +22,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
-	std::shared_ptr<ForwardRenderingPipeline> forwardRendereringPipeline;
+	std::shared_ptr<ShadowRenderingPipeline> shadowdRendereringPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);

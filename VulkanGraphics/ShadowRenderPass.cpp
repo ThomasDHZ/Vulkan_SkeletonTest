@@ -11,7 +11,7 @@ ShadowRenderPass::ShadowRenderPass(VulkanEngine& engine)
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
 
-    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass);
+    shadowdRendereringPipeline = std::make_shared<ShadowRenderingPipeline>(engine, RenderPass);
 }
 
 ShadowRenderPass::~ShadowRenderPass()
@@ -97,7 +97,7 @@ void ShadowRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 void ShadowRenderPass::UpdateSwapChain(VulkanEngine& engine)
 {
     DepthTexture->RecreateRendererTexture(engine);
-    forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    shadowdRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -115,8 +115,7 @@ void ShadowRenderPass::UpdateSwapChain(VulkanEngine& engine)
 void ShadowRenderPass::Destroy(VulkanEngine& engine)
 {
     DepthTexture->Delete(engine);
-
-    forwardRendereringPipeline->Destroy(engine);
+    shadowdRendereringPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

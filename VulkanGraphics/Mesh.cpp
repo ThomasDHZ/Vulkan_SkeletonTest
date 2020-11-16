@@ -44,7 +44,7 @@ Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager,
     LoadTextures(engine, textureManager, meshData.TextureList);
     CreateUniformBuffers(engine);
     CreateDescriptorPool(engine);
-    CreateDescriptorSets(engine, textureManager, layout);
+    CreateDescriptorSets(engine, layout);
 
     for (int x = 0; x < 300; x++)
     {
@@ -63,7 +63,7 @@ Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager,
     LoadTextures(engine, textureManager, textures);
     CreateUniformBuffers(engine);
     CreateDescriptorPool(engine);
-    CreateDescriptorSets(engine, textureManager, layout);
+    CreateDescriptorSets(engine, layout);
 
     for (int x = 0; x < 300; x++)
     {
@@ -78,7 +78,7 @@ Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager,
     LoadTextures(engine, textureManager, textures);
     CreateUniformBuffers(engine);
     CreateDescriptorPool(engine);
-    CreateDescriptorSets(engine, textureManager, layout);
+    CreateDescriptorSets(engine, layout);
     CreateMaterialProperties(textures);
 
     for (int x = 0; x < 300; x++)
@@ -188,7 +188,7 @@ void Mesh::CreateDescriptorPool(VulkanEngine& engine) {
     BaseMesh::CreateDescriptorPool(engine, DescriptorPoolList);
 }
 
-void Mesh::CreateDescriptorSets(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, VkDescriptorSetLayout layout)
+void Mesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout layout)
 {
     BaseMesh::CreateDescriptorSets(engine, layout);
 
@@ -262,10 +262,10 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
     UpdateUniformBuffer(engine, ubo, Lightbuffer, CustomBufferinfo);
 }
 
-void Mesh::ScreenResizeUpdate(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout layout)
+void Mesh::ScreenResizeUpdate(VulkanEngine& engine, VkDescriptorSetLayout layout)
 {
     CreateDescriptorPool(engine);
-    CreateDescriptorSets(engine, textureManager, layout);
+    CreateDescriptorSets(engine, layout);
 }
 
 void Mesh::UpdateUniformBuffer(VulkanEngine& engine, VertexMatrixObject ubo, void* CustomBufferinfo)

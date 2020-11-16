@@ -7,10 +7,13 @@ RenderManager::RenderManager()
 
 RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
 {
+    interfaceRenderPass = InterfaceRenderPass(engine, window);
 	mainRenderPass = MainRenderPass(engine);
     sceneRenderPass = SceneRenderPass(engine);
+    frameBufferRenderPass = FrameBufferRenderPass(engine);
     shadowRenderPass = ShadowRenderPass(engine);
-	interfaceRenderPass = InterfaceRenderPass(engine, window);
+
+ //   frameBuffer = FrameBufferMesh(engine, sceneRenderPass.ColorTexture, mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
 }
 
 RenderManager::~RenderManager()
@@ -38,6 +41,7 @@ void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window
 
     mainRenderPass.UpdateSwapChain(engine);
     sceneRenderPass.UpdateSwapChain(engine);
+    frameBufferRenderPass.UpdateSwapChain(engine);
     shadowRenderPass.UpdateSwapChain(engine);
     interfaceRenderPass.UpdateSwapChain(engine);
 
@@ -66,7 +70,8 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, Model& mesh)
             throw std::runtime_error("failed to begin recording command buffer!");
         }
         MainRenderCMDBuffer(engine, mesh, i);
-       // SceneRenderCMDBuffer(engine, mesh, i);
+        SceneRenderCMDBuffer(engine, mesh, i);
+        ShadowRenderCMDBuffer(engine, mesh, i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
@@ -149,6 +154,7 @@ void RenderManager::Destroy(VulkanEngine& engine)
 	mainRenderPass.Destroy(engine);
     sceneRenderPass.Destroy(engine);
     shadowRenderPass.Destroy(engine);
+    frameBufferRenderPass.Destroy(engine);
 	interfaceRenderPass.Destroy(engine);
 }
 
@@ -190,7 +196,7 @@ void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, Model& model, int
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    model.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.forwardRendereringPipeline, SwapBufferImageIndex);
+    model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.sceneRenderingPipeline, SwapBufferImageIndex);
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }
 
@@ -209,6 +215,6 @@ void RenderManager::ShadowRenderCMDBuffer(VulkanEngine& engine, Model& model, in
     renderPassInfo2.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo2, VK_SUBPASS_CONTENTS_INLINE);
-    model.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.forwardRendereringPipeline, SwapBufferImageIndex);
+    model.Draw(commandBuffers[SwapBufferImageIndex], shadowRenderPass.shadowdRendereringPipeline, SwapBufferImageIndex);
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }

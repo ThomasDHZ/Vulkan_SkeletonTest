@@ -10,6 +10,7 @@ RenderedColorTexture::RenderedColorTexture(VulkanEngine& renderer) : Texture(ren
     CreateTextureImage(renderer);
     CreateTextureView(renderer);
     CreateTextureSampler(renderer);
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedColorTexture::~RenderedColorTexture()

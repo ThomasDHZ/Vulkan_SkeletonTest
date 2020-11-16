@@ -1,4 +1,5 @@
 #include "RenderedDepthTexture.h"
+#include "ImGui/imgui_impl_vulkan.h"
 
 RenderedDepthTexture::RenderedDepthTexture() : Texture()
 {
@@ -9,6 +10,7 @@ RenderedDepthTexture::RenderedDepthTexture(VulkanEngine& renderer) : Texture(ren
     CreateTextureImage(renderer);
     CreateTextureView(renderer);
     CreateTextureSampler(renderer);
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedDepthTexture::~RenderedDepthTexture()

@@ -6,6 +6,7 @@
 #include "Model.h"
 #include "SceneRenderPass.h"
 #include "ShadowRenderPass.h"
+#include "FrameBufferRenderPass.h"
 
 class RenderManager
 {
@@ -27,6 +28,7 @@ public:
 
 	MainRenderPass mainRenderPass;
 	SceneRenderPass sceneRenderPass;
+	FrameBufferRenderPass frameBufferRenderPass;
 	ShadowRenderPass shadowRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 

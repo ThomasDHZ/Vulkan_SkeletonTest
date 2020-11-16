@@ -168,6 +168,21 @@
     <ClCompile Include="SceneRenderPass.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="SceneRenderingPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowRenderingPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBufferMesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBufferRenderPass.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBufferRenderingPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.frag">
@@ -180,6 +195,24 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shaders\WireFrameShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\BloomShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\BloomShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\ShadowShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\ShadowShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\FrameBufferShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\FrameBufferShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -315,6 +348,21 @@
     </ClInclude>
     <ClInclude Include="SceneRenderPass.h">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneRenderingPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowRenderingPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferMesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferRenderPass.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferRenderingPipeline.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

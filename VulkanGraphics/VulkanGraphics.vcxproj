@@ -153,6 +153,9 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="ForwardRenderingPipeline.cpp" />
+    <ClCompile Include="FrameBufferMesh.cpp" />
+    <ClCompile Include="FrameBufferRenderingPipeline.cpp" />
+    <ClCompile Include="FrameBufferRenderPass.cpp" />
     <ClCompile Include="GraphicsPipeline.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
@@ -174,7 +177,9 @@
     <ClCompile Include="RenderedHDRColorTexture.cpp" />
     <ClCompile Include="RendereredTexture.cpp" />
     <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="SceneRenderingPipeline.cpp" />
     <ClCompile Include="SceneRenderPass.cpp" />
+    <ClCompile Include="ShadowRenderingPipeline.cpp" />
     <ClCompile Include="ShadowRenderPass.cpp" />
     <ClCompile Include="SpriteTexture2D.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -189,8 +194,14 @@
     <ClCompile Include="WireFrameRenderingPipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\BloomShader.frag" />
+    <None Include="Shaders\BloomShader.vert" />
+    <None Include="Shaders\FrameBufferShader.frag" />
+    <None Include="Shaders\FrameBufferShader.vert" />
     <None Include="Shaders\Shader.frag" />
     <None Include="Shaders\Shader.vert" />
+    <None Include="Shaders\ShadowShader.frag" />
+    <None Include="Shaders\ShadowShader.vert" />
     <None Include="Shaders\WireFrameShader.frag" />
     <None Include="Shaders\WireFrameShader.vert" />
   </ItemGroup>
@@ -202,6 +213,9 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="ForwardRenderingPipeline.h" />
+    <ClInclude Include="FrameBufferMesh.h" />
+    <ClInclude Include="FrameBufferRenderingPipeline.h" />
+    <ClInclude Include="FrameBufferRenderPass.h" />
     <ClInclude Include="GraphicsPipeline.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
@@ -224,7 +238,9 @@
     <ClInclude Include="RenderedHDRColorTexture.h" />
     <ClInclude Include="RendereredTexture.h" />
     <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="SceneRenderingPipeline.h" />
     <ClInclude Include="SceneRenderPass.h" />
+    <ClInclude Include="ShadowRenderingPipeline.h" />
     <ClInclude Include="ShadowRenderPass.h" />
     <ClInclude Include="SpriteTexture2D.h" />
     <ClInclude Include="Texture.h" />

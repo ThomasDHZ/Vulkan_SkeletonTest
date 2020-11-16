@@ -4,10 +4,9 @@
 #include <array>
 #include "VulkanEngine.h"
 #include "RenderedDepthTexture.h"
-#include "SceneRenderingPipeline.h"
-#include "RenderedColorTexture.h"
+#include "FrameBufferRenderingPipeline.h"
 
-class SceneRenderPass
+class FrameBufferRenderPass
 {
 private:
 	VkRenderPass RenderPass;
@@ -16,17 +15,16 @@ private:
 	void CreateRendererFramebuffers(VulkanEngine& engine);
 
 public:
-	SceneRenderPass();
-	SceneRenderPass(VulkanEngine& engine);
-	~SceneRenderPass();
+	FrameBufferRenderPass();
+	FrameBufferRenderPass(VulkanEngine& engine);
+	~FrameBufferRenderPass();
 
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	std::shared_ptr<RenderedColorTexture> ColorTexture;
-	std::shared_ptr<RenderedColorTexture> BloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
-	std::shared_ptr<SceneRenderingPipeline> sceneRenderingPipeline;
+	std::shared_ptr<FrameBufferRenderingPipeline> frameBufferPipeline;
 
+	void CMDDraw(VulkanEngine& engine);
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);
 
