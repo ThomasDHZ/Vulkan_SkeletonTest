@@ -12,7 +12,7 @@
 #include "VulkanUniformBuffer.h"
 #include "Bone.h"
 
-const  std::string DefaultTexture = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/DefaultTexture.bmp";
+const  std::string DefaultTexture = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/texture.jpg";
 
 enum RenderBitFlag
 {

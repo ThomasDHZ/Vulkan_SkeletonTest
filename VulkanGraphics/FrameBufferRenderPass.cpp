@@ -6,8 +6,6 @@ FrameBufferRenderPass::FrameBufferRenderPass()
 
 FrameBufferRenderPass::FrameBufferRenderPass(VulkanEngine& engine)
 {
-    DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
-
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
 
@@ -30,29 +28,14 @@ void FrameBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
     colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-    VkAttachmentDescription depthAttachment{};
-    depthAttachment.format = VK_FORMAT_D32_SFLOAT;
-    depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
     VkAttachmentReference colorAttachmentRef{};
     colorAttachmentRef.attachment = 0;
     colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-    VkAttachmentReference depthAttachmentRef{};
-    depthAttachmentRef.attachment = 1;
-    depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     VkSubpassDescription subpass{};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
     subpass.pColorAttachments = &colorAttachmentRef;
-    subpass.pDepthStencilAttachment = &depthAttachmentRef;
 
     VkSubpassDependency dependency{};
     dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -62,7 +45,7 @@ void FrameBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
     dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-    std::array<VkAttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
+    std::array<VkAttachmentDescription, 1> attachments = { colorAttachment };
     VkRenderPassCreateInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
@@ -82,9 +65,8 @@ void FrameBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
 
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++) {
-        std::array<VkImageView, 2> attachments = {
-            engine.SwapChain.GetSwapChainImageViews()[i],
-            DepthTexture->GetTextureView()
+        std::array<VkImageView, 1> attachments = {
+            engine.SwapChain.GetSwapChainImageViews()[i]
         };
 
         VkFramebufferCreateInfo framebufferInfo{};
@@ -104,7 +86,6 @@ void FrameBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 
 void FrameBufferRenderPass::UpdateSwapChain(VulkanEngine& engine)
 {
-    DepthTexture->RecreateRendererTexture(engine);
     frameBufferPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
@@ -122,8 +103,6 @@ void FrameBufferRenderPass::UpdateSwapChain(VulkanEngine& engine)
 
 void FrameBufferRenderPass::Destroy(VulkanEngine& engine)
 {
-    DepthTexture->Delete(engine);
-
     frameBufferPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);

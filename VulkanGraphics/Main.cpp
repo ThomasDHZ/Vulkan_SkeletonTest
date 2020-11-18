@@ -37,62 +37,16 @@
 #include "ForwardRenderingPipeline.h"
 #include "Texuture2D.h"
 #include "Mesh.h"
+#include "SkyBoxMesh.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
-
-
-
-#ifdef NDEBUG
-const bool enableValidationLayers = false;
-#else
-const bool enableValidationLayers = true;
-#endif
-
-
-
-struct QueueFamilyIndices {
-    std::optional<uint32_t> graphicsFamily;
-    std::optional<uint32_t> presentFamily;
-
-    bool isComplete() {
-        return graphicsFamily.has_value() && presentFamily.has_value();
-    }
-};
-
-struct SwapChainSupportDetails {
-    VkSurfaceCapabilitiesKHR capabilities;
-    std::vector<VkSurfaceFormatKHR> formats;
-    std::vector<VkPresentModeKHR> presentModes;
-};
-
-
-const std::vector<Vertex> vertices = {
-    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-
-    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
-};
-
-const std::vector<uint16_t> indices = {
-    0, 1, 2, 2, 3, 0,
-    4, 5, 6, 6, 7, 4
-};
-
-std::vector<std::shared_ptr<Bone>> BoneList;
-Animation3D animation;
 
 class HelloTriangleApplication {
 public:
     void run() 
     {
         initVulkan();
-        camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
         mainLoop();
         cleanup();
     }
@@ -108,6 +62,7 @@ private:
     Mouse mouse;
 
     Model ModelInfo;
+    SkyBoxMesh Skybox;
 
     VkDescriptorPool ImGuiDescriptorPool;
     VkCommandPool ImGuiCommandPool;
@@ -119,8 +74,25 @@ private:
         vulkanEngine = VulkanEngine(window.GetWindowPtr());
         renderManager = RenderManager(vulkanEngine, window.GetWindowPtr());
         textureManager = std::make_shared<TextureManager>(vulkanEngine);
-        ModelInfo = Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
 
+        MeshTextures meshTextures;
+        meshTextures.DiffuseMap = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/Models/TestAnimModel/diffuse.png";
+        meshTextures.SpecularMap = DefaultTexture;
+        meshTextures.NormalMap = DefaultTexture;
+        meshTextures.AlphaMap = DefaultTexture;
+        meshTextures.DepthMap = DefaultTexture;
+        meshTextures.EmissionMap = DefaultTexture;
+        meshTextures.ReflectionMap = DefaultTexture;
+        meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/left.jpg";
+        meshTextures.CubeMap[1] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/right.jpg";
+        meshTextures.CubeMap[2] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/top.jpg";
+        meshTextures.CubeMap[3] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/bottom.jpg";
+        meshTextures.CubeMap[4] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/back.jpg";
+        meshTextures.CubeMap[5] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/front.jpg";
+
+        camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
+        ModelInfo = Model(vulkanEngine, textureManager, "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout);
+       // Skybox = SkyBoxMesh(vulkanEngine, textureManager, renderManager.mainRenderPass.skyBoxPipeline->ShaderPipelineDescriptorLayout, meshTextures);
         renderManager.CMDBuffer(vulkanEngine, ModelInfo);
     }
 
@@ -133,8 +105,8 @@ private:
             ImGui::NewFrame();
             {
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-                //ImGui::Image(renderManager.sceneRenderPass.ColorTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
-                //ImGui::Image(renderManager.sceneRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
+                ImGui::Image(renderManager.sceneRenderPass.ColorTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
+                ImGui::Image(renderManager.sceneRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
                // ImGui::Image(renderManager.shadowRenderPass.DepthTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
                 textureManager->UpdateIMGUIVRAM();
             }
@@ -156,10 +128,6 @@ private:
         textureManager->UnloadAllTextures(vulkanEngine);
         vulkanEngine.Destory();
         window.CleanUp();
-    }
-
-    void recreateSwapChain() {
-        renderManager.UpdateRenderManager(vulkanEngine, window.GetWindowPtr(), ModelInfo);
     }
 
     void updateUniformBuffer(uint32_t currentImage) 

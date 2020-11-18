@@ -6,6 +6,7 @@
 #include "RenderedDepthTexture.h"
 #include "ForwardRenderingPipeline.h"
 #include "WireFrameRenderingPipeline.h"
+#include "SkyBoxPipeline.h"
 
 class MainRenderPass
 {
@@ -24,6 +25,7 @@ public:
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<ForwardRenderingPipeline> forwardRendereringPipeline;
+	std::shared_ptr<SkyBoxPipeline> skyBoxPipeline;
 	std::shared_ptr<WireFrameRenderingPipeline> wireFrameRendereringPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine);

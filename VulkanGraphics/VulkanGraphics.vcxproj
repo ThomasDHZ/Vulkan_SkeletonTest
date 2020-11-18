@@ -78,8 +78,8 @@
     <LibraryPath>C:\VulkanSDK\1.1.130.0\Lib;C:\Users\ZZT\Documents\Visual Studio 2019\glfw-3.3.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)\ProgramInclude;C:\Users\dotha\Documents\Visual Studio 2019\Assimp\include;C:\Users\dotha\Documents\Visual Studio 2019\stb-master;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.bin.WIN64\include;C:\Users\dotha\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.141.2\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\dotha\Documents\Visual Studio 2019\Assimp\lib;C:\VulkanSDK\1.2.141.2\Lib;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\ProgramInclude;C:\Users\dhz\Documents\Visual Studio 2019\Assimp\include;C:\Users\dhz\Documents\Visual Studio 2019\stb-master;C:\Users\dhz\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\include;C:\Users\dhz\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.154.1\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\dhz\Documents\Visual Studio 2019\Assimp\lib;C:\VulkanSDK\1.2.154.1\Lib;C:\Users\dhz\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\ZZT\Documents\Visual Studio 2019\Assimp\include;C:\Users\ZZT\Documents\Visual Studio 2019\tinyobjloader-master;C:\Users\ZZT\Documents\Visual Studio 2019\stb-master;C:\Users\ZZT\Documents\Visual Studio 2019\glfw-3.3.bin.WIN64\include;C:\Users\ZZT\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.131.2\Include;$(IncludePath)</IncludePath>
@@ -181,9 +181,12 @@
     <ClCompile Include="SceneRenderPass.cpp" />
     <ClCompile Include="ShadowRenderingPipeline.cpp" />
     <ClCompile Include="ShadowRenderPass.cpp" />
+    <ClCompile Include="SkyBoxMesh.cpp" />
+    <ClCompile Include="SkyBoxPipeline.cpp" />
     <ClCompile Include="SpriteTexture2D.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
+    <ClCompile Include="TextureRenderer.cpp" />
     <ClCompile Include="Texuture2D.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VulkanDebugger.cpp" />
@@ -202,6 +205,8 @@
     <None Include="Shaders\Shader.vert" />
     <None Include="Shaders\ShadowShader.frag" />
     <None Include="Shaders\ShadowShader.vert" />
+    <None Include="Shaders\SkyBoxShader.frag" />
+    <None Include="Shaders\SkyBoxShader.vert" />
     <None Include="Shaders\WireFrameShader.frag" />
     <None Include="Shaders\WireFrameShader.vert" />
   </ItemGroup>
@@ -242,9 +247,12 @@
     <ClInclude Include="SceneRenderPass.h" />
     <ClInclude Include="ShadowRenderingPipeline.h" />
     <ClInclude Include="ShadowRenderPass.h" />
+    <ClInclude Include="SkyBoxMesh.h" />
+    <ClInclude Include="SkyBoxPipeline.h" />
     <ClInclude Include="SpriteTexture2D.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="TextureRenderer.h" />
     <ClInclude Include="Texuture2D.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VertexBuffer.h" />

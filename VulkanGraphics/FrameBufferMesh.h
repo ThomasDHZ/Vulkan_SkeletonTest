@@ -28,7 +28,7 @@ private:
 
     void CreateUniformBuffers(VulkanEngine& renderer) override;
     void CreateDescriptorPool(VulkanEngine& renderer) override;
-    void CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout layout) override;
+    void CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout& layout) override;
 
 public:
 
@@ -42,8 +42,8 @@ public:
     FrameBufferSettings settings;
 
     void Update(VulkanEngine& renderer);
-    void ScreenResizeUpdate(VulkanEngine& renderer, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage);
-    void ScreenResizeUpdate(VulkanEngine& renderer, std::shared_ptr<TextureManager>textureManager, VkDescriptorSetLayout layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader);
+    void ScreenResizeUpdate(VulkanEngine& renderer, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage);
+    void ScreenResizeUpdate(VulkanEngine& renderer, std::shared_ptr<TextureManager>textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader);
     void Destory(VulkanEngine& renderer) override;
 };
 

@@ -99,7 +99,7 @@ protected:
 
     virtual void CreateUniformBuffers(VulkanEngine& engine);
     virtual void CreateDescriptorPool(VulkanEngine& engine);
-    virtual void CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout layout);
+    virtual void CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout& layout);
     virtual void UpdateUniformBuffer(VulkanEngine& engine, VertexMatrixObject ubo, void* CustomBufferinfo = nullptr);
     virtual void UpdateUniformBuffer(VulkanEngine& engine, VertexMatrixObject ubo, LightBufferObject Lightbuffer, void* CustomBufferinfo = nullptr);
 
@@ -111,8 +111,8 @@ public:
     Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata);
     Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, CustomBuffer customBuffer);
     Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, const MeshData& meshData, VkDescriptorSetLayout layout);
-    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout layout);
-    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout layout);
+    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout);
+    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout& layout);
     ~Mesh();
 
     void SetTransformMatrix(glm::mat4 NewTranformMatrix);
@@ -122,7 +122,7 @@ public:
     virtual void Update(VulkanEngine& engine) override;
     virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, void* CustomBufferinfo = nullptr);
     virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, void* CustomBufferinfo = nullptr);
-    virtual void ScreenResizeUpdate(VulkanEngine& engine, VkDescriptorSetLayout layout);
+    virtual void ScreenResizeUpdate(VulkanEngine& engine, VkDescriptorSetLayout& layout);
     virtual void Destory(VulkanEngine& engine) override;
 
     std::string GetMeshName() { return MeshName; }

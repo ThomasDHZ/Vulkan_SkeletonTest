@@ -183,6 +183,15 @@
     <ClCompile Include="FrameBufferRenderingPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TextureRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBoxMesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBoxPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.frag">
@@ -213,6 +222,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shaders\FrameBufferShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\SkyBoxShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\SkyBoxShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -362,6 +377,15 @@
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="FrameBufferRenderingPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureRenderer.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBoxMesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBoxPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

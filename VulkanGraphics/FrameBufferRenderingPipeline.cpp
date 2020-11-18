@@ -113,22 +113,16 @@ void FrameBufferRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, 
 	depthStencil.depthBoundsTestEnable = VK_FALSE;
 	depthStencil.stencilTestEnable = VK_FALSE;
 
-	VkPipelineColorBlendAttachmentState ColorAttachment = {};
-	ColorAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-	ColorAttachment.blendEnable = VK_TRUE;
-	ColorAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-	ColorAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-	ColorAttachment.colorBlendOp = VK_BLEND_OP_ADD;
-	ColorAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-	ColorAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-	ColorAttachment.alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+	VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
+	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+	colorBlendAttachment.blendEnable = VK_FALSE;
 
 	VkPipelineColorBlendStateCreateInfo ColorBlending = {};
 	ColorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	ColorBlending.logicOpEnable = VK_FALSE;
 	ColorBlending.logicOp = VK_LOGIC_OP_COPY;
 	ColorBlending.attachmentCount = 1;
-	ColorBlending.pAttachments = &ColorAttachment;
+	ColorBlending.pAttachments = &colorBlendAttachment;
 	ColorBlending.blendConstants[0] = 0.0f;
 	ColorBlending.blendConstants[1] = 0.0f;
 	ColorBlending.blendConstants[2] = 0.0f;

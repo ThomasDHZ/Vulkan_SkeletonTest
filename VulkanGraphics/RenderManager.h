@@ -7,6 +7,7 @@
 #include "SceneRenderPass.h"
 #include "ShadowRenderPass.h"
 #include "FrameBufferRenderPass.h"
+#include "FrameBufferMesh.h"
 
 class RenderManager
 {
@@ -19,8 +20,11 @@ private:
 		app->framebufferResized = true;
 	}
 
+	FrameBufferMesh frameBuffer;
+
 	void MainRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex);
 	void SceneRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex);
+	void FrameBufferRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex);
 	void ShadowRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex);
 
 public:

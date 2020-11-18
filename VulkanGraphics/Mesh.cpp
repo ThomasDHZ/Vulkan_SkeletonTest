@@ -52,7 +52,7 @@ Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager,
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout layout) : BaseMesh(engine, vertexdata, indicesdata)
+Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout) : BaseMesh(engine, vertexdata, indicesdata)
 {
     CustomBuffer EmptyBuffer;
     EmptyBuffer.ByteSize = sizeof(Empty);
@@ -71,7 +71,7 @@ Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager,
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout layout) : BaseMesh(engine, vertexdata, indicesdata)
+Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout& layout) : BaseMesh(engine, vertexdata, indicesdata)
 {
     ExtendedMeshProperitesBuffer = customBuffer;
 
@@ -175,12 +175,12 @@ void Mesh::CreateDescriptorPool(VulkanEngine& engine) {
 
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
     //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
@@ -188,17 +188,17 @@ void Mesh::CreateDescriptorPool(VulkanEngine& engine) {
     BaseMesh::CreateDescriptorPool(engine, DescriptorPoolList);
 }
 
-void Mesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout layout)
+void Mesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout& layout)
 {
     BaseMesh::CreateDescriptorSets(engine, layout);
 
     VkDescriptorImageInfo DiffuseMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, DiffuseTexture);
-    //VkDescriptorImageInfo SpecularMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, SpecularTexture);
-    //VkDescriptorImageInfo NormalMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, NormalTexture);
-    //VkDescriptorImageInfo DisplacementMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, DepthTexture);
-    //VkDescriptorImageInfo AlphaMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, AlphaTexture);
-    //VkDescriptorImageInfo EmissionMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, EmissionTexture);
-    //VkDescriptorImageInfo ReflectionMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, ReflectionTexture);
+    VkDescriptorImageInfo SpecularMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, SpecularTexture);
+    VkDescriptorImageInfo NormalMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, NormalTexture);
+    VkDescriptorImageInfo DisplacementMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, DepthTexture);
+    VkDescriptorImageInfo AlphaMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, AlphaTexture);
+    VkDescriptorImageInfo EmissionMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, EmissionTexture);
+    VkDescriptorImageInfo ReflectionMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, ReflectionTexture);
     //VkDescriptorImageInfo SkyBoxMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, SkyBoxTexture);
 
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
@@ -210,13 +210,13 @@ void Mesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout layo
         std::vector<VkWriteDescriptorSet> DescriptorList;
         DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 0, DescriptorSets[i], PositionInfo));
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 1, DescriptorSets[i], DiffuseMap));
-        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 2, DescriptorSets[i], SpecularMap));
-        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 3, DescriptorSets[i], NormalMap));
-        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 4, DescriptorSets[i], DisplacementMap));
-        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 5, DescriptorSets[i], AlphaMap));
-        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 6, DescriptorSets[i], EmissionMap));
-        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 7, DescriptorSets[i], ReflectionMap));
-        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 8, DescriptorSets[i], SkyBoxMap));
+        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 2, DescriptorSets[i], SpecularMap));
+        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 3, DescriptorSets[i], NormalMap));
+        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 4, DescriptorSets[i], DisplacementMap));
+        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 5, DescriptorSets[i], AlphaMap));
+        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 6, DescriptorSets[i], EmissionMap));
+        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 7, DescriptorSets[i], ReflectionMap));
+       // DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 8, DescriptorSets[i], SkyBoxMap));
         //DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 9, DescriptorSets[i], meshPropertiesInfo));
         //DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 10, DescriptorSets[i], LightInfo));
 
@@ -262,7 +262,7 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
     UpdateUniformBuffer(engine, ubo, Lightbuffer, CustomBufferinfo);
 }
 
-void Mesh::ScreenResizeUpdate(VulkanEngine& engine, VkDescriptorSetLayout layout)
+void Mesh::ScreenResizeUpdate(VulkanEngine& engine, VkDescriptorSetLayout& layout)
 {
     CreateDescriptorPool(engine);
     CreateDescriptorSets(engine, layout);

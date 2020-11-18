@@ -95,73 +95,73 @@ void BaseMesh::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager
         DiffuseTexture = textureManager->LoadTexture(engine, textures.DiffuseMap, VK_FORMAT_R8G8B8A8_SRGB);
     }
 
-    //if (textures.RendererSpecularMap)
-    //{
-    //    SpecularTexture = textures.RendererSpecularMap;
-    //}
-    //else
-    //{
-    //    SpecularTexture = textureManager->LoadTexture(engine, textures.SpecularMap, VK_FORMAT_R8G8B8A8_UNORM);
-    //}
+    if (textures.RendererSpecularMap)
+    {
+        SpecularTexture = textures.RendererSpecularMap;
+    }
+    else
+    {
+        SpecularTexture = textureManager->LoadTexture(engine, textures.SpecularMap, VK_FORMAT_R8G8B8A8_UNORM);
+    }
 
-    //if (textures.RendererNormalMap)
-    //{
-    //    NormalTexture = textures.RendererNormalMap;
-    //}
-    //else
-    //{
-    //    NormalTexture = textureManager->LoadTexture(engine, textures.NormalMap, VK_FORMAT_R8G8B8A8_UNORM);
-    //}
+    if (textures.RendererNormalMap)
+    {
+        NormalTexture = textures.RendererNormalMap;
+    }
+    else
+    {
+        NormalTexture = textureManager->LoadTexture(engine, textures.NormalMap, VK_FORMAT_R8G8B8A8_UNORM);
+    }
 
-    //if (textures.RendererDepthMap)
-    //{
-    //    DepthTexture = textures.RendererDepthMap;
-    //}
-    //else
-    //{
-    //    DepthTexture = textureManager->LoadTexture(engine, textures.DepthMap, VK_FORMAT_R8G8B8A8_UNORM);
-    //}
+    if (textures.RendererDepthMap)
+    {
+        DepthTexture = textures.RendererDepthMap;
+    }
+    else
+    {
+        DepthTexture = textureManager->LoadTexture(engine, textures.DepthMap, VK_FORMAT_R8G8B8A8_UNORM);
+    }
 
-    //if (textures.RendererAlphaMap)
-    //{
-    //    AlphaTexture = textures.RendererAlphaMap;
-    //}
-    //else
-    //{
-    //    AlphaTexture = textureManager->LoadTexture(engine, textures.AlphaMap, VK_FORMAT_R8G8B8A8_UNORM);
-    //}
+    if (textures.RendererAlphaMap)
+    {
+        AlphaTexture = textures.RendererAlphaMap;
+    }
+    else
+    {
+        AlphaTexture = textureManager->LoadTexture(engine, textures.AlphaMap, VK_FORMAT_R8G8B8A8_UNORM);
+    }
 
-    //if (textures.RendererEmissionMap)
-    //{
-    //    EmissionTexture = textures.RendererEmissionMap;
-    //}
-    //else
-    //{
-    //    EmissionTexture = textureManager->LoadTexture(engine, textures.EmissionMap, VK_FORMAT_R8G8B8A8_UNORM);
-    //}
+    if (textures.RendererEmissionMap)
+    {
+        EmissionTexture = textures.RendererEmissionMap;
+    }
+    else
+    {
+        EmissionTexture = textureManager->LoadTexture(engine, textures.EmissionMap, VK_FORMAT_R8G8B8A8_UNORM);
+    }
 
-    //if (textures.RendererReflectionMap)
-    //{
-    //    ReflectionTexture = textures.RendererReflectionMap;
-    //}
-    //else
-    //{
-    //    ReflectionTexture = textureManager->LoadTexture(engine, textures.ReflectionMap, VK_FORMAT_R8G8B8A8_UNORM);
-    //}
+    if (textures.RendererReflectionMap)
+    {
+        ReflectionTexture = textures.RendererReflectionMap;
+    }
+    else
+    {
+        ReflectionTexture = textureManager->LoadTexture(engine, textures.ReflectionMap, VK_FORMAT_R8G8B8A8_UNORM);
+    }
 
-    //if (!textures.CubeMap[0].empty() &&
-    //    !textures.CubeMap[1].empty() &&
-    //    !textures.CubeMap[2].empty() &&
-    //    !textures.CubeMap[3].empty() &&
-    //    !textures.CubeMap[4].empty() &&
-    //    !textures.CubeMap[5].empty())
-    //{
-    //    SkyBoxTexture = textureManager->LoadTexture(engine, textures.CubeMap);
-    //}
-    //else if (textures.RendererReflectionMap)
-    //{
-    //    SkyBoxTexture = textures.RendererCubeMap;
-    //}
+    if (!textures.CubeMap[0].empty() &&
+        !textures.CubeMap[1].empty() &&
+        !textures.CubeMap[2].empty() &&
+        !textures.CubeMap[3].empty() &&
+        !textures.CubeMap[4].empty() &&
+        !textures.CubeMap[5].empty())
+    {
+        SkyBoxTexture = textureManager->LoadTexture(engine, textures.CubeMap);
+    }
+    else if (textures.RendererReflectionMap)
+    {
+        SkyBoxTexture = textures.RendererCubeMap;
+    }
 }
 
 void BaseMesh::CreateDescriptorPool(VulkanEngine& engine, std::vector<VkDescriptorPoolSize> DescriptorPoolInfo)

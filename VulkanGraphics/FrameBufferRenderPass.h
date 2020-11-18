@@ -20,7 +20,6 @@ public:
 	~FrameBufferRenderPass();
 
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<FrameBufferRenderingPipeline> frameBufferPipeline;
 

@@ -13,6 +13,7 @@ MainRenderPass::MainRenderPass(VulkanEngine& engine)
 
     forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass);
     wireFrameRendereringPipeline = std::make_shared<WireFrameRenderingPipeline>(engine, RenderPass);
+    skyBoxPipeline = std::make_shared<SkyBoxPipeline>(engine, RenderPass);
 }
 
 MainRenderPass::~MainRenderPass()
@@ -108,6 +109,7 @@ void MainRenderPass::UpdateSwapChain(VulkanEngine& engine)
     DepthTexture->RecreateRendererTexture(engine);
     forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
     wireFrameRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    skyBoxPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -127,6 +129,7 @@ void MainRenderPass::Destroy(VulkanEngine& engine)
     DepthTexture->Delete(engine);
 
     forwardRendereringPipeline->Destroy(engine);
+    skyBoxPipeline->Destroy(engine);
     wireFrameRendereringPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);

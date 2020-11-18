@@ -6,6 +6,7 @@
 #include "RenderedDepthTexture.h"
 #include "SceneRenderingPipeline.h"
 #include "RenderedColorTexture.h"
+#include "SkyBoxPipeline.h"
 
 class SceneRenderPass
 {
@@ -26,6 +27,7 @@ public:
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<SceneRenderingPipeline> sceneRenderingPipeline;
+	std::shared_ptr<SkyBoxPipeline> skyBoxPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);
