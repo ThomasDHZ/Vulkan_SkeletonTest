@@ -4,6 +4,7 @@
 #include "InterfaceRenderPass.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "SkyBoxMesh.h"
 #include "SceneRenderPass.h"
 #include "ShadowRenderPass.h"
 #include "FrameBufferRenderPass.h"
@@ -22,9 +23,9 @@ private:
 
 	FrameBufferMesh frameBuffer;
 
-	void MainRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex);
-	void SceneRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex);
-	void FrameBufferRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex);
+	void MainRenderCMDBuffer(VulkanEngine& engine, Model& model, SkyBoxMesh& skybox, int SwapBufferImageIndex);
+	void SceneRenderCMDBuffer(VulkanEngine& engine, Model& model, SkyBoxMesh& skybox, int SwapBufferImageIndex);
+	void FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex);
 	void ShadowRenderCMDBuffer(VulkanEngine& engine, Model& model, int SwapBufferImageIndex);
 
 public:
@@ -40,9 +41,9 @@ public:
 	RenderManager(VulkanEngine& vEngine, GLFWwindow* window);
 	~RenderManager();
 
-	void CMDBuffer(VulkanEngine& engine, Model& mesh);
-	void UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, Model& mesh);
-	void Draw(VulkanEngine& engine, GLFWwindow* window, Model& mesh);
+	void CMDBuffer(VulkanEngine& engine, Model& mesh, SkyBoxMesh& skybox);
+	void UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, Model& mesh, SkyBoxMesh& skybox);
+	void Draw(VulkanEngine& engine, GLFWwindow* window, Model& mesh, SkyBoxMesh& skybox);
 	void Destroy(VulkanEngine& engine);
 };
 

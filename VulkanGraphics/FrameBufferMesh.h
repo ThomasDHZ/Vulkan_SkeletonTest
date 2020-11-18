@@ -26,24 +26,25 @@ private:
 
     VulkanUniformBuffer frameBufferSettings;
 
-    void CreateUniformBuffers(VulkanEngine& renderer) override;
-    void CreateDescriptorPool(VulkanEngine& renderer) override;
+    void CreateUniformBuffers(VulkanEngine& engine) override;
+    void CreateDescriptorPool(VulkanEngine& engine) override;
     void CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout& layout) override;
 
 public:
 
     FrameBufferMesh();
-    FrameBufferMesh(VulkanEngine& renderer, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout);
-    FrameBufferMesh(VulkanEngine& renderer, std::shared_ptr<TextureManager>textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout);
-    FrameBufferMesh(VulkanEngine& renderer, std::shared_ptr<TextureManager>textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout, std::shared_ptr<Texture> BloomImage);
-    FrameBufferMesh(VulkanEngine& renderer, std::shared_ptr<TextureManager>textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader);
+    FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout);
+    FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout);
+    FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout, std::shared_ptr<Texture> BloomImage);
+    FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader);
     ~FrameBufferMesh();
 
     FrameBufferSettings settings;
 
     void Update(VulkanEngine& renderer);
-    void ScreenResizeUpdate(VulkanEngine& renderer, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage);
-    void ScreenResizeUpdate(VulkanEngine& renderer, std::shared_ptr<TextureManager>textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader);
-    void Destory(VulkanEngine& renderer) override;
+    void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout);
+    void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage);
+    void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader);
+    void Destory(VulkanEngine& engine) override;
 };
 

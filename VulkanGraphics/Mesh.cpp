@@ -96,24 +96,6 @@ void Mesh::SetTransformMatrix(glm::mat4 NewTranformMatrix)
     TransformMatrix = NewTranformMatrix;
 }
 
-std::array<DescriptorSetLayoutBindingInfo, 2> Mesh::DescriptorLayout()
-{
-
-    std::array<DescriptorSetLayoutBindingInfo, 2> LayoutBindingInfo = {};
-
-    LayoutBindingInfo[0].Binding = 0;
-    LayoutBindingInfo[0].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    LayoutBindingInfo[0].StageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-    LayoutBindingInfo[1].Binding = 1;
-    LayoutBindingInfo[1].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    LayoutBindingInfo[1].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    return LayoutBindingInfo;
-}
-
-
-
 void Mesh::CreateMaterialProperties(MeshTextures textures)
 {
     if (textures.DiffuseMap != DefaultTexture)
@@ -181,7 +163,7 @@ void Mesh::CreateDescriptorPool(VulkanEngine& engine) {
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
     //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
 
@@ -199,7 +181,7 @@ void Mesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout& lay
     VkDescriptorImageInfo AlphaMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, AlphaTexture);
     VkDescriptorImageInfo EmissionMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, EmissionTexture);
     VkDescriptorImageInfo ReflectionMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, ReflectionTexture);
-    //VkDescriptorImageInfo SkyBoxMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, SkyBoxTexture);
+    VkDescriptorImageInfo SkyBoxMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, SkyBoxTexture);
 
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
     {
@@ -216,7 +198,7 @@ void Mesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout& lay
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 5, DescriptorSets[i], AlphaMap));
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 6, DescriptorSets[i], EmissionMap));
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 7, DescriptorSets[i], ReflectionMap));
-       // DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 8, DescriptorSets[i], SkyBoxMap));
+        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 8, DescriptorSets[i], SkyBoxMap));
         //DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 9, DescriptorSets[i], meshPropertiesInfo));
         //DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 10, DescriptorSets[i], LightInfo));
 

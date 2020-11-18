@@ -15,7 +15,7 @@ struct PointLightStruct {
 
     alignas(4) float constant = 1.0f;
     alignas(4) float linear = 0.09f;
-    alignas(4) float quadratic = 0.032;
+    alignas(4) float quadratic = 0.032f;
 
     alignas(16) glm::vec3 ambient = glm::vec3(0.05f, 0.05f, 0.05f);
     alignas(16) glm::vec3 diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
@@ -116,8 +116,6 @@ public:
     ~Mesh();
 
     void SetTransformMatrix(glm::mat4 NewTranformMatrix);
-
-    static std::array<DescriptorSetLayoutBindingInfo, 2> DescriptorLayout();
 
     virtual void Update(VulkanEngine& engine) override;
     virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, void* CustomBufferinfo = nullptr);

@@ -79,7 +79,18 @@ void FrameBufferMesh::Update(VulkanEngine& renderer)
     frameBufferSettings.UpdateUniformBuffer(renderer, static_cast<void*>(&settings));
 }
 
-void FrameBufferMesh::ScreenResizeUpdate(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage)
+void FrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout)
+{
+    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
+    DescriptorPool = VK_NULL_HANDLE;
+
+    DiffuseTexture = FrameBufferImage;
+
+    CreateDescriptorPool(engine);
+    CreateDescriptorSets(engine, layout);
+}
+
+void FrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage)
 {
     vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
     DescriptorPool = VK_NULL_HANDLE;
@@ -91,7 +102,7 @@ void FrameBufferMesh::ScreenResizeUpdate(VulkanEngine& engine, std::shared_ptr<T
     CreateDescriptorSets(engine, layout);
 }
 
-void FrameBufferMesh::ScreenResizeUpdate(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader)
+void FrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader)
 {
     vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
     DescriptorPool = VK_NULL_HANDLE;

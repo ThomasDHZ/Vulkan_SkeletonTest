@@ -8,6 +8,7 @@ layout(binding = 4) uniform sampler2D depthMap;
 layout(binding = 5) uniform sampler2D AlphaMap;
 layout(binding = 6) uniform sampler2D EmissionMap;
 layout(binding = 7) uniform sampler2D ReflectionMap;
+layout(binding = 8) uniform samplerCube SkyBox;
 
 layout(location = 0) in vec2 fragTexCoord;
 

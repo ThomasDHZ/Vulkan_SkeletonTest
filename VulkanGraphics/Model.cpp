@@ -288,12 +288,12 @@ void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 	meshTextures.DepthMap = DefaultTexture;
 	meshTextures.EmissionMap = DefaultTexture;
 	meshTextures.ReflectionMap = DefaultTexture;
-	//meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/left.jpg";
-	//meshTextures.CubeMap[1] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/right.jpg";
-	//meshTextures.CubeMap[2] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/top.jpg";
-	//meshTextures.CubeMap[3] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/bottom.jpg";
-	//meshTextures.CubeMap[4] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/back.jpg";
-	//meshTextures.CubeMap[5] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/front.jpg";
+	meshTextures.CubeMap[0] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/left.jpg";
+	meshTextures.CubeMap[1] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/right.jpg";
+	meshTextures.CubeMap[2] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/top.jpg";
+	meshTextures.CubeMap[3] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/bottom.jpg";
+	meshTextures.CubeMap[4] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/back.jpg";
+	meshTextures.CubeMap[5] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/front.jpg";
 
 	//Properties.properties.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
 	//Properties.properties.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
