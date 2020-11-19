@@ -113,13 +113,30 @@ private:
             ImGui::NewFrame();
             {
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                ImGui::CheckboxFlags("Normally", &ModelList[0].RenderFlags, RenderDrawFlags::RenderNormally);
+                ImGui::CheckboxFlags("WireFrame", &ModelList[0].RenderFlags, RenderDrawFlags::RenderWireFrame);
+                ImGui::CheckboxFlags("Shadow", &ModelList[0].RenderFlags, RenderDrawFlags::RenderShadow);
+
+                ImGui::CheckboxFlags("Normally2", &ModelList[1].RenderFlags, RenderDrawFlags::RenderNormally);
+                ImGui::CheckboxFlags("WireFrame2", &ModelList[1].RenderFlags, RenderDrawFlags::RenderWireFrame);
+                ImGui::CheckboxFlags("Shadow2", &ModelList[1].RenderFlags, RenderDrawFlags::RenderShadow);
+
+                ImGui::CheckboxFlags("Normally3", &ModelList[2].RenderFlags, RenderDrawFlags::RenderNormally);
+                ImGui::CheckboxFlags("WireFrame3", &ModelList[2].RenderFlags, RenderDrawFlags::RenderWireFrame);
+                ImGui::CheckboxFlags("Shadow3", &ModelList[2].RenderFlags, RenderDrawFlags::RenderShadow);
+
+                ImGui::CheckboxFlags("Normally4", &ModelList[3].RenderFlags, RenderDrawFlags::RenderNormally);
+                ImGui::CheckboxFlags("WireFrame4", &ModelList[3].RenderFlags, RenderDrawFlags::RenderWireFrame);
+                ImGui::CheckboxFlags("Shadow4", &ModelList[3].RenderFlags, RenderDrawFlags::RenderShadow);
+
                 ImGui::Image(renderManager.sceneRenderPass.ColorTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
                 ImGui::Image(renderManager.sceneRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
-               // ImGui::Image(renderManager.shadowRenderPass.DepthTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
+                ImGui::Image(renderManager.shadowRenderPass.DepthTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
                 textureManager->UpdateIMGUIVRAM();
             }
             ImGui::Render();
 
+            renderManager.UpdateCommandBuffer(vulkanEngine, ModelList, Skybox);
             drawFrame();
             mouse.Update(window.GetWindowPtr(), camera);
             keyboard.Update(window.GetWindowPtr(), camera);

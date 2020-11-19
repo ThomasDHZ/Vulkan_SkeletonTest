@@ -107,7 +107,6 @@ protected:
     glm::vec3 MeshRotate = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 MeshScale = glm::vec3(1.0f);
 
-    int RenderFlags = 0;
     bool MeshDeletedFlag = false;
 
     void LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshTextures textures);
@@ -128,6 +127,8 @@ public:
     BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, const std::vector<uint16_t>& Indicesdata, int renderFlags);
     BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, int renderFlags);
     ~BaseMesh();
+
+    unsigned int RenderFlags = 0;
 
     virtual void Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber);
     virtual void Update(VulkanEngine& engine);
