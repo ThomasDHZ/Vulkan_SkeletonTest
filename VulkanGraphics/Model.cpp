@@ -30,10 +30,10 @@ Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManag
 
 	LoadMeshTransform(0, ModelTransformMatrix);
 
-	/*if (AnimationList.size() > 0)
+	if (AnimationList.size() > 0)
 	{
 		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
-	}*/
+	}
 }
 
 Model::~Model()
@@ -602,7 +602,7 @@ void Model::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& cam
 	{
 		//mesh->properites.material.specular = glm::vec3(0.02f);
 		//mesh->properites.EmissionStrength = abs(sin(glfwGetTime()));
-		mesh->Update(engine, camera, light, BoneList);
+		mesh->Update(engine, camera, light, BoneList, modelMatrix);
 	}
 }
 

@@ -20,7 +20,7 @@ RenderManager::~RenderManager()
 {
 }
 
-void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, std::vector<Mesh>& ModelList, SkyBoxMesh& skybox)
+void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, std::vector<Model>& ModelList, SkyBoxMesh& skybox)
 {
     int width = 0, height = 0;
     glfwGetFramebufferSize(window, &width, &height);
@@ -50,7 +50,7 @@ void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window
     CMDBuffer(engine, ModelList, skybox);
 }
 
-void RenderManager::CMDBuffer(VulkanEngine& engine, std::vector<Mesh>& ModelList, SkyBoxMesh& skybox)
+void RenderManager::CMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox)
 {
     commandBuffers.resize(mainRenderPass.SwapChainFramebuffers.size());
 
@@ -81,12 +81,12 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, std::vector<Mesh>& ModelList
     }
 }
 
-void RenderManager::UpdateCommandBuffer(VulkanEngine& engine, std::vector<Mesh>& ModelList, SkyBoxMesh& skybox)
+void RenderManager::UpdateCommandBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox)
 {
     CMDBuffer(engine, ModelList, skybox);
 }
 
-void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::vector<Mesh>& ModelList, SkyBoxMesh& skybox)
+void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::vector<Model>& ModelList, SkyBoxMesh& skybox)
 {
     vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -168,7 +168,7 @@ void RenderManager::Destroy(VulkanEngine& engine)
 	interfaceRenderPass.Destroy(engine);
 }
 
-void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Mesh>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex)
+void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex)
 {
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -199,7 +199,7 @@ void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Mesh>&
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }
 
-void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Mesh>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex)
+void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex)
 {
     std::array<VkClearValue, 3> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -251,7 +251,7 @@ void RenderManager::FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBuf
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }
 
-void RenderManager::ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Mesh>& ModelList, int SwapBufferImageIndex)
+void RenderManager::ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, int SwapBufferImageIndex)
 {
     std::array<VkClearValue, 1> clearValues{};
     clearValues[0].depthStencil = { 1.0f, 0 };

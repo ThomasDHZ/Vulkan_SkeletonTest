@@ -118,8 +118,8 @@ public:
     void SetTransformMatrix(glm::mat4 NewTranformMatrix);
 
     virtual void Update(VulkanEngine& engine) override;
-    virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, void* CustomBufferinfo = nullptr);
-    virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, void* CustomBufferinfo = nullptr);
+    virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, glm::mat4 ModelMatrix = glm::mat4(1.0f), void* CustomBufferinfo = nullptr);
+    virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, glm::mat4 ModelMatrix = glm::mat4(1.0f), void* CustomBufferinfo = nullptr);
     virtual void ScreenResizeUpdate(VulkanEngine& engine, VkDescriptorSetLayout& layout);
     virtual void Destory(VulkanEngine& engine) override;
 
