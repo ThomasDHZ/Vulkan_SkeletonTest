@@ -191,6 +191,7 @@
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VulkanDebugger.cpp" />
     <ClCompile Include="VulkanEngine.cpp" />
+    <ClCompile Include="VulkanGraphics.cpp" />
     <ClCompile Include="VulkanSwapChain.cpp" />
     <ClCompile Include="VulkanUniformBuffer.cpp" />
     <ClCompile Include="VulkanWindow.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="VulkanBufferManager.h" />
     <ClInclude Include="VulkanDebugger.h" />
     <ClInclude Include="VulkanEngine.h" />
+    <ClInclude Include="VulkanGraphics.h" />
     <ClInclude Include="VulkanSwapChain.h" />
     <ClInclude Include="VulkanUniformBuffer.h" />
     <ClInclude Include="VulkanWindow.h" />
