@@ -5,8 +5,9 @@ Model::Model()
 {
 }
 
-Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout)
+Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout, int renderFlags)
 {
+	RenderFlags = renderFlags;
 	Assimp::Importer ModelImporter;
 
 	const aiScene* Scene = ModelImporter.ReadFile(FilePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -24,7 +25,7 @@ Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManag
 
 	for (auto mesh : SubMeshList)
 	{
-		MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, textureManager, mesh, layout)));
+		MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, textureManager, mesh, layout, renderFlags)));
 	}
 
 	LoadMeshTransform(0, ModelTransformMatrix);
@@ -33,8 +34,6 @@ Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManag
 	{
 		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
 	}
-
-	//SendDrawMessage(renderer);
 }
 
 Model::~Model()

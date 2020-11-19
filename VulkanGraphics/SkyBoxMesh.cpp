@@ -4,7 +4,7 @@ SkyBoxMesh::SkyBoxMesh() : Mesh()
 {
 }
 
-SkyBoxMesh::SkyBoxMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, VkDescriptorSetLayout& layout, MeshTextures textures) : Mesh(engine, SkyBoxVertices)
+SkyBoxMesh::SkyBoxMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, VkDescriptorSetLayout& layout, MeshTextures textures) : Mesh(engine, SkyBoxVertices, RenderDrawFlags::RenderNormally)
 {
 	LoadTextures(engine, textureManager, textures);
 	CreateUniformBuffers(engine);

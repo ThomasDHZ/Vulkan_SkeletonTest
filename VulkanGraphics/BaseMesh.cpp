@@ -5,8 +5,9 @@ BaseMesh::BaseMesh()
 {
 }
 
-BaseMesh::BaseMesh(VulkanEngine& engine, const MeshData& meshData)
+BaseMesh::BaseMesh(VulkanEngine& engine, const MeshData& meshData, int renderFlags)
 {
+    RenderFlags = renderFlags;
     MeshVertex = VertexBuffer(engine, meshData.VertexList);
     if (meshData.IndexList.size() != 0)
     {
@@ -14,16 +15,18 @@ BaseMesh::BaseMesh(VulkanEngine& engine, const MeshData& meshData)
     }
 }
 
-BaseMesh::BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, const std::vector<uint16_t>& Indicesdata)
+BaseMesh::BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, const std::vector<uint16_t>& Indicesdata, int renderFlags)
 {
+    RenderFlags = renderFlags;
     MeshVertex = VertexBuffer(engine, Vertexdata);
     if (Indicesdata.size() != 0)
     {
         MeshIndices = IndicesBuffer(engine, Indicesdata);
     }
 }
-BaseMesh::BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata)
+BaseMesh::BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, int renderFlags)
 {
+    RenderFlags = renderFlags;
     MeshVertex = VertexBuffer(engine, Vertexdata);
 }
 

@@ -71,10 +71,10 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, Model& mesh, SkyBoxMesh& sky
         if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
             throw std::runtime_error("failed to begin recording command buffer!");
         }
-        MainRenderCMDBuffer(engine, mesh, skybox, i);
-      //  SceneRenderCMDBuffer(engine, mesh, skybox, i);
-       // FrameBufferRenderCMDBuffer(engine, i);
-      //  ShadowRenderCMDBuffer(engine, mesh, i);
+     //   MainRenderCMDBuffer(engine, mesh, skybox, i);
+        SceneRenderCMDBuffer(engine, mesh, skybox, i);
+        FrameBufferRenderCMDBuffer(engine, i);
+        ShadowRenderCMDBuffer(engine, mesh, i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
@@ -181,7 +181,10 @@ void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, Model& model, SkyB
     vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     // mesh.Draw(commandBuffers[i], mainRenderPass.wireFrameRendereringPipeline, i);
     skybox.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.skyBoxPipeline, SwapBufferImageIndex);
-    model.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.forwardRendereringPipeline, SwapBufferImageIndex);
+    if (model.GetRenderFlags() & RenderDrawFlags::RenderNormally)
+    {
+        model.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.forwardRendereringPipeline, SwapBufferImageIndex);
+    }
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }
 
@@ -203,7 +206,10 @@ void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, Model& model, Sky
 
     vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     skybox.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.skyBoxPipeline, SwapBufferImageIndex);
-    model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.sceneRenderingPipeline, SwapBufferImageIndex);
+    if (model.GetRenderFlags() & RenderDrawFlags::RenderNormally)
+    {
+        model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.sceneRenderingPipeline, SwapBufferImageIndex);
+    }
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }
 
@@ -242,6 +248,9 @@ void RenderManager::ShadowRenderCMDBuffer(VulkanEngine& engine, Model& model, in
     renderPassInfo2.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo2, VK_SUBPASS_CONTENTS_INLINE);
-    model.Draw(commandBuffers[SwapBufferImageIndex], shadowRenderPass.shadowdRendereringPipeline, SwapBufferImageIndex);
+    if (model.GetRenderFlags() & RenderDrawFlags::RenderShadow)
+    {
+        model.Draw(commandBuffers[SwapBufferImageIndex], shadowRenderPass.shadowdRendereringPipeline, SwapBufferImageIndex);
+    }
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }

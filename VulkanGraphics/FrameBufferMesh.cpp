@@ -3,7 +3,7 @@
 FrameBufferMesh::FrameBufferMesh() : Mesh()
 {}
 
-FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout) : Mesh(engine, FrameBufferVertices, FrameBufferIndices)
+FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout) : Mesh(engine, FrameBufferVertices, FrameBufferIndices, RenderDrawFlags::RenderNormally)
 {
     DiffuseTexture = FrameBufferImage;
     CreateUniformBuffers(engine);
@@ -11,7 +11,7 @@ FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<Texture> 
     CreateDescriptorSets(engine, layout);
 }
 
-FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout) : Mesh(engine, FrameBufferVertices, FrameBufferIndices)
+FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout) : Mesh(engine, FrameBufferVertices, FrameBufferIndices, RenderDrawFlags::RenderNormally)
 {
     DiffuseTexture = FrameBufferImage;
     CreateUniformBuffers(engine);
@@ -19,7 +19,7 @@ FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureMa
     CreateDescriptorSets(engine, layout);
 }
 
-FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout, std::shared_ptr<Texture> BloomImage) : Mesh(engine, FrameBufferVertices, FrameBufferIndices)
+FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout, std::shared_ptr<Texture> BloomImage) : Mesh(engine, FrameBufferVertices, FrameBufferIndices, RenderDrawFlags::RenderNormally)
 {
     DiffuseTexture = FrameBufferImage;
     EmissionTexture = BloomImage;
@@ -28,7 +28,7 @@ FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureMa
     CreateDescriptorSets(engine, layout);
 }
 
-FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader) : Mesh(engine, FrameBufferVertices, FrameBufferIndices)
+FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader) : Mesh(engine, FrameBufferVertices, FrameBufferIndices, RenderDrawFlags::RenderNormally)
 {
     DiffuseTexture = FrameBufferImage;
     EmissionTexture = BloomImage;

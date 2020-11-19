@@ -33,7 +33,7 @@ private:
 	glm::mat4 GlobalInverseTransformMatrix;
 	AnimationPlayer3D AnimationPlayer;
 
-	
+	int RenderFlags;
 
 	void LoadMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
@@ -54,11 +54,13 @@ public:
 	std::vector<std::shared_ptr<Bone>> BoneList;
 
 	Model();
-	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout);
+	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout, int renderFlags);
 	~Model();
 
 	void Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber);
 	void Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera, LightBufferObject& light);
 	void UpdateImGUI();
 	void Destroy(VulkanEngine& engine);
+
+	int GetRenderFlags() { return RenderFlags; }
 };

@@ -14,20 +14,11 @@
 
 const  std::string DefaultTexture = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/texture.jpg";
 
-enum RenderBitFlag
-{
-    RenderOnMainPass = 1 << 0,
-    RenderOnTexturePass = 1 << 1,
-    RenderOnFrameBufferPass = 1 << 2,
-    RenderShadow = 1 << 3,
-    RenderMainPass = 1 << 4,
-    RenderEffectPass = 1 << 5
-};
-
 enum RenderDrawFlags
 {
-    RenderNormally,
-    RenderWireFrame
+    RenderNormally = 1 << 0,
+    RenderWireFrame = 1 << 1,
+    RenderShadow = 1 << 2
 };
 
 struct MeshTextures
@@ -116,6 +107,7 @@ protected:
     glm::vec3 MeshRotate = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 MeshScale = glm::vec3(1.0f);
 
+    int RenderFlags = 0;
     bool MeshDeletedFlag = false;
 
     void LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshTextures textures);
@@ -132,9 +124,9 @@ protected:
 public:
 
     BaseMesh();
-    BaseMesh(VulkanEngine& engine, const MeshData& meshData);
-    BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, const std::vector<uint16_t>& Indicesdata);
-    BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata);
+    BaseMesh(VulkanEngine& engine, const MeshData& meshData, int renderFlags);
+    BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, const std::vector<uint16_t>& Indicesdata, int renderFlags);
+    BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, int renderFlags);
     ~BaseMesh();
 
     virtual void Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber);
@@ -160,5 +152,6 @@ public:
     glm::vec3 GetRotation3D() { return MeshRotate; }
     glm::vec2 GetScale2D() { return glm::vec2(MeshScale.x, MeshScale.y); }
     glm::vec3 GetScale3D() { return MeshScale; }
+    int GetRenderFlags() { return RenderFlags; }
     bool GetMeshDeletedFlag() { return MeshDeletedFlag; }
 };
