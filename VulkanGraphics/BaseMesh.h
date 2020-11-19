@@ -133,6 +133,7 @@ public:
     virtual void Update(VulkanEngine& engine);
     virtual void Destory(VulkanEngine& engine);
 
+    void SetRenderFlags(int renderFlags);
     void SetPosition2D(glm::vec2 Pos);
     void SetPosition2D(float x, float y);
     void SetPosition3D(glm::vec3 Pos);

@@ -61,7 +61,7 @@ private:
     Keyboard keyboard;
     Mouse mouse;
 
-    Model ModelInfo;
+    std::vector<Mesh> ModelList;
     SkyBoxMesh Skybox;
 
     void initVulkan() 
@@ -70,7 +70,7 @@ private:
         vulkanEngine = VulkanEngine(window.GetWindowPtr());
         renderManager = RenderManager(vulkanEngine, window.GetWindowPtr());
         textureManager = std::make_shared<TextureManager>(vulkanEngine);
-
+       
         MeshTextures meshTextures;
         meshTextures.DiffuseMap = DefaultTexture;
         meshTextures.SpecularMap = DefaultTexture;
@@ -86,10 +86,22 @@ private:
         meshTextures.CubeMap[4] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/back.jpg";
         meshTextures.CubeMap[5] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/front.jpg";
 
+
         camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
-        ModelInfo = Model(vulkanEngine, textureManager, "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow);
+        Model model = Model(vulkanEngine, textureManager, "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow);
+        
+        ModelList.emplace_back(Mesh(vulkanEngine, textureManager, model.SubMeshList[0], renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+        ModelList.emplace_back(Mesh(vulkanEngine, textureManager, model.SubMeshList[0], renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+        ModelList.emplace_back(Mesh(vulkanEngine, textureManager, model.SubMeshList[0], renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+        ModelList.emplace_back(Mesh(vulkanEngine, textureManager, model.SubMeshList[0], renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+
+        ModelList[0].SetPosition3D(glm::vec3(1.0f, 5.0f, 0.0f));
+        ModelList[1].SetPosition3D(glm::vec3(2.0f, 4.0f, 0.0f));
+        ModelList[2].SetPosition3D(glm::vec3(3.0f, 3.0f, 0.0f));
+        ModelList[2].SetPosition3D(glm::vec3(3.0f, 3.0f, 0.0f));
+
         Skybox = SkyBoxMesh(vulkanEngine, textureManager, renderManager.mainRenderPass.skyBoxPipeline->ShaderPipelineDescriptorLayout, meshTextures);
-        renderManager.CMDBuffer(vulkanEngine, ModelInfo, Skybox);
+        renderManager.CMDBuffer(vulkanEngine, ModelList, Skybox);
     }
 
     void mainLoop() {
@@ -120,7 +132,10 @@ private:
     void cleanup() 
     {
         renderManager.Destroy(vulkanEngine);
-        ModelInfo.Destroy(vulkanEngine);
+        for (auto model : ModelList)
+        {
+           // model.Destroy(vulkanEngine);
+        }
         Skybox.Destory(vulkanEngine);
         textureManager->UnloadAllTextures(vulkanEngine);
         vulkanEngine.Destory();
@@ -136,14 +151,17 @@ private:
 
         LightBufferObject light = {};
         camera->Update(vulkanEngine);
-        ModelInfo.Update(vulkanEngine, camera, light);
+        for (auto& model : ModelList)
+        {
+            model.Update(vulkanEngine, camera, light);
+        }
         Skybox.UpdateUniformBuffer(vulkanEngine, camera);
     }
 
     void drawFrame() 
     {
         updateUniformBuffer(vulkanEngine.DrawFrame);
-        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), ModelInfo, Skybox);
+        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), ModelList, Skybox);
     }
 
 };

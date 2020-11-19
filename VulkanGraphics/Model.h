@@ -22,9 +22,6 @@ class Model
 private:
 	std::string ModelName;
 	glm::mat4 ModelTransformMatrix = glm::mat4(1.0f);
-	glm::vec3 ModelPosition = glm::vec3(0.0f);
-	glm::vec3 ModelRotation = glm::vec3(0.0f);
-	glm::vec3 ModelScale = glm::vec3(1.0f);
 
 
 
@@ -49,9 +46,16 @@ private:
 	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 matrix);
 
 public:
+
 	std::vector<MeshData> SubMeshList;
 	std::vector<std::shared_ptr<Mesh>> MeshList;
 	std::vector<std::shared_ptr<Bone>> BoneList;
+
+	glm::vec3 ModelPosition = glm::vec3(0.0f);
+	glm::vec3 ModelRotation = glm::vec3(0.0f);
+	glm::vec3 ModelScale = glm::vec3(1.0f);
+
+
 
 	Model();
 	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout, int renderFlags);

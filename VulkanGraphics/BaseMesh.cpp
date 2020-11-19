@@ -200,6 +200,11 @@ void BaseMesh::CreateDescriptorSetsData(VulkanEngine& engine, std::vector<VkWrit
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorInfoList.size()), DescriptorInfoList.data(), 0, nullptr);
 }
 
+void BaseMesh::SetRenderFlags(int renderFlags)
+{
+    RenderFlags = renderFlags;
+}
+
 void BaseMesh::SetPosition2D(glm::vec2 Pos)
 {
     MeshPosition = glm::vec3(Pos, 0.0f);
