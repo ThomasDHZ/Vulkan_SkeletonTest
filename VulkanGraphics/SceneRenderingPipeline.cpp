@@ -17,7 +17,7 @@ SceneRenderingPipeline::~SceneRenderingPipeline()
 
 void SceneRenderingPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
 {
-    std::array<DescriptorSetLayoutBindingInfo, 9> LayoutBindingInfo = {};
+    std::array<DescriptorSetLayoutBindingInfo, 11> LayoutBindingInfo = {};
 
     LayoutBindingInfo[0].Binding = 0;
     LayoutBindingInfo[0].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -54,6 +54,14 @@ void SceneRenderingPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
     LayoutBindingInfo[8].Binding = 8;
     LayoutBindingInfo[8].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     LayoutBindingInfo[8].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+    LayoutBindingInfo[9].Binding = 9;
+    LayoutBindingInfo[9].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    LayoutBindingInfo[9].StageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    LayoutBindingInfo[10].Binding = 10;
+    LayoutBindingInfo[10].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    LayoutBindingInfo[10].StageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     GraphicsPipeline::CreateDescriptorSetLayout(renderer, std::vector<DescriptorSetLayoutBindingInfo>(LayoutBindingInfo.begin(), LayoutBindingInfo.end()));
 }

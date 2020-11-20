@@ -103,9 +103,7 @@ protected:
     std::shared_ptr<Texture> ReflectionTexture;
     std::shared_ptr<CubeMapTexture> SkyBoxTexture;
 
-    glm::vec3 MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 MeshRotate = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 MeshScale = glm::vec3(1.0f);
+
 
     bool MeshDeletedFlag = false;
 
@@ -121,6 +119,10 @@ protected:
     VkWriteDescriptorSet AddDescriptorSetBufferInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo);
 
 public:
+
+    glm::vec3 MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 MeshRotate = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 MeshScale = glm::vec3(1.0f);
 
     BaseMesh();
     BaseMesh(VulkanEngine& engine, const MeshData& meshData, int renderFlags);

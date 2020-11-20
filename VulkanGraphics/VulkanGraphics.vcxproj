@@ -146,13 +146,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation2D.cpp" />
     <ClCompile Include="Animation3D.cpp" />
     <ClCompile Include="AnimationPlayer3D.cpp" />
     <ClCompile Include="BaseMesh.cpp" />
     <ClCompile Include="Bone.cpp" />
+    <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="ColliderObject.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="ForwardRenderingPipeline.cpp" />
+    <ClCompile Include="Frame2D.cpp" />
     <ClCompile Include="FrameBufferMesh.cpp" />
     <ClCompile Include="FrameBufferRenderingPipeline.cpp" />
     <ClCompile Include="FrameBufferRenderPass.cpp" />
@@ -166,11 +170,16 @@
     <ClCompile Include="IndicesBuffer.cpp" />
     <ClCompile Include="InterfaceRenderPass.cpp" />
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="LevelSprite.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainRenderPass.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Mesh2D.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Object2D.cpp" />
+    <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
@@ -183,6 +192,7 @@
     <ClCompile Include="ShadowRenderPass.cpp" />
     <ClCompile Include="SkyBoxMesh.cpp" />
     <ClCompile Include="SkyBoxPipeline.cpp" />
+    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteTexture2D.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
@@ -212,13 +222,17 @@
     <None Include="Shaders\WireFrameShader.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation2D.h" />
     <ClInclude Include="Animation3D.h" />
     <ClInclude Include="AnimationPlayer3D.h" />
     <ClInclude Include="BaseMesh.h" />
     <ClInclude Include="Bone.h" />
+    <ClInclude Include="BoxCollider.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ColliderObject.h" />
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="ForwardRenderingPipeline.h" />
+    <ClInclude Include="Frame2D.h" />
     <ClInclude Include="FrameBufferMesh.h" />
     <ClInclude Include="FrameBufferRenderingPipeline.h" />
     <ClInclude Include="FrameBufferRenderPass.h" />
@@ -234,10 +248,15 @@
     <ClInclude Include="IndicesBuffer.h" />
     <ClInclude Include="InterfaceRenderPass.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="LevelSprite.h" />
     <ClInclude Include="MainRenderPass.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Mesh2D.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Mouse.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="Object2D.h" />
+    <ClInclude Include="OrthographicCamera.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
@@ -250,6 +269,7 @@
     <ClInclude Include="ShadowRenderPass.h" />
     <ClInclude Include="SkyBoxMesh.h" />
     <ClInclude Include="SkyBoxPipeline.h" />
+    <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteTexture2D.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureManager.h" />

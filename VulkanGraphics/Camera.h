@@ -17,6 +17,10 @@ enum Camera_Movement {
 class Camera
 {
 protected:
+    float Width;
+    float Height;
+    float Aspect;
+
     glm::mat4 ProjectionMatrix;
     glm::mat4 ViewMatrix;
     glm::vec2 ViewScreenSize;

@@ -164,8 +164,8 @@ void Mesh::CreateDescriptorPool(VulkanEngine& engine) {
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
 
     BaseMesh::CreateDescriptorPool(engine, DescriptorPoolList);
 }
@@ -186,8 +186,8 @@ void Mesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout& lay
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
     {
         VkDescriptorBufferInfo PositionInfo = AddBufferDescriptorInfo(engine, uniformBuffer.GetUniformBuffer(i), sizeof(VertexMatrixObject));
-        //VkDescriptorBufferInfo LightInfo = AddBufferDescriptorInfo(engine, lightBuffer.GetUniformBuffer(i), sizeof(LightBufferObject));
-        //VkDescriptorBufferInfo meshPropertiesInfo = AddBufferDescriptorInfo(engine, meshPropertiesBuffer.GetUniformBuffer(i), sizeof(MeshProperties));
+        VkDescriptorBufferInfo LightInfo = AddBufferDescriptorInfo(engine, lightBuffer.GetUniformBuffer(i), sizeof(LightBufferObject));
+        VkDescriptorBufferInfo meshPropertiesInfo = AddBufferDescriptorInfo(engine, meshPropertiesBuffer.GetUniformBuffer(i), sizeof(MeshProperties));
 
         std::vector<VkWriteDescriptorSet> DescriptorList;
         DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 0, DescriptorSets[i], PositionInfo));
@@ -199,9 +199,8 @@ void Mesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout& lay
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 6, DescriptorSets[i], EmissionMap));
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 7, DescriptorSets[i], ReflectionMap));
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 8, DescriptorSets[i], SkyBoxMap));
-        //DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 9, DescriptorSets[i], meshPropertiesInfo));
-        //DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 10, DescriptorSets[i], LightInfo));
-
+        DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 9, DescriptorSets[i], meshPropertiesInfo));
+        DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 10, DescriptorSets[i], LightInfo));
         BaseMesh::CreateDescriptorSetsData(engine, DescriptorList);
     }
 }
@@ -262,18 +261,18 @@ void Mesh::UpdateUniformBuffer(VulkanEngine& engine, VertexMatrixObject ubo, voi
 void Mesh::UpdateUniformBuffer(VulkanEngine& engine, VertexMatrixObject ubo, LightBufferObject Lightbuffer, void* CustomBufferinfo)
 {
     uniformBuffer.UpdateUniformBuffer(engine, static_cast<void*>(&ubo));
-    //lightBuffer.UpdateUniformBuffer(engine, static_cast<void*>(&Lightbuffer));
-    //meshPropertiesBuffer.UpdateUniformBuffer(engine, static_cast<void*>(&properites));
-    //if (!CustomBufferinfo == NULL)
-    //{
-    //    ExtendedMeshProperitesBuffer.customBuffer.UpdateUniformBuffer(engine, CustomBufferinfo);
-    //}
-    //else
-    //{
-    //    Empty empty = {};
-    //    empty.empty = 1.0f;
-    //    ExtendedMeshProperitesBuffer.customBuffer.UpdateUniformBuffer(engine, static_cast<void*>(&empty));
-    //}
+    lightBuffer.UpdateUniformBuffer(engine, static_cast<void*>(&Lightbuffer));
+    meshPropertiesBuffer.UpdateUniformBuffer(engine, static_cast<void*>(&properites));
+    if (!CustomBufferinfo == NULL)
+    {
+        ExtendedMeshProperitesBuffer.customBuffer.UpdateUniformBuffer(engine, CustomBufferinfo);
+    }
+    else
+    {
+        Empty empty = {};
+        empty.empty = 1.0f;
+        ExtendedMeshProperitesBuffer.customBuffer.UpdateUniformBuffer(engine, static_cast<void*>(&empty));
+    }
 }
 
 void Mesh::Destory(VulkanEngine& engine)
