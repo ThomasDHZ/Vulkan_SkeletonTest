@@ -155,8 +155,8 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="ColliderObject.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
-    <ClCompile Include="DeferredRenderer.cpp" />
-    <ClCompile Include="DefferedRenderingPipeline.cpp" />
+    <ClCompile Include="GBufferRenderPass.cpp" />
+    <ClCompile Include="GBufferPipeline.cpp" />
     <ClCompile Include="ForwardRenderingPipeline.cpp" />
     <ClCompile Include="Frame2D.cpp" />
     <ClCompile Include="FrameBufferMesh.cpp" />
@@ -239,8 +239,8 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ColliderObject.h" />
     <ClInclude Include="CubeMapTexture.h" />
-    <ClInclude Include="DeferredRenderer.h" />
-    <ClInclude Include="DefferedRenderingPipeline.h" />
+    <ClInclude Include="GBufferRenderPass.h" />
+    <ClInclude Include="GBufferPipeline.h" />
     <ClInclude Include="ForwardRenderingPipeline.h" />
     <ClInclude Include="Frame2D.h" />
     <ClInclude Include="FrameBufferMesh.h" />

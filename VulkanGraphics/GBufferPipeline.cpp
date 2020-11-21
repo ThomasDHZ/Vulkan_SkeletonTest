@@ -1,21 +1,21 @@
-#include "DefferedRenderingPipeline.h"
+#include "GBufferPipeline.h"
 #include "Vertex.h"
 
-DefferedRenderingPipeline::DefferedRenderingPipeline() : GraphicsPipeline()
+GBufferPipeline::GBufferPipeline() : GraphicsPipeline()
 {
 }
 
-DefferedRenderingPipeline::DefferedRenderingPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass) : GraphicsPipeline(renderer)
+GBufferPipeline::GBufferPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass) : GraphicsPipeline(renderer)
 {
     CreateDescriptorSetLayout(renderer);
     CreateShaderPipeLine(renderer, renderPass);
 }
 
-DefferedRenderingPipeline::~DefferedRenderingPipeline()
+GBufferPipeline::~GBufferPipeline()
 {
 }
 
-void DefferedRenderingPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
+void GBufferPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
 {
     std::array<DescriptorSetLayoutBindingInfo, 11> LayoutBindingInfo = {};
 
@@ -66,7 +66,7 @@ void DefferedRenderingPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer
     GraphicsPipeline::CreateDescriptorSetLayout(renderer, std::vector<DescriptorSetLayoutBindingInfo>(LayoutBindingInfo.begin(), LayoutBindingInfo.end()));
 }
 
-void DefferedRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void GBufferPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
 {
     auto vertShaderCode = ReadShaderFile("shaders/GBufferShaderVert.spv");
     auto fragShaderCode = ReadShaderFile("shaders/GBufferShaderFrag.spv");
@@ -146,7 +146,7 @@ void DefferedRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, con
     depthStencil.depthBoundsTestEnable = VK_FALSE;
     depthStencil.stencilTestEnable = VK_FALSE;
 
-    std::array<VkPipelineColorBlendAttachmentState, 3> ColorAttachment = {};
+    std::array<VkPipelineColorBlendAttachmentState, 4> ColorAttachment = {};
     ColorAttachment[0].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
     ColorAttachment[0].blendEnable = VK_TRUE;
     ColorAttachment[0].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
@@ -173,6 +173,15 @@ void DefferedRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, con
     ColorAttachment[2].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
     ColorAttachment[2].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
     ColorAttachment[2].alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+
+    ColorAttachment[3].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    ColorAttachment[3].blendEnable = VK_TRUE;
+    ColorAttachment[3].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    ColorAttachment[3].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    ColorAttachment[3].colorBlendOp = VK_BLEND_OP_ADD;
+    ColorAttachment[3].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    ColorAttachment[3].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+    ColorAttachment[3].alphaBlendOp = VK_BLEND_OP_SUBTRACT;
 
     VkPipelineColorBlendStateCreateInfo colorBlending{};
     colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -218,7 +227,7 @@ void DefferedRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, con
     vkDestroyShaderModule(renderer.Device, vertShaderModule, nullptr);
 }
 
-void DefferedRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void GBufferPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
 {
     vkDestroyPipeline(renderer.Device, ShaderPipeline, nullptr);
     vkDestroyPipelineLayout(renderer.Device, ShaderPipelineLayout, nullptr);

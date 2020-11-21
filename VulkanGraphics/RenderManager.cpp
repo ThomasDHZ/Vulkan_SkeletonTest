@@ -10,6 +10,7 @@ RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
     interfaceRenderPass = InterfaceRenderPass(engine, window);
     mainRenderPass = MainRenderPass(engine);
     sceneRenderPass = SceneRenderPass(engine);
+    gBufferRenderPass = GBufferRenderPass(engine);
     frameBufferRenderPass = FrameBufferRenderPass(engine);
     shadowRenderPass = ShadowRenderPass(engine);
 
@@ -41,6 +42,7 @@ void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window
 
     mainRenderPass.UpdateSwapChain(engine);
     sceneRenderPass.UpdateSwapChain(engine);
+    gBufferRenderPass.UpdateSwapChain(engine);
     frameBufferRenderPass.UpdateSwapChain(engine);
     shadowRenderPass.UpdateSwapChain(engine);
     interfaceRenderPass.UpdateSwapChain(engine);
@@ -73,6 +75,7 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelLis
         }
      //   MainRenderCMDBuffer(engine, mesh, skybox, i);
         SceneRenderCMDBuffer(engine, ModelList, skybox, i);
+        GBufferRenderCMDBuffer(engine, ModelList, skybox, i);
         FrameBufferRenderCMDBuffer(engine, i);
         ShadowRenderCMDBuffer(engine, ModelList, i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
@@ -163,6 +166,7 @@ void RenderManager::Destroy(VulkanEngine& engine)
 
 	mainRenderPass.Destroy(engine);
     sceneRenderPass.Destroy(engine);
+    gBufferRenderPass.Destroy(engine);
     shadowRenderPass.Destroy(engine);
     frameBufferRenderPass.Destroy(engine);
 	interfaceRenderPass.Destroy(engine);
@@ -201,13 +205,10 @@ void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>
 
 void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex)
 {
-    std::array<VkClearValue, 6> clearValues{};
+    std::array<VkClearValue, 3> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
     clearValues[1].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[2].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[3].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[4].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[5].depthStencil = { 1.0f, 0 };
+    clearValues[2].depthStencil = { 1.0f, 0 };
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -219,7 +220,7 @@ void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    //skybox.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.skyBoxPipeline, SwapBufferImageIndex);
+    skybox.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.skyBoxPipeline, SwapBufferImageIndex);
     for (auto model : ModelList)
     {
         if (model.GetRenderFlags() & RenderDrawFlags::RenderWireFrame)
@@ -229,6 +230,35 @@ void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model
         if (model.GetRenderFlags() & RenderDrawFlags::RenderNormally)
         {
             model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.sceneRenderingPipeline, SwapBufferImageIndex);
+        }
+    }
+    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+}
+
+void RenderManager::GBufferRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex)
+{
+    std::array<VkClearValue, 5> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[2].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[3].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[4].depthStencil = { 1.0f, 0 };
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = gBufferRenderPass.GetRenderPass();
+    renderPassInfo.framebuffer = gBufferRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    for (auto model : ModelList)
+    {
+        if (model.GetRenderFlags() & RenderDrawFlags::RenderNormally)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], gBufferRenderPass.gBufferPipeline, SwapBufferImageIndex);
         }
     }
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
