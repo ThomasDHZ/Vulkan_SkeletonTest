@@ -1,35 +1,31 @@
-#include "SceneRenderPass.h"
-#include <stdexcept>
-#include <array>
-#include "Vertex.h"
-#include "ImGui/imgui_impl_vulkan.h"
+#include "DeferredRenderer.h"
 
-SceneRenderPass::SceneRenderPass()
+DeferredRenderer::DeferredRenderer()
 {
 }
 
-SceneRenderPass::SceneRenderPass(VulkanEngine& engine)
+DeferredRenderer::DeferredRenderer(VulkanEngine& engine)
 {
-    ColorTexture = std::make_shared<RenderedColorTexture>(engine);
-    BloomTexture = std::make_shared<RenderedColorTexture>(engine);
-    DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
+    GPositionTexture = std::make_shared<RenderedGBufferPositionTexture>(engine);
+    GNormalTexture = std::make_shared<RenderedGBufferNormalTexture>(engine);
+    GAlbedoTexture = std::make_shared<RenderedGBufferAlbedoTexture>(engine);
+    GDepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
 
-    sceneRenderingPipeline = std::make_shared<SceneRenderingPipeline>(engine, RenderPass);
-    skyBoxPipeline = std::make_shared<SkyBoxPipeline>(engine, RenderPass);
+    deferredRendereringPipeline = std::make_shared<DefferedRenderingPipeline>(engine, RenderPass);
 }
 
-SceneRenderPass::~SceneRenderPass()
+DeferredRenderer::~DeferredRenderer()
 {
 }
 
-void SceneRenderPass::CreateRenderPass(VulkanEngine& engine)
+void DeferredRenderer::CreateRenderPass(VulkanEngine& engine)
 {
-    std::array<VkAttachmentDescription, 3> attchmentDescriptions = {};
+    std::array<VkAttachmentDescription, 4> attchmentDescriptions = {};
 
-    attchmentDescriptions[0].format = VK_FORMAT_R8G8B8A8_UNORM;
+    attchmentDescriptions[0].format = VK_FORMAT_R16G16B16A16_SFLOAT;
     attchmentDescriptions[0].samples = VK_SAMPLE_COUNT_1_BIT;
     attchmentDescriptions[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attchmentDescriptions[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -38,7 +34,7 @@ void SceneRenderPass::CreateRenderPass(VulkanEngine& engine)
     attchmentDescriptions[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     attchmentDescriptions[0].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-    attchmentDescriptions[1].format = VK_FORMAT_R8G8B8A8_UNORM;
+    attchmentDescriptions[1].format = VK_FORMAT_R16G16B16A16_SFLOAT;
     attchmentDescriptions[1].samples = VK_SAMPLE_COUNT_1_BIT;
     attchmentDescriptions[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attchmentDescriptions[1].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -47,23 +43,33 @@ void SceneRenderPass::CreateRenderPass(VulkanEngine& engine)
     attchmentDescriptions[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     attchmentDescriptions[1].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-    attchmentDescriptions[2].format = VK_FORMAT_D32_SFLOAT;
+    attchmentDescriptions[2].format = VK_FORMAT_R8G8B8A8_UNORM;
     attchmentDescriptions[2].samples = VK_SAMPLE_COUNT_1_BIT;
     attchmentDescriptions[2].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    attchmentDescriptions[2].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attchmentDescriptions[2].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attchmentDescriptions[2].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attchmentDescriptions[2].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     attchmentDescriptions[2].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attchmentDescriptions[2].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+    attchmentDescriptions[2].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-    std::array<VkAttachmentReference, 2> ColorRefs;
+    attchmentDescriptions[3].format = VK_FORMAT_D32_SFLOAT;
+    attchmentDescriptions[3].samples = VK_SAMPLE_COUNT_1_BIT;
+    attchmentDescriptions[3].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attchmentDescriptions[3].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attchmentDescriptions[3].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attchmentDescriptions[3].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attchmentDescriptions[3].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    attchmentDescriptions[3].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+
+    std::array<VkAttachmentReference, 3> ColorRefs;
     ColorRefs[0] = { 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
     ColorRefs[1] = { 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
-    VkAttachmentReference depthReference = { 2, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
+    ColorRefs[2] = { 2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
+    VkAttachmentReference depthReference = { 3, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 
     VkSubpassDescription subpassDescription = {};
     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpassDescription.colorAttachmentCount = 2;
+    subpassDescription.colorAttachmentCount = 3;
     subpassDescription.pColorAttachments = ColorRefs.data();
     subpassDescription.pDepthStencilAttachment = &depthReference;
 
@@ -100,20 +106,21 @@ void SceneRenderPass::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void SceneRenderPass::CreateRendererFramebuffers(VulkanEngine& renderer)
+void DeferredRenderer::CreateRendererFramebuffers(VulkanEngine& renderer)
 {
-    SwapChainFramebuffers.resize(3);
+    SwapChainFramebuffers.resize(4);
     for (size_t i = 0; i < renderer.SwapChain.GetSwapChainImageCount(); i++)
     {
-        VkImageView attachments[3];
-        attachments[0] = ColorTexture->View;
-        attachments[1] = BloomTexture->View;
-        attachments[2] = DepthTexture->View;
+        VkImageView attachments[4];
+        attachments[0] = GPositionTexture->View;
+        attachments[1] = GNormalTexture->View;
+        attachments[2] = GAlbedoTexture->View;
+        attachments[3] = GDepthTexture->View;
 
         VkFramebufferCreateInfo fbufCreateInfo = {};
         fbufCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         fbufCreateInfo.renderPass = RenderPass;
-        fbufCreateInfo.attachmentCount = 3;
+        fbufCreateInfo.attachmentCount = 4;
         fbufCreateInfo.pAttachments = attachments;
         fbufCreateInfo.width = renderer.SwapChain.GetSwapChainResolution().width;
         fbufCreateInfo.height = renderer.SwapChain.GetSwapChainResolution().height;
@@ -126,14 +133,14 @@ void SceneRenderPass::CreateRendererFramebuffers(VulkanEngine& renderer)
     }
 }
 
-void SceneRenderPass::UpdateSwapChain(VulkanEngine& engine)
+void DeferredRenderer::UpdateSwapChain(VulkanEngine& engine)
 {
-    ColorTexture->RecreateRendererTexture(engine);
-    BloomTexture->RecreateRendererTexture(engine);
-    DepthTexture->RecreateRendererTexture(engine);
+    GPositionTexture->RecreateRendererTexture(engine);
+    GNormalTexture->RecreateRendererTexture(engine);
+    GAlbedoTexture->RecreateRendererTexture(engine);
+    GDepthTexture->RecreateRendererTexture(engine);
 
-    sceneRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
-    skyBoxPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    deferredRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -148,14 +155,14 @@ void SceneRenderPass::UpdateSwapChain(VulkanEngine& engine)
     CreateRendererFramebuffers(engine);
 }
 
-void SceneRenderPass::Destroy(VulkanEngine& engine)
+void DeferredRenderer::Destroy(VulkanEngine& engine)
 {
-    ColorTexture->Delete(engine);
-    BloomTexture->Delete(engine);
-    DepthTexture->Delete(engine);
+    GPositionTexture->Delete(engine);
+    GNormalTexture->Delete(engine);
+    GAlbedoTexture->Delete(engine);
+    GDepthTexture->Delete(engine);
 
-    sceneRenderingPipeline->Destroy(engine);
-    skyBoxPipeline->Destroy(engine);
+    deferredRendereringPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

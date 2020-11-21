@@ -9,6 +9,7 @@ RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
 {
     interfaceRenderPass = InterfaceRenderPass(engine, window);
     mainRenderPass = MainRenderPass(engine);
+    deferredRenderer = DeferredRenderer(engine);
     sceneRenderPass = SceneRenderPass(engine);
     frameBufferRenderPass = FrameBufferRenderPass(engine);
     shadowRenderPass = ShadowRenderPass(engine);
@@ -41,6 +42,7 @@ void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window
 
     mainRenderPass.UpdateSwapChain(engine);
     sceneRenderPass.UpdateSwapChain(engine);
+    deferredRenderer.UpdateSwapChain(engine);
     frameBufferRenderPass.UpdateSwapChain(engine);
     shadowRenderPass.UpdateSwapChain(engine);
     interfaceRenderPass.UpdateSwapChain(engine);
@@ -72,6 +74,7 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelLis
             throw std::runtime_error("failed to begin recording command buffer!");
         }
      //   MainRenderCMDBuffer(engine, mesh, skybox, i);
+        DeferredRendererCMDBuffer(engine, ModelList, skybox, i);
         SceneRenderCMDBuffer(engine, ModelList, skybox, i);
         FrameBufferRenderCMDBuffer(engine, i);
         ShadowRenderCMDBuffer(engine, ModelList, i);
@@ -163,6 +166,7 @@ void RenderManager::Destroy(VulkanEngine& engine)
 
 	mainRenderPass.Destroy(engine);
     sceneRenderPass.Destroy(engine);
+    deferredRenderer.Destroy(engine);
     shadowRenderPass.Destroy(engine);
     frameBufferRenderPass.Destroy(engine);
 	interfaceRenderPass.Destroy(engine);
@@ -223,6 +227,34 @@ void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model
         {
             model.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.wireFrameRendereringPipeline, SwapBufferImageIndex);
         }
+        if (model.GetRenderFlags() & RenderDrawFlags::RenderNormally)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.sceneRenderingPipeline, SwapBufferImageIndex);
+        }
+    }
+    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+}
+
+void RenderManager::DeferredRendererCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex)
+{
+    std::array<VkClearValue, 4> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[2].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[3].depthStencil = { 1.0f, 0 };
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = sceneRenderPass.GetRenderPass();
+    renderPassInfo.framebuffer = sceneRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    for (auto model : ModelList)
+    {
         if (model.GetRenderFlags() & RenderDrawFlags::RenderNormally)
         {
             model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.sceneRenderingPipeline, SwapBufferImageIndex);

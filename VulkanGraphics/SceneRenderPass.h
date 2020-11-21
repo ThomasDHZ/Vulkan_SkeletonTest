@@ -21,7 +21,7 @@ public:
 	SceneRenderPass(VulkanEngine& engine);
 	~SceneRenderPass();
 
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
+	 std::vector<VkFramebuffer> SwapChainFramebuffers;
 	std::shared_ptr<RenderedColorTexture> ColorTexture;
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;

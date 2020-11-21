@@ -31,6 +31,8 @@
 #include "Texuture2D.h"
 #include "Mesh.h"
 #include "SkyBoxMesh.h"
+#include "Mesh2D.h"
+#include "Sprite.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -48,6 +50,7 @@ private:
     Keyboard keyboard;
     Mouse mouse;
 
+    std::vector<std::shared_ptr<Object2D>> SpriteList;
     std::vector<Model> ModelList;
     SkyBoxMesh Skybox;
 

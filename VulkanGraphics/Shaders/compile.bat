@@ -10,4 +10,6 @@ C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe WireFrameShader.vert -o WireFrameVert.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe WireFrameShader.frag -o WireFrameFrag.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe SkyBoxShader.vert -o SkyBoxShaderVert.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe SkyBoxShader.frag -o SkyBoxShaderFrag.spv
+C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe GBufferShader.vert -o GBufferShaderVert.spv
+C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe GBufferShader.frag -o GBufferShaderFrag.spv
 pause
