@@ -84,7 +84,7 @@ void VulkanGraphics::MainLoop()
 
             ImGui::Image(renderManager.sceneRenderPass.ColorTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             ImGui::Image(renderManager.sceneRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
-            ImGui::Image(renderManager.deferredRenderer.GPositionTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
+          //  ImGui::Image(renderManager.deferredRenderer.GPositionTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
            // ImGui::Image(renderManager.sceneRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));/*
          //   ImGui::Image(renderManager.shadowRenderPass.DepthTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));*/
             textureManager->UpdateIMGUIVRAM();

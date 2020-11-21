@@ -7,6 +7,9 @@
 #include "SceneRenderingPipeline.h"
 #include "RenderedColorTexture.h"
 #include "SkyBoxPipeline.h"
+#include "RenderedGBufferPositionTexture.h"
+#include "RenderedGBufferNormalTexture.h"
+#include "RenderedGBufferAlbedoTexture.h"
 
 class SceneRenderPass
 {
@@ -23,11 +26,14 @@ public:
 
 	 std::vector<VkFramebuffer> SwapChainFramebuffers;
 	std::shared_ptr<RenderedColorTexture> ColorTexture;
+	std::shared_ptr<RenderedGBufferPositionTexture> GPositionTexture;
+	std::shared_ptr<RenderedGBufferNormalTexture> GNormalTexture;
+	std::shared_ptr<RenderedGBufferAlbedoTexture> GAlbedoTexture;
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<SceneRenderingPipeline> sceneRenderingPipeline;
-	std::shared_ptr<SkyBoxPipeline> skyBoxPipeline;
+	//std::shared_ptr<SkyBoxPipeline> skyBoxPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);

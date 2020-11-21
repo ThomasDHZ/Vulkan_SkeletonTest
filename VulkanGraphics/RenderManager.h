@@ -26,7 +26,6 @@ private:
 
 	void MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
 	void SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
-	void DeferredRendererCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
 	void FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex);
 	void ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, int SwapBufferImageIndex);
 
@@ -35,7 +34,6 @@ public:
 
 	MainRenderPass mainRenderPass;
 	SceneRenderPass sceneRenderPass;
-	DeferredRenderer deferredRenderer;
 	FrameBufferRenderPass frameBufferRenderPass;
 	ShadowRenderPass shadowRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
