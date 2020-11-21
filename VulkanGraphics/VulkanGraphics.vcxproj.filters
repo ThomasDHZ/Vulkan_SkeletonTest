@@ -25,9 +25,6 @@
     <Filter Include="Header Files\Renderer">
       <UniqueIdentifier>{9824d86f-db60-4b22-b8b7-76a47911bec9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Vulkan">
-      <UniqueIdentifier>{41ed92d8-833e-4c92-9785-e05018f3b8b8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Vulkan">
       <UniqueIdentifier>{d308bcc6-e562-4919-a575-23bd17ca8040}</UniqueIdentifier>
     </Filter>
@@ -42,6 +39,9 @@
     </Filter>
     <Filter Include="Source Files\Mesh">
       <UniqueIdentifier>{65ee210d-360e-4fd7-bb30-eaf5bbf194c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Texture\Vulkan">
+      <UniqueIdentifier>{41ed92d8-833e-4c92-9785-e05018f3b8b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -88,25 +88,25 @@
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="VulkanEngine.cpp">
-      <Filter>Source Files\Vulkan</Filter>
+      <Filter>Source Files\Texture\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="VulkanDebugger.cpp">
-      <Filter>Source Files\Vulkan</Filter>
+      <Filter>Source Files\Texture\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="VulkanSwapChain.cpp">
-      <Filter>Source Files\Vulkan</Filter>
+      <Filter>Source Files\Texture\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="VulkanUniformBuffer.cpp">
-      <Filter>Source Files\Vulkan</Filter>
+      <Filter>Source Files\Texture\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="VulkanWindow.cpp">
-      <Filter>Source Files\Vulkan</Filter>
+      <Filter>Source Files\Texture\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="IndicesBuffer.cpp">
-      <Filter>Source Files\Vulkan</Filter>
+      <Filter>Source Files\Texture\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="VertexBuffer.cpp">
-      <Filter>Source Files\Vulkan</Filter>
+      <Filter>Source Files\Texture\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="RenderManager.cpp">
       <Filter>Source Files\Renderer</Filter>
