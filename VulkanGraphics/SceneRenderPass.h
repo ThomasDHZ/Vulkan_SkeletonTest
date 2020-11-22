@@ -7,6 +7,7 @@
 #include "SceneRenderingPipeline.h"
 #include "RenderedColorTexture.h"
 #include "SkyBoxPipeline.h"
+#include "DebugLightRenderingPipeline.h"
 
 class SceneRenderPass
 {
@@ -28,6 +29,7 @@ public:
 
 	std::shared_ptr<SceneRenderingPipeline> sceneRenderingPipeline;
 	std::shared_ptr<SkyBoxPipeline> skyBoxPipeline;
+	std::shared_ptr<DebugLightRenderingPipeline> debugLightRenderingPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);

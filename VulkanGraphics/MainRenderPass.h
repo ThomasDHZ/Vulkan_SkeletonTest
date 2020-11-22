@@ -7,6 +7,7 @@
 #include "ForwardRenderingPipeline.h"
 #include "WireFrameRenderingPipeline.h"
 #include "SkyBoxPipeline.h"
+#include "DebugLightRenderingPipeline.h"
 
 class MainRenderPass
 {
@@ -27,6 +28,7 @@ public:
 	std::shared_ptr<ForwardRenderingPipeline> forwardRendereringPipeline;
 	std::shared_ptr<SkyBoxPipeline> skyBoxPipeline;
 	std::shared_ptr<WireFrameRenderingPipeline> wireFrameRendereringPipeline;
+	std::shared_ptr<DebugLightRenderingPipeline> debugLightRenderingPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);

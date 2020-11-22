@@ -155,6 +155,8 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="ColliderObject.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
+    <ClCompile Include="DebugLightMesh.cpp" />
+    <ClCompile Include="DebugLightRenderingPipeline.cpp" />
     <ClCompile Include="GBufferRenderPass.cpp" />
     <ClCompile Include="GBufferPipeline.cpp" />
     <ClCompile Include="ForwardRenderingPipeline.cpp" />
@@ -173,6 +175,7 @@
     <ClCompile Include="InterfaceRenderPass.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="LevelSprite.cpp" />
+    <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainRenderPass.cpp" />
     <ClCompile Include="MegaMan.cpp" />
@@ -184,6 +187,7 @@
     <ClCompile Include="Object2D.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
+    <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
     <ClCompile Include="RenderedGBufferAlbedoTexture.cpp" />
@@ -216,6 +220,8 @@
   <ItemGroup>
     <None Include="Shaders\BloomShader.frag" />
     <None Include="Shaders\BloomShader.vert" />
+    <None Include="Shaders\FlatShader.frag" />
+    <None Include="Shaders\FlatShader.vert" />
     <None Include="Shaders\FrameBufferShader.frag" />
     <None Include="Shaders\FrameBufferShader.vert" />
     <None Include="Shaders\GBufferShader.frag" />
@@ -239,6 +245,8 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ColliderObject.h" />
     <ClInclude Include="CubeMapTexture.h" />
+    <ClInclude Include="DebugLightMesh.h" />
+    <ClInclude Include="DebugLightRenderingPipeline.h" />
     <ClInclude Include="GBufferRenderPass.h" />
     <ClInclude Include="GBufferPipeline.h" />
     <ClInclude Include="ForwardRenderingPipeline.h" />
@@ -259,6 +267,7 @@
     <ClInclude Include="InterfaceRenderPass.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="LevelSprite.h" />
+    <ClInclude Include="LightManager.h" />
     <ClInclude Include="MainRenderPass.h" />
     <ClInclude Include="MegaMan.h" />
     <ClInclude Include="Mesh.h" />
@@ -269,6 +278,7 @@
     <ClInclude Include="Object2D.h" />
     <ClInclude Include="OrthographicCamera.h" />
     <ClInclude Include="PerspectiveCamera.h" />
+    <ClInclude Include="PointLight.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
     <ClInclude Include="RenderedGBufferAlbedoTexture.h" />

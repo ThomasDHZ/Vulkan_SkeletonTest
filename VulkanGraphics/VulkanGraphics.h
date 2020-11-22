@@ -33,6 +33,7 @@
 #include "SkyBoxMesh.h"
 #include "Mesh2D.h"
 #include "Sprite.h"
+#include "LightManager.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -44,6 +45,7 @@ private:
     VulkanWindow window;
     VulkanEngine vulkanEngine;
     RenderManager renderManager;
+    LightManager light;
     std::shared_ptr<TextureManager> textureManager;
 
     std::shared_ptr<PerspectiveCamera> camera;
